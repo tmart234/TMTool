@@ -16,11 +16,6 @@ Minor: modified threat definition, modified threat logic, modified flow & stenci
 
 Steps to run scripts
 - convert files to xml by renaming the extension
-
-Model XML file Notes
-- <a:KeyValueOfguidanyType> to find the elements used in the model
-	- within element find  <i:type="c:string">value</b:Value>  for custom names
-	- get custom element properties selection from <b:SelectedIndex> and the <values> above
 	
 2nd phase
 - goal is to utilize TMT's built-in reporting features but with more usability

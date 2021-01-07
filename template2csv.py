@@ -1,3 +1,7 @@
+## script will pull all threat categories (STRIDE + custom) from a MS TMT template file (.tb7)
+## then it fill in a CSV file with all threats
+
+
 import xml.etree.ElementTree as ET
 import csv
 
@@ -34,7 +38,7 @@ with open('test1.csv', 'w', newline='') as r:
 
 
     for types in root.iter('ThreatType'):
-        # skip row it is a 'root' category
+        # skip row if is a 'root' category
         for subelem in types.findall('Id'):
             _id = subelem.text
         if subelem.text == 'SU':

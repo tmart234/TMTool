@@ -32,17 +32,18 @@ def cat2str(cat, cats):
 # gets elements (stencils, flows boundarys)
 class Elements():
     def __init__(self, root, writer, ele_type):
-	    for types in root.iter('ElementType'):
-	    	for subelem in types.findall('Name'):
-    			self.ele_name = subelem.text
-    		for subelem in types.findall('ID'):
-    			self.ele_id = subelem.text
-    		for subelem in types.findall('Description'):
-    			self.ele_desc = subelem.text
-    		for subelem in types.findall('ParentElement'):
-    			self.ele_parent = subelem.text
-    			# WRITE EACH ROW ITERATIVELY
-    		writer.writerow([self.ele_name,self.ele_id,self.ele_desc,self.ele_parent,ele_type])
+            for _type in root.findall(ele_type):
+                for types in _type.iter('ElementType'):
+                    for subelem in types.findall('Name'):
+                            self.ele_name = subelem.text
+                    for subelem in types.findall('ID'):
+                            self.ele_id = subelem.text
+                    for subelem in types.findall('Description'):
+                            self.ele_desc = subelem.text
+                    for subelem in types.findall('ParentElement'):
+                            self.ele_parent = subelem.text
+                            # WRITE EACH ROW ITERATIVELY
+                    writer.writerow([self.ele_name,self.ele_id,self.ele_desc,self.ele_parent,ele_type])
 
  
 cats = find_cats()
@@ -75,8 +76,8 @@ with open('threats.csv', 'w', newline='') as r:
             cat = subelem.text
             cat = cat2str(cat, cats)
         for subelem in types.findall('ShortTitle'):
-            title = subelem.text.translate({ord('{'):None, ord('}'):None})
             # remove curley braces for csv output
+            title = subelem.text.translate({ord('{'):None, ord('}'):None})
         for subelem in types.findall('Description'):
             desc = subelem.text.translate({ord('{'):None, ord('}'):None})
 
@@ -89,9 +90,7 @@ with open('elements.csv', 'w', newline='') as r:
     writer.writerow(['Name', 'ID', 'Description', 'Parent', 'Element Type'])
 
     # generic elements
-    for gen in root.findall('GenericElements'):
-        Elements(root, writer, "Generic")
+    Elements(root, writer, "GenericElements")
 
     # standard elements
-    for stan in root.findall('StandardElements'):
-        Elements(root, writer, "Standard")
+    Elements(root, writer, "StandardElements")

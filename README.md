@@ -11,18 +11,19 @@ Major: missing stencils, flows, or threats entirely
 Minor: modified threat definition, modified threat logic, modified flow & stencil properties
 
 2 scripts for .tm7 model files:
-- model2csv.py - enumerate extra information from a model ex: notes, custom properties. Add into a model’s csv file (or separate csv file depending on structure)
+- model2csv.py - enumerate extra information from a model which we can't get from TMT's built in csv threat file. ex: notes, custom properties. Keep as separate csv file in conjuction with the model’s csv file
 - diff 2 TMT produced csv files, regardless of TMT’s numbering or the ordering, to compare and to partially integrate one model’s derived threats into another
 
 Steps to run scripts
 - convert files to xml by renaming the extension
 	
 2nd phase
-- goal is to utilize TMT's built-in reporting features but with more usability
-- add "severity" as custom threat property to template
+- goal is to utilize TMT's built-in reporting and threat auditing features... but with more usability
+- add "severity" as custom threat property to a custom template
 - add "mitigation(s)" as custom threat property to template
 - For False positives: set status="not applicable" for the threat ID
-- Justification column should hold justification for either the severity or flase positive, not mitigations
-- Threat's Priority level should get set from scoring (will need script, to figure out later: a facor of severity + explotibility)
-- Threat Note entries are system/model level, not threat ID level
+- Justification column should hold justification for either the severity level or flase positive, not for mitigations
+- Threat's Priority level should be more granular and set from scoring (will need script for this, to figure out later. Will be a facor of severity and explotibility)
+- will need to set a Model'srisk threshold based on Priority levels (Ex: will only fix low-medium threats and up)
+- Threat Note entries are system/model level, not threat ID level. Could contain system meta data.
 

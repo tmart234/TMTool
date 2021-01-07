@@ -11,7 +11,7 @@ Major: missing stencils, flows, or threats entirely
 Minor: modified threat definition, modified threat logic, modified flow & stencil properties
 
 2 scripts for .tm7 model files:
-- enumerate extra information from a model ex: notes, custom properties. Add into a model’s csv file (or separate csv file depending on structure)
+- model2csv.py - enumerate extra information from a model ex: notes, custom properties. Add into a model’s csv file (or separate csv file depending on structure)
 - diff 2 TMT produced csv files, regardless of TMT’s numbering or the ordering, to compare and to partially integrate one model’s derived threats into another
 
 Steps to run scripts

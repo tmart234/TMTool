@@ -1,6 +1,7 @@
-## script will pull all threat categories (STRIDE + custom) from a MS TMT template file (.tb7)
-## then it fill in a CSV file with all threats
-
+## this script will pull all threats and threat categories
+## (STRIDE + custom) from a MS TMT template files (.tb7)
+## and it will also pull all template's generic + standard elements
+## after, it creates 2 CSV files for each
 
 import xml.etree.ElementTree as ET
 import csv
@@ -27,11 +28,28 @@ def cat2str(cat, cats):
          if cat == value:
              return key
 
+# gets elements (stencils, flows boundarys)
+class Elements():
+    def __init__(self, root, writer, ele_type):
+	    for types in root.iter('ElementType'):
+	    	for subelem in types.findall('Name'):
+    			self.ele_name = subelem.text
+    		for subelem in types.findall('ID'):
+    			self.ele_id = subelem.text
+    		for subelem in types.findall('Description'):
+    			self.ele_desc = subelem.text
+    		for subelem in types.findall('ParentElement'):
+    			self.ele_parent = subelem.text
+    			# WRITE EACH ROW ITERATIVELY
+    		writer.writerow([self.ele_name,self.ele_id,self.ele_desc,self.ele_parent,ele_type])
+
+
+
 
  
 cats = find_cats()
 
-with open('test1.csv', 'w', newline='') as r:
+with open('threats.csv', 'w', newline='') as r:
     writer = csv.writer(r)
     # write headders in csv file
     writer.writerow(['Category','Short Title','Description'])
@@ -65,3 +83,16 @@ with open('test1.csv', 'w', newline='') as r:
 
         # WRITE EACH ROW ITERATIVELY 
         writer.writerow([cat,title,desc])
+
+with open('elements.csv', 'w', newline='') as r:
+    writer = csv.writer(r)
+    # write headders in csv file
+    writer.writerow(['Name', 'ID', 'Description', 'Parent', 'Element Type'])
+
+    # generic elements
+    for gen in root.findall('GenericElements'):
+        Elements(root, writer, "Generic")
+
+    # standard elements
+    for stan in root.findall('StandardElements'):
+        Elements(root, writer, "Standard")

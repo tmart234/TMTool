@@ -22,6 +22,7 @@ def find_cats():
 #    print(cats)
     return cats
 
+
 # take the ID and look it up in the category dict
 def cat2str(cat, cats):
     for key, value in cats.items():
@@ -43,9 +44,6 @@ class Elements():
     			# WRITE EACH ROW ITERATIVELY
     		writer.writerow([self.ele_name,self.ele_id,self.ele_desc,self.ele_parent,ele_type])
 
-
-
-
  
 cats = find_cats()
 
@@ -56,7 +54,7 @@ with open('threats.csv', 'w', newline='') as r:
 
 
     for types in root.iter('ThreatType'):
-        # skip row if is a 'root' category
+        # get ID and skip row if ID is a 'root' category
         for subelem in types.findall('Id'):
             _id = subelem.text
         if subelem.text == 'SU':
@@ -77,12 +75,13 @@ with open('threats.csv', 'w', newline='') as r:
             cat = subelem.text
             cat = cat2str(cat, cats)
         for subelem in types.findall('ShortTitle'):
-            title = subelem.text
+            title = subelem.text.translate({ord('{'):None, ord('}'):None})
+            # remove curley braces for csv output
         for subelem in types.findall('Description'):
-            desc = subelem.text
+            desc = subelem.text.translate({ord('{'):None, ord('}'):None})
 
         # WRITE EACH ROW ITERATIVELY 
-        writer.writerow([cat,title,desc])
+        writer.writerow([cat,title.replace(".Name",""),desc.replace(".Name","")])
 
 with open('elements.csv', 'w', newline='') as r:
     writer = csv.writer(r)

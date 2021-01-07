@@ -21,10 +21,6 @@ Steps to run scripts:
 
 2nd phase
 -	goal is to utilize TMT's built-in reporting and threat auditing features... but with more usability.
--	add "severity" as custom threat property to a custom template
--	add "mitigation(s)" as custom threat property to template
--	For False positives: set status="not applicable" for the threat ID
--	Justification column should hold justification for either the severity level or false positive, not for mitigations
--	Threat's Priority level should be more granular and set from scoring (will need script for this, to figure out later. Will be a factor of severity and exploitability)
+-	Threat's Priority level should set from scoring (will need script for this, to figure out later. Will be a factor of severity and exploitability)
 -	will need to set a Model’s risk threshold based on Priority levels (Ex: will only fix low-medium threats and up)
 -	Threat Note entries are system/model level, not threat ID level. Could contain system meta data.

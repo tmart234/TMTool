@@ -23,10 +23,11 @@ Model XML file Notes
 	- get custom element properties selection from <b:SelectedIndex> and the <values> above
 	
 2nd phase
-- goal is to use TMT more, not less!!
-- add severity as custom threat property to template
+- goal is to utilize TMT's built-in reporting features but with more usability
+- add "severity" as custom threat property to template
+- add "mitigation(s)" as custom threat property to template
 - For False positives: set status="not applicable" for the threat ID
-- Justification column will hold justification for either the severity or flase positive 
-- Priority level should get set from scoring (to figure out later: a facor of severity + explotibility)
+- Justification column should hold justification for either the severity or flase positive, not mitigations
+- Threat's Priority level should get set from scoring (will need script, to figure out later: a facor of severity + explotibility)
 - Threat Note entries are system/model level, not threat ID level
 

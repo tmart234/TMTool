@@ -15,10 +15,6 @@ First step will be writing (4) python scripts to increase TMT’s utility for bo
 -	diff 2 TMT produced csv files, regardless of TMT’s numbering or the ordering, to compare and to partially integrate one model’s derived threats into another.
 
 
-Steps to run scripts:
--	convert files to xml by renaming the extension.
-
-
 2nd phase & future work
 -	goal is to utilize TMT's built-in .HTM reporting and threat auditing features... but with more usability.
 - script to convert the template.csv back to a .tb7 file. Ideally for merging, you'd import new threats then modify the threat logic to fit your template (find & replace in excel)

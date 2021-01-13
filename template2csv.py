@@ -5,8 +5,22 @@
 
 import xml.etree.ElementTree as ET
 import csv
+import tkinter as tk
+from tkinter import filedialog
+import shutil
+import os
 
-root = ET.parse("temp1.xml").getroot()
+script_path = os.path.dirname(os.path.abspath(__file__))
+
+root = tk.Tk()
+root.withdraw()
+
+file_path = filedialog.askopenfilename(parent=root, filetypes=[("MS threat template files", "*.tb7")])
+# copy and rename file extension
+folder_path = os.path.join(script_path, "temp_template.xml")
+shutil.copy(file_path, folder_path)
+
+root = ET.parse(folder_path).getroot()
 
 # pull all Categories from XML
 def find_cats():

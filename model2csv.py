@@ -4,8 +4,22 @@
 
 import xml.etree.ElementTree as ET
 import csv
+import tkinter as tk
+from tkinter import filedialog
+import shutil
+import os
 
-tree = ET.parse('sample2.xml')
+script_path = os.path.dirname(os.path.abspath(__file__))
+
+root = tk.Tk()
+root.withdraw()
+
+file_path = filedialog.askopenfilename(parent=root, filetypes=[("MS threat model files", "*.tm7")])
+# copy and rename file extension
+folder_path = os.path.join(script_path, "temp_model.xml")
+shutil.copy(file_path, folder_path)
+
+tree = ET.parse(folder_path)
 root = tree.getroot()
 
 # set up dictionaries
@@ -39,7 +53,7 @@ with open('model.csv', 'w', newline='') as r:
                         for ele5 in ele4.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model.Abstracts}Properties'):
                             for ele6 in ele5.iter('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}anyType'):
                                 for ele7 in ele6.iter():
-                                   if 'StringDisplayAttribute' in ET.tostring(ele7, method='text'):
-                                       print(ele7.attrib)
+                                   #if 'StringDisplayAttribute' in ET.tostring(ele7, method='text'):
+                                    print(ele7.attrib)
                                 # <i:type="c:string">value</b:Value> for custom names
                                 # add element to elements

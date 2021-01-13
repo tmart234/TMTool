@@ -19,8 +19,10 @@ Steps to run scripts:
 -	convert files to xml by renaming the extension.
 
 
-2nd phase
--	goal is to utilize TMT's built-in reporting and threat auditing features... but with more usability.
+2nd phase & future work
+-	goal is to utilize TMT's built-in .HTM reporting and threat auditing features... but with more usability.
+- script to convert the template.csv back to a .tb7 file. Ideally for merging, you'd import new threats then modify the threat logic to fit your template (find & replace in excel)
+- explore scripts for validating templates by writing test models for a template's threats and parsing
 -	Threat's Priority level should set from scoring (will need script for this, to figure out later. Will be a factor of severity and exploitability)
 -	will need to set a Model’s risk threshold based on Priority levels (Ex: will only fix low-medium threats and up)
--	Threat Note entries are system/model level, not threat ID level. Could contain system meta data.
+-	Threat Note entries are system/model level, not threat ID level like threat properties. Notes could contain system meta data for scripts.

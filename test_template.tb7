@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <KnowledgeBase xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Manifest name="NewTemplate" id="51e3a082-4d15-478a-a41e-c7299ea7ba9b" version="1.0.0.28" author="LAPTOP-HETV38CP\tmart" />
+  <Manifest name="NewTemplate" id="51e3a082-4d15-478a-a41e-c7299ea7ba9b" version="1.0.0.32" author="LAPTOP-HETV38CP\tmart" />
   <ThreatMetaData>
     <IsPriorityUsed>true</IsPriorityUsed>
     <IsStatusUsed>true</IsStatusUsed>
@@ -38,6 +38,7 @@
         <Values>
           <Value />
         </Values>
+        <Description>Enumerate attacks, TTPs, or specific instances of the threat</Description>
         <Id>6d8e5b6c-ade1-41a9-81ee-b8a6b0762270</Id>
         <AttributeType>0</AttributeType>
       </ThreatMetaDatum>
@@ -48,6 +49,7 @@
         <Values>
           <Value />
         </Values>
+        <Description>Justification for false positive or severity</Description>
         <Id>b53f19ea-81aa-42b9-9555-c97494dacb84</Id>
         <AttributeType>0</AttributeType>
       </ThreatMetaDatum>
@@ -113,6 +115,44 @@
       <Representation>Ellipse</Representation>
       <StrokeThickness>0</StrokeThickness>
       <ImageLocation>Centered on stencil</ImageLocation>
+      <Attributes />
+      <StencilConstraints>
+        <StencilConstraint>
+          <SelectedStencilType>Any</SelectedStencilType>
+          <SelectedStencilConnection>Any</SelectedStencilConnection>
+        </StencilConstraint>
+      </StencilConstraints>
+    </ElementType>
+    <ElementType>
+      <Name>Generic Systems</Name>
+      <ID>8db306cc-f8f5-4c07-8be2-48e2a0af38aa</ID>
+      <Description />
+      <ParentElement>ROOT</ParentElement>
+      <Image />
+      <ImageStream />
+      <Hidden>false</Hidden>
+      <Representation>Rectangle</Representation>
+      <StrokeThickness>0</StrokeThickness>
+      <ImageLocation />
+      <Attributes />
+      <StencilConstraints>
+        <StencilConstraint>
+          <SelectedStencilType>Any</SelectedStencilType>
+          <SelectedStencilConnection>Any</SelectedStencilConnection>
+        </StencilConstraint>
+      </StencilConstraints>
+    </ElementType>
+    <ElementType>
+      <Name>Boundaries</Name>
+      <ID>06836650-88ef-4421-a2d8-88cb8befbff0</ID>
+      <Description />
+      <ParentElement>ROOT</ParentElement>
+      <Image />
+      <ImageStream />
+      <Hidden>false</Hidden>
+      <Representation>BorderBoundary</Representation>
+      <StrokeThickness>0</StrokeThickness>
+      <ImageLocation />
       <Attributes />
       <StencilConstraints>
         <StencilConstraint>
@@ -235,6 +275,134 @@
       </StencilConstraints>
     </ElementType>
     <ElementType>
+      <Name>PC</Name>
+      <ID>a8fb4cc3-8c76-49a9-b093-6983a9a1aa8b</ID>
+      <Description>generic PC</Description>
+      <ParentElement>8db306cc-f8f5-4c07-8be2-48e2a0af38aa</ParentElement>
+      <Image />
+      <ImageStream />
+      <Hidden>false</Hidden>
+      <Representation>Rectangle</Representation>
+      <StrokeThickness>0</StrokeThickness>
+      <ImageLocation />
+      <Attributes />
+      <StencilConstraints>
+        <StencilConstraint>
+          <SelectedStencilType>Any</SelectedStencilType>
+          <SelectedStencilConnection>Any</SelectedStencilConnection>
+        </StencilConstraint>
+      </StencilConstraints>
+    </ElementType>
+    <ElementType>
+      <Name>Phone</Name>
+      <ID>1a0bf3c5-9314-4208-b88e-64690c6d4c1b</ID>
+      <Description>generic mobile device</Description>
+      <ParentElement>8db306cc-f8f5-4c07-8be2-48e2a0af38aa</ParentElement>
+      <Image />
+      <ImageStream />
+      <Hidden>false</Hidden>
+      <Representation>Rectangle</Representation>
+      <StrokeThickness>0</StrokeThickness>
+      <ImageLocation />
+      <Attributes>
+        <Attribute>
+          <Id>ad494650-d32f-4174-af2c-310c540b7baa</Id>
+          <IsInherited>false</IsInherited>
+          <Name>cce9f994-89ab-4106-b41c-4348921ddd80</Name>
+          <DisplayName>Mobile OS</DisplayName>
+          <Mode>Dynamic</Mode>
+          <Type>List</Type>
+          <Inheritance>Virtual</Inheritance>
+          <AttributeValues>
+            <Value>Android</Value>
+            <Value>iOS</Value>
+          </AttributeValues>
+        </Attribute>
+      </Attributes>
+      <StencilConstraints>
+        <StencilConstraint>
+          <SelectedStencilType>Any</SelectedStencilType>
+          <SelectedStencilConnection>Any</SelectedStencilConnection>
+        </StencilConstraint>
+      </StencilConstraints>
+    </ElementType>
+    <ElementType>
+      <Name>SoC Boundary</Name>
+      <ID>eed0723d-a3a3-4d8d-bf47-e5472302e622</ID>
+      <Description>contains multiple elements within a SoC</Description>
+      <ParentElement>06836650-88ef-4421-a2d8-88cb8befbff0</ParentElement>
+      <Image />
+      <ImageStream />
+      <Hidden>false</Hidden>
+      <Representation>BorderBoundary</Representation>
+      <StrokeThickness>0</StrokeThickness>
+      <ImageLocation />
+      <Attributes />
+      <StencilConstraints>
+        <StencilConstraint>
+          <SelectedStencilType>Any</SelectedStencilType>
+          <SelectedStencilConnection>Any</SelectedStencilConnection>
+        </StencilConstraint>
+      </StencilConstraints>
+    </ElementType>
+    <ElementType>
+      <Name>Device Physical Boundary</Name>
+      <ID>c59243b4-236c-4159-a42d-6fee44fa4c37</ID>
+      <Description>contains elements within a physical device</Description>
+      <ParentElement>06836650-88ef-4421-a2d8-88cb8befbff0</ParentElement>
+      <Image />
+      <ImageStream />
+      <Hidden>false</Hidden>
+      <Representation>BorderBoundary</Representation>
+      <StrokeThickness>0</StrokeThickness>
+      <ImageLocation />
+      <Attributes />
+      <StencilConstraints>
+        <StencilConstraint>
+          <SelectedStencilType>Any</SelectedStencilType>
+          <SelectedStencilConnection>Any</SelectedStencilConnection>
+        </StencilConstraint>
+      </StencilConstraints>
+    </ElementType>
+    <ElementType>
+      <Name>Local Network Boundary</Name>
+      <ID>efeb9e28-179c-4803-a2da-6159ebf3e5cd</ID>
+      <Description>contains devices communicating within a local network</Description>
+      <ParentElement>06836650-88ef-4421-a2d8-88cb8befbff0</ParentElement>
+      <Image />
+      <ImageStream />
+      <Hidden>false</Hidden>
+      <Representation>BorderBoundary</Representation>
+      <StrokeThickness>0</StrokeThickness>
+      <ImageLocation />
+      <Attributes />
+      <StencilConstraints>
+        <StencilConstraint>
+          <SelectedStencilType>Any</SelectedStencilType>
+          <SelectedStencilConnection>Any</SelectedStencilConnection>
+        </StencilConstraint>
+      </StencilConstraints>
+    </ElementType>
+    <ElementType>
+      <Name>Company Internet Boundary</Name>
+      <ID>3530bb86-0864-4c98-8391-cab381338648</ID>
+      <Description>contains a network within company infrastructure</Description>
+      <ParentElement>06836650-88ef-4421-a2d8-88cb8befbff0</ParentElement>
+      <Image />
+      <ImageStream />
+      <Hidden>false</Hidden>
+      <Representation>BorderBoundary</Representation>
+      <StrokeThickness>0</StrokeThickness>
+      <ImageLocation />
+      <Attributes />
+      <StencilConstraints>
+        <StencilConstraint>
+          <SelectedStencilType>Any</SelectedStencilType>
+          <SelectedStencilConnection>Any</SelectedStencilConnection>
+        </StencilConstraint>
+      </StencilConstraints>
+    </ElementType>
+    <ElementType>
       <Name>MCU</Name>
       <ID>b3cfab57-1767-4411-b9c1-b9822959a57b</ID>
       <Description>Compute Element</Description>
@@ -244,7 +412,23 @@
       <Representation>Rectangle</Representation>
       <StrokeThickness>0</StrokeThickness>
       <ImageLocation>Centered on stencil</ImageLocation>
-      <Attributes />
+      <Attributes>
+        <Attribute>
+          <Id>0cd44465-8ec8-48a6-94ae-1c1c3e6ed920</Id>
+          <IsInherited>false</IsInherited>
+          <Name>eaf886ea-a784-48df-ace5-86adca8957c6</Name>
+          <DisplayName>OS</DisplayName>
+          <Mode>Dynamic</Mode>
+          <Type>List</Type>
+          <Inheritance>Virtual</Inheritance>
+          <AttributeValues>
+            <Value>Bare Metal</Value>
+            <Value>FreeRTOS, Zephyr, etc</Value>
+            <Value>Embedded linux</Value>
+            <Value>Linux</Value>
+          </AttributeValues>
+        </Attribute>
+      </Attributes>
       <StencilConstraints>
         <StencilConstraint>
           <SelectedStencilType>Any</SelectedStencilType>
@@ -344,6 +528,18 @@
             <Value>network</Value>
           </AttributeValues>
         </Attribute>
+        <Attribute>
+          <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
+          <IsInherited>true</IsInherited>
+          <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
+          <DisplayName>access vector</DisplayName>
+          <Mode>Dynamic</Mode>
+          <Type>List</Type>
+          <Inheritance>Virtual</Inheritance>
+          <AttributeValues>
+            <Value>network</Value>
+          </AttributeValues>
+        </Attribute>
       </Attributes>
       <StencilConstraints>
         <StencilConstraint>
@@ -363,6 +559,18 @@
       <StrokeThickness>0</StrokeThickness>
       <ImageLocation>Centered on stencil</ImageLocation>
       <Attributes>
+        <Attribute>
+          <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
+          <IsInherited>true</IsInherited>
+          <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
+          <DisplayName>access vector</DisplayName>
+          <Mode>Dynamic</Mode>
+          <Type>List</Type>
+          <Inheritance>Virtual</Inheritance>
+          <AttributeValues>
+            <Value>adjecent network</Value>
+          </AttributeValues>
+        </Attribute>
         <Attribute>
           <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
           <IsInherited>true</IsInherited>
@@ -454,6 +662,18 @@
             <Value>local</Value>
           </AttributeValues>
         </Attribute>
+        <Attribute>
+          <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
+          <IsInherited>true</IsInherited>
+          <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
+          <DisplayName>access vector</DisplayName>
+          <Mode>Dynamic</Mode>
+          <Type>List</Type>
+          <Inheritance>Virtual</Inheritance>
+          <AttributeValues>
+            <Value>local</Value>
+          </AttributeValues>
+        </Attribute>
       </Attributes>
       <StencilConstraints>
         <StencilConstraint>
@@ -508,7 +728,7 @@
         <Exclude>flow.62fe7ad3-9c6d-443c-855d-9801485ed102 is 'yes'</Exclude>
       </GenerationFilters>
       <Id>f05a81cf-b6a1-4ccf-94fc-3ad2af411ecd</Id>
-      <ShortTitle>Attack sniffs a wirelss communication</ShortTitle>
+      <ShortTitle>Attacker passivly sniffs a wirelss communication</ShortTitle>
       <Category>09bb1c30-479f-4416-965c-7d4e38207328</Category>
       <RelatedCategory />
       <Description>sniffing is when an attacker passivly gathers the contents of digital communication (ex: wireshark packet sniffing)</Description>
@@ -520,6 +740,7 @@
           <Values>
             <Value>sniffing is when an attacker passivly gathers the contents of digital communication (ex: wireshark packet sniffing)</Value>
           </Values>
+          <Description>Enumerate attacks, TTPs, or specific instances of the threat</Description>
           <Id>6d8e5b6c-ade1-41a9-81ee-b8a6b0762270</Id>
           <AttributeType>0</AttributeType>
         </ThreatMetaDatum>

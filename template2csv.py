@@ -116,3 +116,9 @@ with open('elements.csv', 'w', newline='') as r:
 
     # standard elements
     Elements(root, writer, "StandardElements")
+
+# delete temp .xml file created
+if os.path.exists(folder_path):
+  os.remove(folder_path)
+else:
+  print("The temp file does not exist")

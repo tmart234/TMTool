@@ -57,3 +57,11 @@ with open('model.csv', 'w', newline='') as r:
                                     print(ele7.attrib)
                                 # <i:type="c:string">value</b:Value> for custom names
                                 # add element to elements
+
+
+    
+# delete temp .xml file created
+if os.path.exists(folder_path):
+  os.remove(folder_path)
+else:
+  print("The temp file does not exist")

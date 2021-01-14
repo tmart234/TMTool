@@ -2,7 +2,7 @@
 Microsoft Threat Modeling Tool python scripts to increase TMT’s utility for both template developers and model makers.
 
 3 scripts for .tb7 template files:
--	template2csv.py - enumerate a template's elements, threat categories, and threats, and threat logic. Convert to .csv format.
+-	template2csv.py - enumerate a template's elements, threat categories, and threats, and threat logic. Save elements and threats as csv file.
 
 -	diff 2 template .csv files (produced in previous script) for template devs to compare and possibly to partially integrate new threats into their template. Categories: Major: missing stencils, flows, or threats entirely Minor: modified threat definition, modified threat logic, modified flow & stencil properties
 

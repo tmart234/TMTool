@@ -22,7 +22,7 @@ shutil.copy(file_path, folder_path)
 
 root = ET.parse(folder_path).getroot()
 
-# pull all Categories from XML
+# pull all threat Categories from the XML
 def find_cats():
     cats={}
     cat_ID=''
@@ -65,7 +65,7 @@ cats = find_cats()
 with open('threats.csv', 'w', newline='') as r:
     writer = csv.writer(r)
     # write headders in csv file
-    writer.writerow(['Category','Short Title','Description'])
+    writer.writerow(['Category','Short Title','Description', 'Include Logic', 'Exclude Logic'])
 
 
     for types in root.iter('ThreatType'):
@@ -85,6 +85,14 @@ with open('threats.csv', 'w', newline='') as r:
         elif subelem.text == 'EU':
             continue
 
+        # get threat logic
+        # TODO: replace GUID with names. Seach in order: Gerneric element's GUIDs,
+        #  Standard element GUIDs,  then element property GUIDs
+        for gen_filters in types.findall('GenerationFilters'):
+            for include_logic in gen_filters.findall('Include'):
+                include = include_logic.text
+            for exclude_logic in gen_filters.findall('Exclude'):
+                exclude = exclude_logic.text
         # get elements
         for subelem in types.findall('Category'):
             cat = subelem.text
@@ -96,7 +104,7 @@ with open('threats.csv', 'w', newline='') as r:
             desc = subelem.text.translate({ord('{'):None, ord('}'):None})
 
         # WRITE EACH ROW ITERATIVELY 
-        writer.writerow([cat,title.replace(".Name",""),desc.replace(".Name","")])
+        writer.writerow([cat,title.replace(".Name",""),desc.replace(".Name",""),include,exclude])
 
 with open('elements.csv', 'w', newline='') as r:
     writer = csv.writer(r)

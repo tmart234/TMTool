@@ -1,0 +1,34 @@
+*A collection of my thoughts on different parts of the threat modeling process*
+
+goal: to utilize TMT's built-in reporting and threat auditing features but with more usability (scoring)
+
+2 Scripts for diffing:
+- diff template produced .csv files (produced in template2csv.py script) for template devs to compare and possibly to partially integrate new threats into their template. Categories: Major: missing stencils, flows, or threats entirely Minor: modified threat definition, modified threat logic, modified flow & stencil properties
+- diff the TMT produced csv files, regardless of TMT’s numbering or the ordering (unsorted), to compare
+
+
+Modeling
+- a model's Note entries are system level, not threat ID level like how threat properties are.
+	- therefore model notes could contain system metadata for scripts and other variables that shouldn't change. 
+	- ex: CVSS environmental metrics like Security Requirements (based on risk level) or the Target Distribution (proportion of vulnerable systems)
+
+Auditing a Model's Threats
+- "Export to CSV" function will only grab threat IDs and their threat properties
+	- using the exported csv allong with the model.csv (produced from model2csv.py script), we can begin to automatically audit threats
+- when auditing the generated threat IDs, if a False positive is identified, set status to: "not applicable"
+- Justification column should hold justification for the severity level, CIA, or why it's a flase positive
+	- Justification should not be for mitigations
+
+Reporting
+- address how can we view access vector (an element property) within the generated threat model report?
+- address how can we view authentication (an element property) within the generated threat model report?
+ 
+Python scoring script
+- ditch access complexity completely? or cange to just a high/low scores (remove medium AC score like in CVSS 3.0)? Need to decide
+- CVSS base metrics + environmental metrics?
+- authentication could be baked into the model
+- CVSS will have threashold and threat's CVSS score mapped to the threat's "priority" in Threat properties?
+	- set the "CVSS Score" threat property for each threat ID
+	- below threashold will automatically set status to: Not Aplicable
+	- above, set status to: Needs Investigation and set "priority"
+	- explore adding more statuses to template? is this needed?

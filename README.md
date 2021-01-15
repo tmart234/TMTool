@@ -16,8 +16,7 @@ Microsoft Threat Modeling Tool python scripts to increase TMT’s utility for bo
 
 
 2nd phase & future work
--	goal is to utilize TMT's built-in .HTM reporting and threat auditing features... but with more usability.
+-	goal is to utilize TMT's built-in .HTM reporting and threat auditing features but with more usability.
 - explore scripts for validating templates by writing test models for a template's threats and parsing
--	Threat's Priority level should set from scoring (will need script for this, to figure out later. Will be a factor of severity and exploitability)
--	will need to set a Model’s risk threshold based on Priority levels (Ex: will only fix low-medium threats and up)
--	Threat Note entries are system/model level, not threat ID level like threat properties. Notes could contain system meta data for scripts.
+-	Threat Note entries are system/model level, not threat ID level like threat properties. Notes could contain system meta data for scripts like the Security Requirements for the model's CIA
+-	will need to set a Model’s Security Requirements based on Priority levels (Ex: will only fix low-medium threats and up)

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <KnowledgeBase xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Manifest name="NewTemplate" id="51e3a082-4d15-478a-a41e-c7299ea7ba9b" version="1.0.0.32" author="LAPTOP-HETV38CP\tmart" />
+  <Manifest name="NewTemplate" id="51e3a082-4d15-478a-a41e-c7299ea7ba9b" version="1.0.0.37" author="LAPTOP-HETV38CP\tmart" />
   <ThreatMetaData>
     <IsPriorityUsed>true</IsPriorityUsed>
     <IsStatusUsed>true</IsStatusUsed>
@@ -71,7 +71,7 @@
           <Value>low-medium</Value>
           <Value>low</Value>
         </Values>
-        <Description>Priority is the result of severity + exploitability</Description>
+        <Description>Priority is the result of severity + exploitability and should convey impact of the threat ID</Description>
         <Id>d0b23e75-fbdc-482b-8484-ed9eec277043</Id>
         <AttributeType>1</AttributeType>
       </ThreatMetaDatum>
@@ -98,9 +98,51 @@
         <Values>
           <Value />
         </Values>
-        <Description>Possible Mitigation</Description>
+        <Description>Possible safeguards and countermeasures</Description>
         <Id>f2f2ba8a-6876-4690-815d-016c3324764f</Id>
         <AttributeType>0</AttributeType>
+      </ThreatMetaDatum>
+      <ThreatMetaDatum>
+        <Name>6f73c3c9-92a4-4cdc-9efa-6596587a5e37</Name>
+        <Label>Confidentiality</Label>
+        <HideFromUI>false</HideFromUI>
+        <Values>
+          <Value>None</Value>
+          <Value>Public</Value>
+          <Value>Confidential</Value>
+          <Value>Restricted</Value>
+        </Values>
+        <Description>information access and disclosure to unauthorized users</Description>
+        <Id>6f73c3c9-92a4-4cdc-9efa-6596587a5e37</Id>
+        <AttributeType>1</AttributeType>
+      </ThreatMetaDatum>
+      <ThreatMetaDatum>
+        <Name>f46fb992-8974-4bbd-8c61-0437d531748a</Name>
+        <Label>Integrity</Label>
+        <HideFromUI>false</HideFromUI>
+        <Values>
+          <Value>None</Value>
+          <Value>Limitied Modification</Value>
+          <Value>Partial Modification</Value>
+          <Value>Total Modification</Value>
+        </Values>
+        <Description>trustworthiness and guaranteed veracity of information</Description>
+        <Id>f46fb992-8974-4bbd-8c61-0437d531748a</Id>
+        <AttributeType>1</AttributeType>
+      </ThreatMetaDatum>
+      <ThreatMetaDatum>
+        <Name>b659da49-30c2-42c8-8e13-9f72999f8774</Name>
+        <Label>Availability</Label>
+        <HideFromUI>false</HideFromUI>
+        <Values>
+          <Value>None</Value>
+          <Value>Support</Value>
+          <Value>Essential</Value>
+          <Value>Critical</Value>
+        </Values>
+        <Description>accessibility of information resources</Description>
+        <Id>b659da49-30c2-42c8-8e13-9f72999f8774</Id>
+        <AttributeType>1</AttributeType>
       </ThreatMetaDatum>
     </PropertiesMetaData>
   </ThreatMetaData>
@@ -129,7 +171,6 @@
       <Description />
       <ParentElement>ROOT</ParentElement>
       <Image />
-      <ImageStream />
       <Hidden>false</Hidden>
       <Representation>Rectangle</Representation>
       <StrokeThickness>0</StrokeThickness>
@@ -148,7 +189,6 @@
       <Description />
       <ParentElement>ROOT</ParentElement>
       <Image />
-      <ImageStream />
       <Hidden>false</Hidden>
       <Representation>BorderBoundary</Representation>
       <StrokeThickness>0</StrokeThickness>
@@ -265,8 +305,23 @@
       <Hidden>false</Hidden>
       <Representation>Ellipse</Representation>
       <StrokeThickness>0</StrokeThickness>
-      <ImageLocation>Centered on stencil</ImageLocation>
-      <Attributes />
+      <ImageLocation>Before label</ImageLocation>
+      <Attributes>
+        <Attribute>
+          <Id>22baf8e1-26a6-4af9-9506-c41e52d7f249</Id>
+          <IsInherited>false</IsInherited>
+          <Name>f43dce17-9676-45a7-9258-09b02540cbe2</Name>
+          <DisplayName>Threat Agent</DisplayName>
+          <Mode>Dynamic</Mode>
+          <Type>List</Type>
+          <Inheritance>Virtual</Inheritance>
+          <AttributeValues>
+            <Value>User Accidental Discovery</Value>
+            <Value>Curious Attacker</Value>
+            <Value>Insider Attacker</Value>
+          </AttributeValues>
+        </Attribute>
+      </Attributes>
       <StencilConstraints>
         <StencilConstraint>
           <SelectedStencilType>Any</SelectedStencilType>
@@ -280,12 +335,25 @@
       <Description>generic PC</Description>
       <ParentElement>8db306cc-f8f5-4c07-8be2-48e2a0af38aa</ParentElement>
       <Image />
-      <ImageStream />
       <Hidden>false</Hidden>
       <Representation>Rectangle</Representation>
       <StrokeThickness>0</StrokeThickness>
       <ImageLocation />
-      <Attributes />
+      <Attributes>
+        <Attribute>
+          <Id>db432303-f979-493d-8241-a600bec634c5</Id>
+          <IsInherited>false</IsInherited>
+          <Name>50bdc7ac-198e-4e1c-9a2e-5c3e035295aa</Name>
+          <DisplayName>PC OS</DisplayName>
+          <Mode>Dynamic</Mode>
+          <Type>List</Type>
+          <Inheritance>Virtual</Inheritance>
+          <AttributeValues>
+            <Value>Windows</Value>
+            <Value>Linux</Value>
+          </AttributeValues>
+        </Attribute>
+      </Attributes>
       <StencilConstraints>
         <StencilConstraint>
           <SelectedStencilType>Any</SelectedStencilType>
@@ -299,7 +367,6 @@
       <Description>generic mobile device</Description>
       <ParentElement>8db306cc-f8f5-4c07-8be2-48e2a0af38aa</ParentElement>
       <Image />
-      <ImageStream />
       <Hidden>false</Hidden>
       <Representation>Rectangle</Representation>
       <StrokeThickness>0</StrokeThickness>
@@ -327,12 +394,30 @@
       </StencilConstraints>
     </ElementType>
     <ElementType>
+      <Name>Server</Name>
+      <ID>4693ec5d-768e-4c77-9168-23bd2c2e5dfe</ID>
+      <Description>Generic backend server</Description>
+      <ParentElement>8db306cc-f8f5-4c07-8be2-48e2a0af38aa</ParentElement>
+      <Image />
+      <ImageStream />
+      <Hidden>false</Hidden>
+      <Representation>Rectangle</Representation>
+      <StrokeThickness>0</StrokeThickness>
+      <ImageLocation />
+      <Attributes />
+      <StencilConstraints>
+        <StencilConstraint>
+          <SelectedStencilType>Any</SelectedStencilType>
+          <SelectedStencilConnection>Any</SelectedStencilConnection>
+        </StencilConstraint>
+      </StencilConstraints>
+    </ElementType>
+    <ElementType>
       <Name>SoC Boundary</Name>
       <ID>eed0723d-a3a3-4d8d-bf47-e5472302e622</ID>
       <Description>contains multiple elements within a SoC</Description>
       <ParentElement>06836650-88ef-4421-a2d8-88cb8befbff0</ParentElement>
       <Image />
-      <ImageStream />
       <Hidden>false</Hidden>
       <Representation>BorderBoundary</Representation>
       <StrokeThickness>0</StrokeThickness>
@@ -351,7 +436,6 @@
       <Description>contains elements within a physical device</Description>
       <ParentElement>06836650-88ef-4421-a2d8-88cb8befbff0</ParentElement>
       <Image />
-      <ImageStream />
       <Hidden>false</Hidden>
       <Representation>BorderBoundary</Representation>
       <StrokeThickness>0</StrokeThickness>
@@ -370,7 +454,6 @@
       <Description>contains devices communicating within a local network</Description>
       <ParentElement>06836650-88ef-4421-a2d8-88cb8befbff0</ParentElement>
       <Image />
-      <ImageStream />
       <Hidden>false</Hidden>
       <Representation>BorderBoundary</Representation>
       <StrokeThickness>0</StrokeThickness>
@@ -389,7 +472,6 @@
       <Description>contains a network within company infrastructure</Description>
       <ParentElement>06836650-88ef-4421-a2d8-88cb8befbff0</ParentElement>
       <Image />
-      <ImageStream />
       <Hidden>false</Hidden>
       <Representation>BorderBoundary</Representation>
       <StrokeThickness>0</StrokeThickness>
@@ -540,6 +622,18 @@
             <Value>network</Value>
           </AttributeValues>
         </Attribute>
+        <Attribute>
+          <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
+          <IsInherited>true</IsInherited>
+          <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
+          <DisplayName>access vector</DisplayName>
+          <Mode>Dynamic</Mode>
+          <Type>List</Type>
+          <Inheritance>Virtual</Inheritance>
+          <AttributeValues>
+            <Value>network</Value>
+          </AttributeValues>
+        </Attribute>
       </Attributes>
       <StencilConstraints>
         <StencilConstraint>
@@ -607,6 +701,18 @@
             <Value>adjecent network</Value>
           </AttributeValues>
         </Attribute>
+        <Attribute>
+          <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
+          <IsInherited>true</IsInherited>
+          <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
+          <DisplayName>access vector</DisplayName>
+          <Mode>Dynamic</Mode>
+          <Type>List</Type>
+          <Inheritance>Virtual</Inheritance>
+          <AttributeValues>
+            <Value>adjecent network</Value>
+          </AttributeValues>
+        </Attribute>
       </Attributes>
       <StencilConstraints>
         <StencilConstraint>
@@ -626,6 +732,18 @@
       <StrokeThickness>0</StrokeThickness>
       <ImageLocation>Centered on stencil</ImageLocation>
       <Attributes>
+        <Attribute>
+          <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
+          <IsInherited>true</IsInherited>
+          <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
+          <DisplayName>access vector</DisplayName>
+          <Mode>Dynamic</Mode>
+          <Type>List</Type>
+          <Inheritance>Virtual</Inheritance>
+          <AttributeValues>
+            <Value>local</Value>
+          </AttributeValues>
+        </Attribute>
         <Attribute>
           <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
           <IsInherited>true</IsInherited>

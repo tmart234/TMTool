@@ -1,5 +1,5 @@
-## this script will parse a model's used elements
-##
+## this script will parse a model's elements to a csv file
+## right now the script only enumerates element names
 
 
 import xml.etree.ElementTree as ET
@@ -53,15 +53,14 @@ with open('model.csv', 'w', newline='') as r:
                         for ele5 in ele4.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model.Abstracts}Properties'):
                             for ele6 in ele5.iter('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}anyType'):
                                 for ele7 in ele6.iter():
-                                   #if 'StringDisplayAttribute' in ET.tostring(ele7, method='text'):
-                                    print(ele7.attrib)
-                                # <i:type="c:string">value</b:Value> for custom names
-                                # add element to elements
-
+                                    # find element's names
+                                   if "c:string" in str(ele7.attrib) and (ele7.text and ele7.text != '0'):
+                                             print(ele7.text)
+                                    # TODO: match names with GUID
 
     
-# delete temp .xml file created
+""" # delete temp .xml file created
 if os.path.exists(folder_path):
   os.remove(folder_path)
 else:
-  print("The temp file does not exist")
+  print("The temp file does not exist") """

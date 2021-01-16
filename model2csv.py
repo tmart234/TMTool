@@ -62,7 +62,7 @@ with open('model.csv', 'w', newline='') as r:
         for ele in child.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}DrawingSurfaceModel'):
             for borders in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Borders'):
                 # write element headders
-                writer.writerow(['Elements'])
+                writer.writerow(['Stencils'])
                 writer.writerow(['GenericTypeId','GUID','Name'])
                 write_element(borders)
             for lines in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Lines'):

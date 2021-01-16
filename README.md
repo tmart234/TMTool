@@ -8,6 +8,6 @@ scripts for .tb7 template files:
 
 
 scripts for .tm7 model files:
--	model2csv.py - enumerate a model's flows, notes, elements, element properties, and any other information from a model which we cannot get from TMT's built-in csv file generation but which will be used in conjunction with the generated csv file.
+-	model2csv.py - enumerate a model's flows, notes, elements, element properties, and any other information from a model which we cannot get from TMT's built-in csv file generation but which will later be used in conjunction with the generated csv file.
 
 View threat_modeling_notes.txt for more

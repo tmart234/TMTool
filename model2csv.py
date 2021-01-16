@@ -1,5 +1,5 @@
 ## this script will parse a model's elements to a csv file
-## right now the script only enumerates element names
+## right now the script only enumerates flows and elements but needs more work
 
 
 import xml.etree.ElementTree as ET
@@ -27,7 +27,7 @@ root = tree.getroot()
 elements = dict.fromkeys(['flows','stencils','boundarys','interactors'])
 # singular element dict
 element = dict.fromkeys(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid','EleProperties'])
-# create custom element properties dict as this part will change
+# TODO: create custom element properties dict as this part will change
 # from <b:SelectedIndex> and the properties above
 
 def write_element(ele2):
@@ -52,7 +52,6 @@ def write_element(ele2):
                                 element['Name'] = ele7.text
                                 # write element to csv row
                                 writer.writerow([element['GenericTypeId'], element['GUID'], element['Name'], element['SourceGuid'], element['TargetGuid']])
-                                            # TODO: get custom element properties selection from <b:SelectedIndex> and the <values> above
 
 
 with open('model.csv', 'w', newline='') as r:

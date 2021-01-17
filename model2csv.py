@@ -1,5 +1,6 @@
 ## this script will parse a model's elements to a csv file
-## the script enumerates element names, IDs, source GUID and target GUID of flows, and all element properties
+## the script enumerates element's names, IDs, source GUID and target GUID of flows, 
+## all element properties, and all model notes
 
 import xml.etree.ElementTree as ET
 import csv
@@ -106,6 +107,20 @@ with open('model.csv', 'w', newline='') as r:
                 # unlike stencils, flows have a source and target guids
                 writer.writerow(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid', 'Element Properties'])
                 write_element(lines)
+    # write note headders
+    writer.writerow([''])
+    writer.writerow(['Notes'])
+    writer.writerow(['ID','Message'])
+    _id = ''
+    _message = ''
+    # find all note elements
+    for notes in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Notes'):
+        for note in notes.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Note'):
+            for id in note.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Id'):
+                _id = id.text
+            for message in note.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Message'):
+                _message = message.text
+            writer.writerow([_id,_message])
                
     
 # delete temp .xml file created

@@ -1,7 +1,7 @@
 ## this script will pull all threats and threat categories
 ## (STRIDE + custom) from a MS TMT template files (.tb7)
 ## and it will also pull all template's generic + standard elements
-## after, it creates 2 CSV files for each
+## after, it creates threats.csv file
 
 import xml.etree.ElementTree as ET
 import csv

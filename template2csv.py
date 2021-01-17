@@ -33,7 +33,6 @@ def find_cats():
         for subelem in cat.findall('Id'):
             cat_ID = subelem.text
         cats[cat_name]=cat_ID
-#    print(cats)
     return cats
 
 
@@ -42,6 +41,15 @@ def cat2str(cat, cats):
     for key, value in cats.items():
          if cat == value:
              return key
+
+# deletes temp xml file
+def cleanUp(_folder_path):
+    if os.path.exists(_folder_path):
+        os.remove(_folder_path)
+        return
+    else:
+        print("The temp file does not exist")
+        return
 
 # gets elements (stencils, flows boundarys)
 class Elements():
@@ -62,27 +70,28 @@ class Elements():
  
 cats = find_cats()
 
-with open('threats.csv', 'w', newline='') as r:
+with open('template.csv', 'w', newline='') as r:
     writer = csv.writer(r)
     # write headders in csv file
+    writer.writerow(['Threats'])
     writer.writerow(['Category','Short Title','Description', 'Include Logic', 'Exclude Logic'])
-
 
     for types in root.iter('ThreatType'):
         # get ID and skip row if ID is a 'root' category
+        _id = ''
         for subelem in types.findall('Id'):
             _id = subelem.text
-        if subelem.text == 'SU':
+        if _id == 'SU':
             continue
-        elif subelem.text == 'TU':
+        elif _id == 'TU':
             continue
-        elif subelem.text == 'RU':
+        elif _id == 'RU':
             continue
-        elif subelem.text == 'IU':
+        elif _id == 'IU':
             continue
-        elif subelem.text == 'DU':
+        elif _id == 'DU':
             continue
-        elif subelem.text == 'EU':
+        elif _id == 'EU':
             continue
 
         # get threat logic
@@ -95,8 +104,8 @@ with open('threats.csv', 'w', newline='') as r:
                 exclude = exclude_logic.text
         # get elements
         for subelem in types.findall('Category'):
-            cat = subelem.text
-            cat = cat2str(cat, cats)
+            category = subelem.text
+            category = cat2str(category, cats)
         for subelem in types.findall('ShortTitle'):
             # remove curley braces for csv output
             title = subelem.text.translate({ord('{'):None, ord('}'):None})
@@ -104,12 +113,11 @@ with open('threats.csv', 'w', newline='') as r:
             desc = subelem.text.translate({ord('{'):None, ord('}'):None})
 
         # WRITE EACH ROW ITERATIVELY 
-        writer.writerow([cat,title.replace(".Name",""),desc.replace(".Name",""),include,exclude])
+        writer.writerow([category,title.replace(".Name",""),desc.replace(".Name",""),include,exclude])
 
-with open('elements.csv', 'w', newline='') as r:
-    writer = csv.writer(r)
-    # write headders in csv file
-    writer.writerow(['Name', 'ID', 'Description', 'Parent', 'Element Type'])
+    writer.writerow('')
+    writer.writerow(['Elements'])
+    writer.writerow(['Name', 'ID', 'Description','Parent', 'Type'])
 
     # generic elements
     Elements(root, writer, "GenericElements")
@@ -117,8 +125,5 @@ with open('elements.csv', 'w', newline='') as r:
     # standard elements
     Elements(root, writer, "StandardElements")
 
-# delete temp .xml file created
-if os.path.exists(folder_path):
-  os.remove(folder_path)
-else:
-  print("The temp file does not exist")
+    # delete temp .xml file created
+    cleanUp(folder_path)

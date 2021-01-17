@@ -88,10 +88,10 @@ def write_element(ele2):
 
             # save prop list to element dict
             element['properties'] = ele_props
-            print(element['properties'])
-            ele_props.clear()
+            # print(element['properties'])
             # write to csv
-            writer.writerow([element['GenericTypeId'], element['GUID'], element['Name'], element['SourceGuid'], element['TargetGuid']])
+            writer.writerow([element['GenericTypeId'], element['GUID'], element['Name'], element['SourceGuid'], element['TargetGuid'], element['properties']])
+            ele_props.clear()
     # if len(prop_guid_list) != len(prop_names):
     #     print ("prop list error")m
     #     print(len(prop_guid_list),len(prop_names))
@@ -110,14 +110,14 @@ with open('model.csv', 'w', newline='') as r:
             for borders in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Borders'):
                 # write element headders
                 writer.writerow(['Stencils'])
-                writer.writerow(['GenericTypeId','GUID','Name'])
+                writer.writerow(['GenericTypeId','GUID','Name', '', '', 'Element Properties'])
                 write_element(borders)
             for lines in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Lines'):
                 # create a new line with same doc and write element headders
                 writer.writerow([''])
                 writer.writerow(['Flows'])
                 # unlike stencils, flows have a source and target guids
-                writer.writerow(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid'])
+                writer.writerow(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid', 'Element Properties'])
                 write_element(lines)
                
     

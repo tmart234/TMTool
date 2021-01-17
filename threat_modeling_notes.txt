@@ -36,6 +36,11 @@ Python scoring script
 	- below threashold will automatically set status to: Not Aplicable
 	- above, set status to: Needs Investigation and set "priority" level
 	- explore adding more statuses to template? is this needed?
+- Explore ditching CVSS base + environmental in favor of a simpiler Probability & Impact ranking system
+	- pro : consists of just 2 metrics Probability & Impact
+		- low (5), medium (10), high (15) 
+	- con: both Probability & Impact can't be infered without adding more built-in metics or explicitly setting via scoring each threat.
+		- a goal of this project is to explore how much the model can infer, making less work for the threat modeler
 	
 Template
 - in test_template.tm7, C.I.A. (base) and severity (environmental) metrics add to Threat Properties (meaning it can be set for every threat ID generated)

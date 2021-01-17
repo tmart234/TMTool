@@ -1,12 +1,16 @@
-*A collection of my thoughts on different parts of the threat modeling process*
+ *A collection of my thoughts on different parts of the threat modeling process*
+
+WIP:
+	- csv2template
+		- would work best with generic and default values for <ThreatMetaDatum> (used in <ThreatMetaData> and <ThreatType>)
+		- will not get <Image>, <StrokeThickness>, <ImageLocation> data, these will also be default values, the rest we save in csv
+			- perhaps these defaults can be extracted from the previous .tm7 file. (process: convert to csv -> modify -> with old .tm7 and csv, port only relevent section back into file)
 
 goal: to utilize TMT's built-in reporting and threat auditing features but with more usability (scoring, deriving mitigations, etc.) and automate the threat modeling process as possible
 
 Need 2 Scripts for diffing:
 - diff template produced .csv files (produced in template2csv.py script) for template devs to compare and possibly to partially integrate new threats into their template. Categories: Major: missing stencils, flows, or threats entirely Minor: modified threat definition, modified threat logic, modified flow & stencil properties
 - diff the TMT produced csv files, regardless of TMT’s numbering or the ordering (unsorted)
-
-
 Modeling
 - a model's Note entries are system level, not threat ID level (like how Threat Properties are).
 	- therefore model notes could contain system metadata for scripts and other variables that shouldn't change. 
@@ -36,3 +40,28 @@ Python scoring script
 Template
 - in test_template.tm7, C.I.A. (base) and severity (environmental) metrics add to Threat Properties (meaning it can be set for every threat ID generated)
 - CVSS score is a threat property
+- Add base threats to template:
+	Spoofing: 
+		- Session hijacking 
+		- CSFR
+	Tampering:
+		- XSS
+		- SQL Injection
+	Repudiation:
+		- Audit Log Deletion
+		- Insecure Backup
+	Info Disclosure:
+		- Verbose Exceptions/Sensitive logging
+	DoS:
+		- website defacement
+	EoP:
+		- logic flow attacks?
+- map which threats trace to OWASP top 10, SANS top 25, or other compliance standards
+
+Mitigations
+- Microsoft has a decent list of mitigations
+	- https://docs.microsoft.com/en-us/azure/security/develop/threat-modeling-tool-mitigations
+	- unfortunatly these mitigations are not baked into the TMT in a sensible way where we can derive them
+	- maybe we can categorize this mitigation list further based on STRIDE's desired properties
+		- Workfolw: generate a threat -> look up STRIDE desired property -> derive mitigation Class -> implemention of mitigation/ device security requirements (TMT shouldn't derive, but should give basic suggestions on how)
+

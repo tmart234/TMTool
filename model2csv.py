@@ -1,7 +1,5 @@
 ## this script will parse a model's elements to a csv file
-## right now the script only enumerates element prop_names, IDs, source GUID and target GUID of flows
-## also prints all element properties
-
+## the script enumerates element names, IDs, source GUID and target GUID of flows, and all element properties
 
 import xml.etree.ElementTree as ET
 import csv
@@ -24,7 +22,7 @@ tree = ET.parse(folder_path)
 root = tree.getroot()
 
 # set up dictionaries
-# singul element dict
+# single element dict
 element = dict.fromkeys(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid', 'properties'])
 # namespace for prop elements
 ele_namespace = {'b': 'http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase'}
@@ -85,23 +83,12 @@ def write_element(ele2):
                     _values.clear()
                     ele_props.append(ele_prop.copy())
                     ele_prop.clear()
-
             # save prop list to element dict
             element['properties'] = ele_props
             # print(element['properties'])
             # write to csv
             writer.writerow([element['GenericTypeId'], element['GUID'], element['Name'], element['SourceGuid'], element['TargetGuid'], element['properties']])
             ele_props.clear()
-    # if len(prop_guid_list) != len(prop_names):
-    #     print ("prop list error")m
-    #     print(len(prop_guid_list),len(prop_names))
-    #     return
-    # else:
-    #     # print(prop_index)
-    #     # print(prop_guid_list)
-    #     # print(prop_names)
-    #     for s in prop_values:
-    #         print(*s)
 
 with open('model.csv', 'w', newline='') as r:
     writer = csv.writer(r)

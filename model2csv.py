@@ -1,5 +1,6 @@
 ## this script will parse a model's elements to a csv file
-## right now the script only enumerates flows and elements but needs more work
+## right now the script only enumerates element prop_names, IDs, source GUID and target GUID of flows
+## also prints all element properties
 
 
 import xml.etree.ElementTree as ET
@@ -23,41 +24,87 @@ tree = ET.parse(folder_path)
 root = tree.getroot()
 
 # set up dictionaries
-# multiple elements, values are a list of element dicts of those types
-elements = dict.fromkeys(['flows','stencils','boundarys','interactors'])
-# singular element dict
-element = dict.fromkeys(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid','EleProperties'])
-# TODO: create custom element properties dict as this part will change
-# from <b:SelectedIndex> and the properties above
+# singul element dict
+element = dict.fromkeys(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid', 'properties'])
+# namespace for prop elements
+ele_namespace = {'b': 'http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase'}
+any_namespace = {'a': 'http://schemas.microsoft.com/2003/10/Serialization/Arrays'}
 
 def write_element(ele2):
+    # create a custom element properties dict
+    ele_prop = dict.fromkeys(['PropName', 'PropGUID', 'PropValues', 'SelectedIndex'])
+    ele_props = []
+    # temp list of property values
+    _values = []
+
          # this level enumerates a model's elements
     for ele3 in ele2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}KeyValueOfguidanyType'):
                         # GUID also at this level
         for ele4 in ele3.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Value'):
-                            # get GUID
+            # get GUID
             for guid in ele4.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model.Abstracts}Guid'):
                 element['GUID'] = guid.text
             for gen_type in ele4.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model.Abstracts}GenericTypeId'):
                 element['GenericTypeId'] = gen_type.text
             for source in ele4.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model.Abstracts}SourceGuid'):
                 element['SourceGuid'] = source.text
-            for source in ele4.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model.Abstracts}TargetGuid'):
-                element['TargetGuid'] = source.text
-            for ele5 in ele4.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model.Abstracts}Properties'):
-                for ele6 in ele5.iter('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}anyType'):
-                    for ele7 in ele6.iter():
-                     # find element's the custom name ex: "HTTPS Device In"
-                            if "c:string" in str(ele7.attrib) and (ele7.text and ele7.text != '0'):
-                                element['Name'] = ele7.text
-                                # write element to csv row
-                                writer.writerow([element['GenericTypeId'], element['GUID'], element['Name'], element['SourceGuid'], element['TargetGuid']])
+            for target in ele4.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model.Abstracts}TargetGuid'):
+                element['TargetGuid'] = target.text
+            for props in ele4.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model.Abstracts}Properties'):
+                for types in props.findall('.//a:anyType', any_namespace):
+                # get all child elements of anyType element, all properties located here
+                    for dis_name in types.findall('.//b:DisplayName', ele_namespace):   
+                        ele_prop['PropName'] = dis_name.text
+                    for prop_guid in types.findall('.//b:Name', ele_namespace):   
+                        if prop_guid.text:
+                            ele_prop['PropGUID'] = prop_guid.text
+                        else:
+                            ele_prop['PropGUID'] = ''
+                    selection = types.find('.//b:SelectedIndex', ele_namespace)   
+                    if selection is None:
+                        ele_prop['SelectedIndex'] = ''
+                        # get all prop values
+                        value = types.find('.//b:Value', ele_namespace)
+                        # set values
+                        if value.text is None:
+                            _values.append('')
+                        else:
+                            _values.append(value.text)
+                        # set custom element name 
+                        if ele_prop['PropName'] == 'Name':
+                            element['Name'] = value.text
+                            ele_prop['PropValues'] = _values.copy()
+                    else:
+                        # get prop selection
+                        ele_prop['SelectedIndex'] = selection.text
+                        # get value list for selection
+                        for values in types.findall('.//b:Value/*', ele_namespace):
+                            _values.append(values.text)
+                        ele_prop['PropValues'] = _values.copy()
+                     # add prop to prop list
+                    _values.clear()
+                    ele_props.append(ele_prop.copy())
+                    ele_prop.clear()
 
+            # save prop list to element dict
+            element['properties'] = ele_props
+            print(element['properties'])
+            ele_props.clear()
+            # write to csv
+            writer.writerow([element['GenericTypeId'], element['GUID'], element['Name'], element['SourceGuid'], element['TargetGuid']])
+    # if len(prop_guid_list) != len(prop_names):
+    #     print ("prop list error")m
+    #     print(len(prop_guid_list),len(prop_names))
+    #     return
+    # else:
+    #     # print(prop_index)
+    #     # print(prop_guid_list)
+    #     # print(prop_names)
+    #     for s in prop_values:
+    #         print(*s)
 
 with open('model.csv', 'w', newline='') as r:
     writer = csv.writer(r)
-    # write headders in csv file
-
     for child in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}DrawingSurfaceList'):
         for ele in child.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}DrawingSurfaceModel'):
             for borders in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Borders'):
@@ -66,8 +113,10 @@ with open('model.csv', 'w', newline='') as r:
                 writer.writerow(['GenericTypeId','GUID','Name'])
                 write_element(borders)
             for lines in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Lines'):
+                # create a new line with same doc and write element headders
                 writer.writerow([''])
                 writer.writerow(['Flows'])
+                # unlike stencils, flows have a source and target guids
                 writer.writerow(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid'])
                 write_element(lines)
                

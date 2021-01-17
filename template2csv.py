@@ -1,7 +1,7 @@
 ## this script will pull all threats and threat categories
 ## (STRIDE + custom) from a MS TMT template files (.tb7)
 ## and it will also pull all template's generic + standard elements
-## after, it creates threats.csv file
+## after, it creates a template.csv file
 
 import xml.etree.ElementTree as ET
 import csv
@@ -10,6 +10,7 @@ from tkinter import filedialog
 import shutil
 import os
 
+# get script's path
 script_path = os.path.dirname(os.path.abspath(__file__))
 
 root = tk.Tk()
@@ -22,7 +23,7 @@ shutil.copy(file_path, folder_path)
 
 root = ET.parse(folder_path).getroot()
 
-# pull all threat Categories from the XML
+# pull all threat Categories and their GUIDs from the XML
 def find_cats():
     cats={}
     cat_ID=''
@@ -36,7 +37,7 @@ def find_cats():
     return cats
 
 
-# take the ID and look it up in the category dict
+# take a threat category GUID and look it up in the category dict
 def cat2str(cat, cats):
     for key, value in cats.items():
          if cat == value:
@@ -64,8 +65,13 @@ class Elements():
                             self.ele_desc = subelem.text
                     for subelem in types.findall('ParentElement'):
                             self.ele_parent = subelem.text
-                            # WRITE EACH ROW ITERATIVELY
-                    writer.writerow([self.ele_name,self.ele_id,self.ele_desc,self.ele_parent,ele_type])
+                    for subelem in types.findall('Hidden'):
+                            self.hidden = subelem.text
+                    for subelem in types.findall('Representation'):
+                            self.rep = subelem.text
+                    # will not get <Image>, <StrokeThickness>, <ImageLocation>, or sencil constraints
+                            # TODO: get attributes
+                    writer.writerow([self.ele_name,self.ele_id,self.ele_desc,self.ele_parent,self.hidden,self.rep])
 
  
 cats = find_cats()
@@ -94,9 +100,8 @@ with open('template.csv', 'w', newline='') as r:
         elif _id == 'EU':
             continue
 
+        # TODO: replace threat logic GUIDs with names in csv and make a guid lookup function for elements
         # get threat logic
-        # TODO: replace GUID with names. Seach in order: Gerneric element's GUIDs,
-        #  Standard element GUIDs,  then element property GUIDs
         for gen_filters in types.findall('GenerationFilters'):
             for include_logic in gen_filters.findall('Include'):
                 include = include_logic.text
@@ -116,11 +121,15 @@ with open('template.csv', 'w', newline='') as r:
         writer.writerow([category,title.replace(".Name",""),desc.replace(".Name",""),include,exclude])
 
     writer.writerow('')
-    writer.writerow(['Elements'])
-    writer.writerow(['Name', 'ID', 'Description','Parent', 'Type'])
+    writer.writerow(['Generic Elements'])
+    writer.writerow(['Name', 'ID', 'Description','Parent', 'Hidden_bool', 'Representation'])
 
     # generic elements
     Elements(root, writer, "GenericElements")
+
+    writer.writerow('')
+    writer.writerow(['Standard Elements'])
+    writer.writerow(['Name', 'ID', 'Description','Parent', 'Hidden_bool', 'Representation'])
 
     # standard elements
     Elements(root, writer, "StandardElements")

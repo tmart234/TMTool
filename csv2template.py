@@ -64,7 +64,7 @@ def guid2str(cat, cats):
 #              return value
 
 cats = find_cats()
-print(cats)
+# print(cats)
 categories = []
 # enumerate temp_xml threats categories
 for types in root.iter('ThreatType'):
@@ -117,15 +117,19 @@ with open(template_path, newline='') as csvfile:
     # remove duplicates
     csv_categories = list(set(csv_categories))
     categories = list(set(categories))
-    # TODO: make this work with less categories (or a category not found)
     # compare both category lists
-    compare = (set(csv_categories) - set(categories))
-    if not compare:
+    surplus = (set(csv_categories) - set(categories))
+    deficit = (set(categories) - set(csv_categories))
+    if not surplus and not deficit:
         print('Same categories')
-    else:    
-        for _string in csv_categories:
-            if _string not in categories:
-                print('New category found: ' + _string)
+    # modify xml file here
+    else:
+        # add extra csv categories
+        if surplus not in categories:
+            print('adding new category found: ' + str(surplus))
+        # remove missing csv categories
+        if deficit not in csv_categories:
+            print('removing category not found: ' + str(deficit))
                 # TODO: grab all csv threats within this category and add to xml doc
                 # check this worked with template2csv.py
     

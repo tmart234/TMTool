@@ -7,6 +7,7 @@ import tkinter as tk
 from tkinter import filedialog
 import shutil
 import os
+import collections
 
 script_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -81,33 +82,37 @@ for types in root.iter('ThreatType'):
         categories.append(category)
 #print(categories)
 
+# get threat categories of all the threats we have in csv file
 csv_categories = []
 with open(template_path, newline='') as csvfile:
     csv_reader = csv.reader(csvfile, delimiter=',')
     line_count = 0
     for row in csv_reader:
         # skip empty rows
-        if not row:
+        if row[0] == '':
             break
-        if row[0] != 'Threats' and line_count == 0:
-            print('NOT FOUND')
-            break
-        if line_count > 1:
+        elif row[0] == 'Threats' or row[0] == 'Category':
+            # start at line +2 to get first threat
+            line_count += 1
+            continue
+        elif line_count >= 2:
             csv_categories.append(row[0])
-        line_count += 1
-    # sort both categories lists
-    categories.sort()
-    csv_categories.sort()
-    # compare 2 lists of strings, find differences
-    compare_list = [string for string in categories if string not in csv_categories]
-    if compare_list:
-        print('!!! new category found')
-        print(compare_list)
-    else:
-        print('Same categories')
+            line_count += 1
+            continue
+        else:
+            break
 
-# get threat categories of all the threats we have in csv and guids
-# sort and compare both lists
+    # remove duplicates
+    csv_categories = list(set(csv_categories))
+    categories = list(set(categories))
+    # compare both lists
+    compare = (set(csv_categories) - set(categories))
+    if not compare:
+        print('Same categories')
+    else:    
+        for _string in csv_categories:
+            if _string not in categories:
+                print('New category found: ' + _string)
 
 # delete temp .xml file created
 cleanUp(folder_path)

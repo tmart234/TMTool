@@ -14,7 +14,7 @@ root = tk.Tk()
 root.withdraw()
 
 tm7_path = filedialog.askopenfilename(parent=root, filetypes=[("template tb7 file", "*.tb7")])
-#template_path = filedialog.askopenfilename(parent=root, filetypes=[("template csv file", "template.csv")])
+template_path = filedialog.askopenfilename(parent=root, filetypes=[("template csv file", "template.csv")])
 
 # copy and rename file extension for tm7 file
 folder_path = os.path.join(script_path, "temp_template.xml")
@@ -52,12 +52,12 @@ def cat2str(cat, cats):
              return key
 
 cats = find_cats()
+categories = []
 # enumerate temp_xml threats categories
 for types in root.iter('ThreatType'):
         # get ID and skip row if ID is a 'root' category
     _id = ''
     category = ''
-    categories = []
     for subelem in types.findall('Id'):
          _id = subelem.text
     if _id == 'SU':
@@ -79,7 +79,32 @@ for types in root.iter('ThreatType'):
         category = cat2str(category, cats)
         # get guid list
         categories.append(category)
+#print(categories)
 
+csv_categories = []
+with open(template_path, newline='') as csvfile:
+    csv_reader = csv.reader(csvfile, delimiter=',')
+    line_count = 0
+    for row in csv_reader:
+        # skip empty rows
+        if not row:
+            break
+        if row[0] != 'Threats' and line_count == 0:
+            print('NOT FOUND')
+            break
+        if line_count > 1:
+            csv_categories.append(row[0])
+        line_count += 1
+    # sort both categories lists
+    categories.sort()
+    csv_categories.sort()
+    # compare 2 lists of strings, find differences
+    compare_list = [string for string in categories if string not in csv_categories]
+    if compare_list:
+        print('!!! new category found')
+        print(compare_list)
+    else:
+        print('Same categories')
 
 # get threat categories of all the threats we have in csv and guids
 # sort and compare both lists

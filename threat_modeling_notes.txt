@@ -6,10 +6,17 @@ WIP:
 		- will not get <Image>, <StrokeThickness>, <ImageLocation> data, these will also be default values, the rest we save in csv
 			- perhaps these defaults can be extracted from the previous .tm7 file. (process: convert to csv -> modify -> with old .tm7 and csv, port only relevent section back into file)
 
-goal: to utilize TMT's built-in reporting and threat auditing features but with more usability (scoring, deriving mitigations, etc.) and automate the threat modeling process as possible
+Project Goals: 
+Modeling:
+	- to utilize TMT's built-in reporting and threat auditing features but with more usability (scoring, deriving mitigations, and any other processes in Threat Modeling)
+	- explore what metrics can be infered from the model, making less work for the threat modeler and automating the process of analysing derived threats as much as possible
+Templates:
+	- make it easier for a template developer to make mass edits, whether it be to elements, guids, threat logic, etc.
+	- explore auditing templates and writing test models to verify that threats are/aren't being derived (TMT is some CLI program so this might be challenging)
 
 Need 2 Scripts for diffing:
 - diff template produced .csv files (produced in template2csv.py script) for template devs to compare and possibly to partially integrate new threats into their template. Categories: Major: missing stencils, flows, or threats entirely Minor: modified threat definition, modified threat logic, modified flow & stencil properties
+	- diffing template functionality can almost entirely be pulled from csv2template.py
 - diff the TMT produced csv files, regardless of TMT’s numbering or the ordering (unsorted)
 Modeling
 - a model's Note entries are system level, not threat ID level (like how Threat Properties are).
@@ -40,7 +47,6 @@ Python scoring script
 	- pro : consists of just 2 metrics Probability & Impact
 		- low (5), medium (10), high (15) 
 	- con: both Probability & Impact can't be infered without adding more built-in metics or explicitly setting via scoring each threat.
-		- a goal of this project is to explore how much the model can infer, making less work for the threat modeler
 	
 Template
 - in test_template.tm7, C.I.A. (base) and severity (environmental) metrics add to Threat Properties (meaning it can be set for every threat ID generated)

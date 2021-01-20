@@ -1,7 +1,11 @@
-""" this script will elements.csv and threats.csv files and convert
- back to a .tb7 file. 
- Right now it only compares threat categories
-  work in progress """
+""" 
+This script will take a .tb7 file and template.csv file
+It will compare threat categories, individual threats, and threat GUIDs in order
+If, there are more or less categories/threats present in template.csv,
+that difference will be added or subtracted to the xml and saved as a new .tb7 file
+ 
+  work in progress!!!
+  """
 
 import xml.etree.ElementTree as ET
 import csv
@@ -113,6 +117,7 @@ with open(template_path, newline='') as csvfile:
     # remove duplicates
     csv_categories = list(set(csv_categories))
     categories = list(set(categories))
+    # TODO: make this work with less categories (or a category not found)
     # compare both category lists
     compare = (set(csv_categories) - set(categories))
     if not compare:
@@ -124,8 +129,8 @@ with open(template_path, newline='') as csvfile:
                 # TODO: grab all csv threats within this category and add to xml doc
                 # check this worked with template2csv.py
     
-    # compare individual threats by "short title", add missing to xml
-    # compare guids, choose csv guid for any non matching
+    # TODO: compare individual threats by "short title", add/sub to xml
+    # TODO: compare guids, always choose template.csv's guid for any non matching guids
 
 # delete temp .xml file created
 cleanUp(folder_path)

@@ -1,5 +1,7 @@
 """ this script will elements.csv and threats.csv files and convert
- back to a .tb7 file work in progress """
+ back to a .tb7 file. 
+ Right now it only compares threat categories
+  work in progress """
 
 import xml.etree.ElementTree as ET
 import csv
@@ -7,7 +9,6 @@ import tkinter as tk
 from tkinter import filedialog
 import shutil
 import os
-import collections
 
 script_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -47,12 +48,19 @@ def find_cats():
     return cats
 
 # take a threat category GUID and look it up in the category dict
-def cat2str(cat, cats):
+def guid2str(cat, cats):
     for key, value in cats.items():
          if cat == value:
              return key
 
+# # take a threat category and look up it's GUID in the dict
+# def cat2guid(cat, cats):
+#     for key, value in cats.keys():
+#          if cat == key:
+#              return value
+
 cats = find_cats()
+print(cats)
 categories = []
 # enumerate temp_xml threats categories
 for types in root.iter('ThreatType'):
@@ -77,7 +85,7 @@ for types in root.iter('ThreatType'):
     # these categories can not contain 0 threats
     for subelem in types.findall('Category'):
         category = subelem.text
-        category = cat2str(category, cats)
+        category = guid2str(category, cats)
         # get guid list
         categories.append(category)
 #print(categories)
@@ -105,7 +113,7 @@ with open(template_path, newline='') as csvfile:
     # remove duplicates
     csv_categories = list(set(csv_categories))
     categories = list(set(categories))
-    # compare both lists
+    # compare both category lists
     compare = (set(csv_categories) - set(categories))
     if not compare:
         print('Same categories')
@@ -113,6 +121,11 @@ with open(template_path, newline='') as csvfile:
         for _string in csv_categories:
             if _string not in categories:
                 print('New category found: ' + _string)
+                # TODO: grab all csv threats within this category and add to xml doc
+                # check this worked with template2csv.py
+    
+    # compare individual threats by "short title", add missing to xml
+    # compare guids, choose csv guid for any non matching
 
 # delete temp .xml file created
 cleanUp(folder_path)

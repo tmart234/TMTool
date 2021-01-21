@@ -85,7 +85,7 @@ def guid2str(cat, cats):
 
 # # take a threat category and look up it's GUID in the dict
 # def cat2guid(cat, cats):
-#     for key, value in cats.keys():
+#     for key, value in cats.items():
 #          if cat == key:
 #              return value
 
@@ -165,7 +165,7 @@ with open(template_path, newline='') as csvfile:
             # add each threat new in template.csv from the surplus's category list
         # remove missing csv category threats
         if deficit not in csv_categories:
-            print('removing category not found: ' + str(deficit))
+            print('removing threats from category not found: ' + str(deficit))
             # delete each threat in deficit's category list
             # remove category entirely if not STRIDE
 

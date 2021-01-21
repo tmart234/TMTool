@@ -83,6 +83,7 @@ class CVSS():
         # static value, assume target exists in env on a considerable scale
         # TODO: input Security requirements and TD
         self.TD = 1.0
+        self.temporal_score = None
         self.base = dict.fromkeys('AV','AC','AU','C','I','A')
         self.env = dict.fromkeys('CPD','TD','CR','IR','AR')
         # TODO: figure out how were importing values here
@@ -93,6 +94,7 @@ class CVSS():
         self.env_score = self.calulate_env()
         self.calulate_overall()
 
+    # TODO: get values from dict and get_() functions above
     def calulate_base(self):
         self.impact = 10.41 * (1 - (1 - self.conf_impact) * (1 - self.integ_impact) * (1 - self.aval_impact))
         self.exploitability = 20 * self.access_complexity * self.authentication * self.access_vector
@@ -107,15 +109,16 @@ class CVSS():
         self.env = ((self.adj_temp + (10 - self.adj_temp) * self.CDP) * self.TD)
         return
  
-# AdjustedTemporal = TemporalScore recomputed with the Impact sub-equation 
-#                    replaced with the following AdjustedImpact equation.
+# self.adj_temp = TemporalScore recomputed with the Impact sub-equation 
+#                    replaced with the following self.adj_impact equation.
  
-# AdjustedImpact = Min(10, 
-#                      10.41 * (1 - 
-#                                 (1 - ConfImpact * ConfReq) 
-#                               * (1 - IntegImpact * IntegReq) 
-#                               * (1 - AvailImpact * AvailReq)))
+# self.adj_impact = min(10, (10.41 * (1 - (1 - self.conf_impact * ConfReq) * (1 - self.integ_impact * IntegReq) * (1 - self.aval_impact * AvailReq))))
  
-
+    # See overall score decision tree
     def calulate_overall(self):
-        print('cal overall')
+        if self.env_score:
+            self.overall_score = self.env_score
+        elif self.temporal_score:
+            self.overall_score = self.temporal_score
+        else:
+            self.overall_score = self.base_score

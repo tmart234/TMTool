@@ -4,52 +4,58 @@ WIP:
 	- csv2template
 		- would work best with generic and default values for <ThreatMetaDatum> (used in <ThreatMetaData> and <ThreatType>)
 		- will not get <Image>, <StrokeThickness>, <ImageLocation> data, these will also be default values, the rest we save in csv
-			- perhaps these defaults can be extracted from the previous .tm7 file. (process: convert to csv -> modify -> with old .tm7 and csv, port only relevent section back into file)
+			- perhaps these defaults can be extracted from the previous .tm7 file. (process: convert to csv -> modify -> with old .tm7 and csv, port only relevant section back into file)
 
 Project Goals: 
 Modeling:
 	- to utilize TMT's built-in reporting and threat auditing features but with more usability (scoring, deriving mitigations, and any other processes in Threat Modeling)
-	- explore what metrics can be infered from the model, making less work for the threat modeler and automating the process of analysing derived threats as much as possible
+	- explore what metrics can be inferred from the model, making less work for the threat modeler and automating the process of analyzing derived threats as much as possible
+		- "Perfect is the enemy of good": It is NOT a goal of this project to create the "perfect" threat model, but rather improve upon the threat modeling process
 Templates:
 	- make it easier for a template developer to make mass edits, whether it be to elements, guids, threat logic, etc.
 	- explore auditing templates and writing test models to verify that threats are/aren't being derived (TMT is some CLI program so this might be challenging)
 
-Need 2 Scripts for diffing:
-- diff template produced .csv files (produced in template2csv.py script) for template devs to compare and possibly to partially integrate new threats into their template. Categories: Major: missing stencils, flows, or threats entirely Minor: modified threat definition, modified threat logic, modified flow & stencil properties
+The typical TM process:
+Scope -> Model -> Analyze - Mitigate -> Document
+
+Future diffing scripts:
+- diff template produced .csv files (produced in template2csv.py script) for template developers to compare and possibly to partially integrate new threats into their template. Categories: Major: missing stencils, flows, or threats entirely Minor: modified threat definition, modified threat logic, modified flow & stencil properties
 	- diffing template functionality can almost entirely be pulled from csv2template.py
 - diff the TMT produced csv files, regardless of TMT’s numbering or the ordering (unsorted)
-Modeling
-- a model's Note entries are system level, not threat ID level (like how Threat Properties are).
+
+Modeling:
+- a model's Note entries are system level, not threat ID level like how Threat Properties are, which can be set for every generated threat
 	- therefore model notes could contain system metadata for scripts and other variables that shouldn't change. 
 	- ex: CVSS environmental metrics like Security Requirements (based on risk level) or the Target Distribution (proportion of vulnerable systems)
 
-Auditing a Model's Threats
+Analyzing & Auditing:
 - "Export to CSV" function will only grab threat IDs and their threat properties
-	- using the exported csv allong with the model.csv (produced from model2csv.py script), we can begin to automatically audit threats
+	- using the exported csv along with the model.csv (produced from model2csv.py script), we can begin to automatically audit threats
 - when auditing the generated threat IDs, if a False positive is identified, set status to: "not applicable"
 - set CIA & severity (custom template threat properties) here
 
-Reporting
+Documenting
 - address how can we view access vector (an element property) within the generated threat model report?
 - address how can we view authentication (an element property) within the generated threat model report?
 	- script that fills in an empty Threat Property after finding or not finding the element property required (ex: [flow] has Auth is 'Yes')
  
 Python scoring script
-- ditch access complexity completely? or cange to just a high/low scores (remove medium AC score like in CVSS 3.0)? Need to decide on this
+- ditch access complexity completely? or change to just a high/low scores (remove medium AC score like in CVSS 3.0)? Need to decide on this
 - CVSS base metrics + environmental metrics?
 - could authentication be represented in the template better than flow properties?
-- CVSS will have threashold. The threat's CVSS score mapped to the threat's "priority" in Threat properties?
+- CVSS will have threshold. The threat's CVSS score mapped to the threat's "priority" in Threat properties?
 	- set the "CVSS Score" threat property string for each threat ID
-	- below threashold will automatically set status to: Not Aplicable
+	- below threshold will automatically set status to: Not Applicable
 	- above, set status to: Needs Investigation and set "priority" level
 	- explore adding more statuses to template? is this needed?
-- Explore ditching CVSS base + environmental in favor of a simpiler Probability & Impact ranking system
+- Explore ditching CVSS base + environmental in favor of a simpler Probability & Impact ranking system
 	- pro : consists of just 2 metrics Probability & Impact
 		- low (5), medium (10), high (15) 
-	- con: both Probability & Impact can't be infered without adding more built-in metics or explicitly setting via scoring each threat.
+	- con: both Probability & Impact can't be inferred without adding more built-in metrics or explicitly setting via scoring each threat.
 	
 Template
-- in test_template.tm7, C.I.A. (base) and severity (environmental) metrics add to Threat Properties (meaning it can be set for every threat ID generated)
+- Answers: what are we building? and what could go wrong?
+- in test_template.tm7, C.I.A. (base) and severity (environmental) metrics add to Threat Properties
 - CVSS score is a threat property
 - Add base threats to template:
 	Spoofing: 
@@ -70,9 +76,10 @@ Template
 - map which threats trace to OWASP top 10, SANS top 25, or other compliance standards
 
 Mitigations
+- Answers: "what are we going to do about it?"
 - Microsoft has a decent list of mitigations
 	- https://docs.microsoft.com/en-us/azure/security/develop/threat-modeling-tool-mitigations
-	- unfortunatly these mitigations are not baked into the TMT in a sensible way where we can derive them
+	- unfortunately these mitigations are not baked into the TMT in a sensible way where we can derive them
 	- maybe we can categorize this mitigation list further based on STRIDE's desired properties
-		- Workfolw: generate a threat -> look up STRIDE desired property -> derive mitigation Class -> implemention of mitigation/ device security requirements (TMT shouldn't derive, but should give basic suggestions on how)
-
+		- Workflow: generate a threat -> look up STRIDE desired property -> derive mitigation Class -> implementation of mitigation/ device security requirements (TMT shouldn't derive, but should give basic suggestions on how)
+- will need to answer the final question after settling on a mitigation: "did we do a good enough job?". Can we address this in Threat's Justification? or another metric?

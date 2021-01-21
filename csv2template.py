@@ -51,6 +51,32 @@ def find_cats():
         cats[cat_name]=cat_ID
     return cats
 
+# find if an item occures in list
+def compare_list(item, _list):
+    for _str in _list:
+        if item == _str:
+            return True
+    return False
+
+# add cat to xml file
+def add_cat(cat):
+    print('adding... ' + cat)
+
+# loop each list, compare, and add if not found
+def compare_cats(_surplus, _cats):
+    for item in _surplus:
+    # compare each category in surplus list
+        result = compare_list(item, _cats)
+        # don't add surplus category
+        if result == True:
+            print('found: ' + item)
+            continue
+    # add surplus category
+        else:
+            print('not found: ' + item)
+            add_cat(item)
+    return
+
 # take a threat category GUID and look it up in the category dict
 def guid2str(cat, cats):
     for key, value in cats.items():
@@ -114,27 +140,37 @@ with open(template_path, newline='') as csvfile:
         else:
             break
 
-    # remove duplicates
-    csv_categories = list(set(csv_categories))
-    categories = list(set(categories))
     # compare both category lists
-    surplus = (set(csv_categories) - set(categories))
-    deficit = (set(categories) - set(csv_categories))
+    surplus = list(set(set(csv_categories) - set(categories)))
+    deficit = list(set(set(categories) - set(csv_categories)))
     if not surplus and not deficit:
         print('Same categories')
     # modify xml file here
     else:
         # add extra csv categories
         if surplus not in categories:
-            print('adding new category found: ' + str(surplus))
-        # remove missing csv categories
+            print('comparing new categories found: ' )
+            print(*surplus)
+            key_cats = []
+            for keys,value in cats.items():
+                key_cats.append(keys)
+            if key_cats and surplus:
+                # loop each list, compare, and add if not found
+                compare_cats(surplus, cats)
+                # TODO: make work with deficit
+            else:
+                print('empty lists')
+                print(key_cats)
+                
+            # add each threat new in template.csv from the surplus's category list
+        # remove missing csv category threats
         if deficit not in csv_categories:
             print('removing category not found: ' + str(deficit))
-                # TODO: grab all csv threats within this category and add to xml doc
-                # check this worked with template2csv.py
-    
+            # delete each threat in deficit's category list
+            # remove category entirely if not STRIDE
+
     # TODO: compare individual threats by "short title", add/sub to xml
     # TODO: compare guids, always choose template.csv's guid for any non matching guids
 
-# delete temp .xml file created
-cleanUp(folder_path)
+# TODO: remove and replace with function that copies to new .tb7 file
+#cleanUp(folder_path)

@@ -1,22 +1,23 @@
  *A collection of my thoughts on different parts of the threat modeling process*
 
-WIP:
-	- csv2template
-		- would work best with generic and default values for <ThreatMetaDatum> (used in <ThreatMetaData> and <ThreatType>)
-		- will not get <Image>, <StrokeThickness>, <ImageLocation> data, these will also be default values, the rest we save in csv
-			- perhaps these defaults can be extracted from the previous .tm7 file. (process: convert to csv -> modify -> with old .tm7 and csv, port only relevant section back into file)
+WIP scripts:
+- csv2template.py
+- cvss.py
 
 Project Goals: 
-Modeling:
+	Modeling:
 	- to utilize TMT's built-in reporting and threat auditing features but with more usability (scoring, deriving mitigations, and any other processes in Threat Modeling)
 	- explore what metrics can be inferred from the model, making less work for the threat modeler and automating the process of analyzing derived threats as much as possible
-		- "Perfect is the enemy of good": It is NOT a goal of this project to create the "perfect" threat model, but rather improve upon the threat modeling process
-Templates:
+		- It is NOT a goal of this project to create the "perfect" threat model, but rather improve upon the overall threat modeling process. "Perfect is the enemy of good"
+	Templates:
 	- make it easier for a template developer to make mass edits, whether it be to elements, guids, threat logic, etc.
 	- explore auditing templates and writing test models to verify that threats are/aren't being derived (TMT is some CLI program so this might be challenging)
 
 The typical TM process:
 Scope -> Model -> Analyze - Mitigate -> Document
+
+Just getting Started?
+Read MS threat modeling security fundamentals: https://docs.microsoft.com/en-us/learn/paths/tm-threat-modeling-fundamentals/
 
 Future diffing scripts:
 - diff template produced .csv files (produced in template2csv.py script) for template developers to compare and possibly to partially integrate new threats into their template. Categories: Major: missing stencils, flows, or threats entirely Minor: modified threat definition, modified threat logic, modified flow & stencil properties
@@ -24,56 +25,46 @@ Future diffing scripts:
 - diff the TMT produced csv files, regardless of TMT’s numbering or the ordering (unsorted)
 
 Modeling:
-- a model's Note entries are system level, not threat ID level like how Threat Properties are, which can be set for every generated threat
+- a model's Note entries are system level, not threat ID level like Threat Properties (which can be set for every generated threat)
 	- therefore model notes could contain system metadata for scripts and other variables that shouldn't change. 
-	- ex: CVSS environmental metrics like Security Requirements (based on risk level) or the Target Distribution (proportion of vulnerable systems)
+		- ex: CVSS environmental metrics like Security Requirements (based on risk level) or the Target Distribution (proportion of vulnerable systems)
 
 Analyzing & Auditing:
 - "Export to CSV" function will only grab threat IDs and their threat properties
 	- using the exported csv along with the model.csv (produced from model2csv.py script), we can begin to automatically audit threats
 - when auditing the generated threat IDs, if a False positive is identified, set status to: "not applicable"
-- set CIA & severity (custom template threat properties) here
+- set CIA & severity (custom template threat properties) when analyzing
+ 
+Python scoring script
+- Use CVSS base metrics + environmental metrics? This seems easier to use than other things like OWASP Risk rating methodology: https://owasp.org/www-community/OWASP_Risk_Rating_Methodology
+- Explore ditching CVSS base + environmental in favor of a simpler Probability * Impact ranking system
+	- pro : consists of just 2 metrics Probability & Impact
+		- low (5), medium (10), high (15) 
+	- con: both Probability & Impact can't be inferred without adding more built-in metrics or explicitly setting via scoring each threat.
+- could access complexity be baked into the threat database as a metric for each threat?
+- could and should authentication be represented in the template more than just flow element properties?
+- CVSS will have score threshold. The threat's CVSS score can be mapped to the threat's "priority" level in Threat properties? (https://docs.microsoft.com/en-us/azure/security/develop/threat-modeling-tool-feature-overview#priority-change)
+	Workflow:
+	- make sure threats are ready to score after the analyzing stage
+	- score threats
+	- script sets the "CVSS Score" threat property for each threat
+	- below threshold scores will automatically set status to: Not Applicable with a generic justification
+	- above threshold scores, set status to: Needs Investigation and set "priority" level
+	- maybe add statuses to template like: Scored (indicates analysis was done: CIA, severity, and other threat props are set)
 
+	
 Documenting
 - address how can we view access vector (an element property) within the generated threat model report?
 - address how can we view authentication (an element property) within the generated threat model report?
 	- script that fills in an empty Threat Property after finding or not finding the element property required (ex: [flow] has Auth is 'Yes')
- 
-Python scoring script
-- ditch access complexity completely? or change to just a high/low scores (remove medium AC score like in CVSS 3.0)? Need to decide on this
-- CVSS base metrics + environmental metrics?
-- could authentication be represented in the template better than flow properties?
-- CVSS will have threshold. The threat's CVSS score mapped to the threat's "priority" in Threat properties?
-	- set the "CVSS Score" threat property string for each threat ID
-	- below threshold will automatically set status to: Not Applicable
-	- above, set status to: Needs Investigation and set "priority" level
-	- explore adding more statuses to template? is this needed?
-- Explore ditching CVSS base + environmental in favor of a simpler Probability & Impact ranking system
-	- pro : consists of just 2 metrics Probability & Impact
-		- low (5), medium (10), high (15) 
-	- con: both Probability & Impact can't be inferred without adding more built-in metrics or explicitly setting via scoring each threat.
 	
 Template
-- Answers: what are we building? and what could go wrong?
-- in test_template.tm7, C.I.A. (base) and severity (environmental) metrics add to Threat Properties
-- CVSS score is a threat property
-- Add base threats to template:
-	Spoofing: 
-		- Session hijacking 
-		- CSFR
-	Tampering:
-		- XSS
-		- SQL Injection
-	Repudiation:
-		- Audit Log Deletion
-		- Insecure Backup
-	Info Disclosure:
-		- Verbose Exceptions/Sensitive logging
-	DoS:
-		- website defacement
-	EoP:
-		- logic flow attacks?
-- map which threats trace to OWASP top 10, SANS top 25, or other compliance standards
+- Answers: "what are we building?" and "what could go wrong?"
+- in test_template.tm7: added C.I.A. (base) and severity (environmental) metrics, CVSS score, and Compliance Tags to Threat Properties
+- PyTM has a good database of threats that could be part of any template: https://github.com/izar/pytm/blob/master/docs/threats.md
+	- has metrics: Severity, Mitigations, conditional logic (will have to be modified) & pre-requirements, and links to CAPEC and CWE tags
+- Address and explore how templates and/or threat databases can provide different data-flow diagram depth layers: https://docs.microsoft.com/en-us/learn/modules/tm-provide-context-with-the-right-depth-layer/
+	Layer 0: major system parts. Layer 1: secondary system parts. Layer 2: system's sub-components. Layer 3: every process and low-level system subpart
 
 Mitigations
 - Answers: "what are we going to do about it?"

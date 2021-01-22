@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <KnowledgeBase xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Manifest name="NewTemplate" id="51e3a082-4d15-478a-a41e-c7299ea7ba9b" version="1.0.0.61" author="LAPTOP-HETV38CP\tmart" />
+  <Manifest name="NewTemplate" id="51e3a082-4d15-478a-a41e-c7299ea7ba9b" version="1.0.0.62" author="LAPTOP-HETV38CP\tmart" />
   <ThreatMetaData>
     <IsPriorityUsed>true</IsPriorityUsed>
     <IsStatusUsed>true</IsStatusUsed>
@@ -164,6 +164,17 @@
         <Description>Possible safeguards and countermeasures</Description>
         <Id>f2f2ba8a-6876-4690-815d-016c3324764f</Id>
         <AttributeType>0</AttributeType>
+      </ThreatMetaDatum>
+      <ThreatMetaDatum>
+        <Name>2faec1c4-ac90-4d5f-b30f-6df33219382d</Name>
+        <Label>Compliance Tag(s)</Label>
+        <HideFromUI>false</HideFromUI>
+        <Values>
+          <Value />
+        </Values>
+        <Description>Links to mapped CWE, CAPEC, OWASP Top 10, and other compliance standards</Description>
+        <Id>2faec1c4-ac90-4d5f-b30f-6df33219382d</Id>
+        <AttributeType>2</AttributeType>
       </ThreatMetaDatum>
     </PropertiesMetaData>
   </ThreatMetaData>
@@ -587,43 +598,7 @@
           <IsInherited>true</IsInherited>
           <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
           <DisplayName>access vector</DisplayName>
-          <Mode>Dynamic</Mode>
-          <Type>List</Type>
-          <Inheritance>Virtual</Inheritance>
-          <AttributeValues>
-            <Value>network</Value>
-          </AttributeValues>
-        </Attribute>
-        <Attribute>
-          <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
-          <IsInherited>true</IsInherited>
-          <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
-          <DisplayName>access vector</DisplayName>
-          <Mode>Dynamic</Mode>
-          <Type>List</Type>
-          <Inheritance>Virtual</Inheritance>
-          <AttributeValues>
-            <Value>network</Value>
-          </AttributeValues>
-        </Attribute>
-        <Attribute>
-          <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
-          <IsInherited>true</IsInherited>
-          <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
-          <DisplayName>access vector</DisplayName>
-          <Mode>Dynamic</Mode>
-          <Type>List</Type>
-          <Inheritance>Virtual</Inheritance>
-          <AttributeValues>
-            <Value>network</Value>
-          </AttributeValues>
-        </Attribute>
-        <Attribute>
-          <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
-          <IsInherited>true</IsInherited>
-          <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
-          <DisplayName>access vector</DisplayName>
-          <Mode>Dynamic</Mode>
+          <Mode>Static</Mode>
           <Type>List</Type>
           <Inheritance>Virtual</Inheritance>
           <AttributeValues>
@@ -654,43 +629,7 @@
           <IsInherited>true</IsInherited>
           <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
           <DisplayName>access vector</DisplayName>
-          <Mode>Dynamic</Mode>
-          <Type>List</Type>
-          <Inheritance>Virtual</Inheritance>
-          <AttributeValues>
-            <Value>adjecent network</Value>
-          </AttributeValues>
-        </Attribute>
-        <Attribute>
-          <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
-          <IsInherited>true</IsInherited>
-          <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
-          <DisplayName>access vector</DisplayName>
-          <Mode>Dynamic</Mode>
-          <Type>List</Type>
-          <Inheritance>Virtual</Inheritance>
-          <AttributeValues>
-            <Value>adjecent network</Value>
-          </AttributeValues>
-        </Attribute>
-        <Attribute>
-          <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
-          <IsInherited>true</IsInherited>
-          <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
-          <DisplayName>access vector</DisplayName>
-          <Mode>Dynamic</Mode>
-          <Type>List</Type>
-          <Inheritance>Virtual</Inheritance>
-          <AttributeValues>
-            <Value>adjecent network</Value>
-          </AttributeValues>
-        </Attribute>
-        <Attribute>
-          <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
-          <IsInherited>true</IsInherited>
-          <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
-          <DisplayName>access vector</DisplayName>
-          <Mode>Dynamic</Mode>
+          <Mode>Static</Mode>
           <Type>List</Type>
           <Inheritance>Virtual</Inheritance>
           <AttributeValues>
@@ -721,43 +660,7 @@
           <IsInherited>true</IsInherited>
           <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
           <DisplayName>access vector</DisplayName>
-          <Mode>Dynamic</Mode>
-          <Type>List</Type>
-          <Inheritance>Virtual</Inheritance>
-          <AttributeValues>
-            <Value>local</Value>
-          </AttributeValues>
-        </Attribute>
-        <Attribute>
-          <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
-          <IsInherited>true</IsInherited>
-          <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
-          <DisplayName>access vector</DisplayName>
-          <Mode>Dynamic</Mode>
-          <Type>List</Type>
-          <Inheritance>Virtual</Inheritance>
-          <AttributeValues>
-            <Value>local</Value>
-          </AttributeValues>
-        </Attribute>
-        <Attribute>
-          <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
-          <IsInherited>true</IsInherited>
-          <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
-          <DisplayName>access vector</DisplayName>
-          <Mode>Dynamic</Mode>
-          <Type>List</Type>
-          <Inheritance>Virtual</Inheritance>
-          <AttributeValues>
-            <Value>local</Value>
-          </AttributeValues>
-        </Attribute>
-        <Attribute>
-          <Id>7fb04c58-cb05-4c7b-837d-758dfe517ff2</Id>
-          <IsInherited>true</IsInherited>
-          <Name>263e223b-d8ab-45fe-a790-48d8730fda94</Name>
-          <DisplayName>access vector</DisplayName>
-          <Mode>Dynamic</Mode>
+          <Mode>Static</Mode>
           <Type>List</Type>
           <Inheritance>Virtual</Inheritance>
           <AttributeValues>
@@ -835,6 +738,17 @@
           <AttributeType>0</AttributeType>
         </ThreatMetaDatum>
         <ThreatMetaDatum>
+          <Name>2ca6aca5-e337-4dc3-a17e-ecc6ee26c939</Name>
+          <Label>Access Complexity</Label>
+          <HideFromUI>false</HideFromUI>
+          <Values>
+            <Value xsi:nil="true" />
+          </Values>
+          <Description>Complexity of the attack required to exploit the vulnerability </Description>
+          <Id>2ca6aca5-e337-4dc3-a17e-ecc6ee26c939</Id>
+          <AttributeType>1</AttributeType>
+        </ThreatMetaDatum>
+        <ThreatMetaDatum>
           <Name>6f73c3c9-92a4-4cdc-9efa-6596587a5e37</Name>
           <Label>Confidentiality</Label>
           <HideFromUI>false</HideFromUI>
@@ -885,7 +799,7 @@
           <Values>
             <Value xsi:nil="true" />
           </Values>
-          <Description>Priority is the result of severity + exploitability and should convey impact of the threat ID</Description>
+          <Description>Priority will be mapped from CVSS score</Description>
           <Id>d0b23e75-fbdc-482b-8484-ed9eec277043</Id>
           <AttributeType>1</AttributeType>
         </ThreatMetaDatum>
@@ -925,6 +839,17 @@
           <AttributeType>0</AttributeType>
         </ThreatMetaDatum>
         <ThreatMetaDatum>
+          <Name>2ca6aca5-e337-4dc3-a17e-ecc6ee26c939</Name>
+          <Label>Access Complexity</Label>
+          <HideFromUI>false</HideFromUI>
+          <Values>
+            <Value xsi:nil="true" />
+          </Values>
+          <Description>Complexity of the attack required to exploit the vulnerability </Description>
+          <Id>2ca6aca5-e337-4dc3-a17e-ecc6ee26c939</Id>
+          <AttributeType>1</AttributeType>
+        </ThreatMetaDatum>
+        <ThreatMetaDatum>
           <Name>6f73c3c9-92a4-4cdc-9efa-6596587a5e37</Name>
           <Label>Confidentiality</Label>
           <HideFromUI>false</HideFromUI>
@@ -975,7 +900,7 @@
           <Values>
             <Value xsi:nil="true" />
           </Values>
-          <Description>Priority is the result of severity + exploitability and should convey impact of the threat ID</Description>
+          <Description>Priority will be mapped from CVSS score</Description>
           <Id>d0b23e75-fbdc-482b-8484-ed9eec277043</Id>
           <AttributeType>1</AttributeType>
         </ThreatMetaDatum>
@@ -1015,6 +940,17 @@
           <AttributeType>0</AttributeType>
         </ThreatMetaDatum>
         <ThreatMetaDatum>
+          <Name>2ca6aca5-e337-4dc3-a17e-ecc6ee26c939</Name>
+          <Label>Access Complexity</Label>
+          <HideFromUI>false</HideFromUI>
+          <Values>
+            <Value xsi:nil="true" />
+          </Values>
+          <Description>Complexity of the attack required to exploit the vulnerability </Description>
+          <Id>2ca6aca5-e337-4dc3-a17e-ecc6ee26c939</Id>
+          <AttributeType>1</AttributeType>
+        </ThreatMetaDatum>
+        <ThreatMetaDatum>
           <Name>6f73c3c9-92a4-4cdc-9efa-6596587a5e37</Name>
           <Label>Confidentiality</Label>
           <HideFromUI>false</HideFromUI>
@@ -1065,7 +1001,7 @@
           <Values>
             <Value xsi:nil="true" />
           </Values>
-          <Description>Priority is the result of severity + exploitability and should convey impact of the threat ID</Description>
+          <Description>Priority will be mapped from CVSS score</Description>
           <Id>d0b23e75-fbdc-482b-8484-ed9eec277043</Id>
           <AttributeType>1</AttributeType>
         </ThreatMetaDatum>

@@ -1,5 +1,5 @@
-## this script will pull all threats and threat categories
-## (STRIDE + custom) from a MS TMT template files (.tb7)
+## this script will pull all threat categories, threats,
+## and threat properties from a MS TMT template files (.tb7)
 ## and it will also pull all template's generic + standard elements
 ## after, it creates a template.csv file
 
@@ -9,6 +9,8 @@ import tkinter as tk
 from tkinter import filedialog
 import shutil
 import os
+import xmltodict
+import json
 
 # get script's path
 script_path = os.path.dirname(os.path.abspath(__file__))
@@ -70,8 +72,17 @@ class Elements():
                     for subelem in types.findall('Representation'):
                             self.rep = subelem.text
                     # will not get <Image>, <StrokeThickness>, <ImageLocation>, or sencil constraints
-                            # TODO: get attributes
-                    writer.writerow([self.ele_name,self.ele_id,self.ele_desc,self.ele_parent,self.hidden,self.rep])
+                            # get all property data (all child elements)
+                    elemnent_attribs = types.find('Attributes')
+                    self.attribs = ET.tostring(elemnent_attribs, encoding='utf8', method='xml')
+                    # have to dump as json because we have an ordereddicts within ordereddicts
+                    self.attribs = json.loads(json.dumps(xmltodict.parse(self.attribs,process_namespaces=True,namespaces=namespaces)))
+
+                    writer.writerow([self.ele_name,self.ele_id,self.ele_desc,self.ele_parent,self.hidden,self.rep,self.attribs])
+
+namespaces = {
+        'http://www.w3.org/2001/XMLSchema-instance': None # skip this namespace
+        }
 
 with open('template.csv', 'w', newline='') as r:
     writer = csv.writer(r)
@@ -85,7 +96,7 @@ with open('template.csv', 'w', newline='') as r:
     writer.writerow([''])
     # write threats in csv file
     writer.writerow(['Threats'])
-    writer.writerow(['Category','Short Title','ID','Description', 'Include Logic', 'Exclude Logic'])
+    writer.writerow(['Category','Short Title','ID','Description', 'Include Logic', 'Exclude Logic','Properties'])
 
     for types in root.iter('ThreatType'):
         # get ID and skip row if ID is a 'root' category
@@ -122,20 +133,26 @@ with open('template.csv', 'w', newline='') as r:
             title = subelem.text.translate({ord('{'):None, ord('}'):None})
         for subelem in types.findall('Description'):
             desc = subelem.text.translate({ord('{'):None, ord('}'):None})
+        # get all property data (all child elements)
+        properties = types.find('PropertiesMetaData')
+        prop_str = ET.tostring(properties, encoding='utf8', method='xml')
+        # have to dump as json because we have an ordereddicts within ordereddicts
+        prop_str = json.loads(json.dumps(xmltodict.parse(prop_str,process_namespaces=True,namespaces=namespaces)))
+        # TODO: get element constraints? 
 
         # WRITE EACH ROW ITERATIVELY 
-        writer.writerow([category,title.replace(".Name",""),threat_id,desc.replace(".Name",""),include,exclude])
+        writer.writerow([category,title.replace(".Name",""),threat_id,desc.replace(".Name",""),include,exclude,prop_str])
 
     writer.writerow('')
     writer.writerow(['Generic Elements'])
-    writer.writerow(['Name', 'ID', 'Description','Parent', 'Hidden_bool', 'Representation'])
+    writer.writerow(['Name', 'ID', 'Description','Parent', 'Hidden_bool', 'Representation', 'Attributes'])
 
     # generic elements
     Elements(root, writer, "GenericElements")
 
     writer.writerow('')
     writer.writerow(['Standard Elements'])
-    writer.writerow(['Name', 'ID', 'Description','Parent', 'Hidden_bool', 'Representation'])
+    writer.writerow(['Name', 'ID', 'Description','Parent', 'Hidden_bool', 'Representation', 'Attributes'])
 
     # standard elements
     Elements(root, writer, "StandardElements")

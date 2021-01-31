@@ -73,14 +73,19 @@ class Elements():
                             # TODO: get attributes
                     writer.writerow([self.ele_name,self.ele_id,self.ele_desc,self.ele_parent,self.hidden,self.rep])
 
- 
-cats = find_cats()
-
 with open('template.csv', 'w', newline='') as r:
     writer = csv.writer(r)
-    # write headders in csv file
+
+    # write template threat categories
+    cats = find_cats()
+    writer.writerow(['Threat Categories', 'IDs'])
+    for key, value in cats.items():
+        writer.writerow([key, value]) 
+
+    writer.writerow([''])
+    # write threats in csv file
     writer.writerow(['Threats'])
-    writer.writerow(['Category','Short Title','Description', 'Include Logic', 'Exclude Logic'])
+    writer.writerow(['Category','Short Title','ID','Description', 'Include Logic', 'Exclude Logic'])
 
     for types in root.iter('ThreatType'):
         # get ID and skip row if ID is a 'root' category
@@ -109,8 +114,9 @@ with open('template.csv', 'w', newline='') as r:
                 exclude = exclude_logic.text
         # get elements
         for subelem in types.findall('Category'):
-            category = subelem.text
-            category = cat2str(category, cats)
+            category = cat2str(subelem.text, cats)
+        for subelem in types.findall('Id'):
+            threat_id = subelem.text
         for subelem in types.findall('ShortTitle'):
             # remove curley braces for csv output
             title = subelem.text.translate({ord('{'):None, ord('}'):None})
@@ -118,7 +124,7 @@ with open('template.csv', 'w', newline='') as r:
             desc = subelem.text.translate({ord('{'):None, ord('}'):None})
 
         # WRITE EACH ROW ITERATIVELY 
-        writer.writerow([category,title.replace(".Name",""),desc.replace(".Name",""),include,exclude])
+        writer.writerow([category,title.replace(".Name",""),threat_id,desc.replace(".Name",""),include,exclude])
 
     writer.writerow('')
     writer.writerow(['Generic Elements'])

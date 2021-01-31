@@ -7,12 +7,14 @@ that difference will be added or subtracted to the xml and saved as a new .tb7 f
   work in progress!!!
   """
 
-import xml.etree.ElementTree as ET
 import csv
-import tkinter as tk
-from tkinter import filedialog
-import shutil
 import os
+import shutil
+import tkinter as tk
+import xml.etree.ElementTree as ET
+from tkinter import filedialog
+from tkinter.constants import LAST
+import uuid
 
 script_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -26,7 +28,8 @@ template_path = filedialog.askopenfilename(parent=root, filetypes=[("template cs
 folder_path = os.path.join(script_path, "temp_template.xml")
 shutil.copy(tm7_path, folder_path)
 # parse xml
-root = ET.parse(folder_path).getroot()
+tree = ET.parse(folder_path)
+root = tree.getroot()
 
 # TODO: refactor duplicate code!
 # deletes temp xml file
@@ -36,6 +39,7 @@ def cleanUp(_folder_path):
         return
     else:
         print("The temp file does not exist")
+ 
 
 # pull all available threat Categories and their GUIDs from the XML
 # some may be empty (contains 0 threats)
@@ -59,22 +63,34 @@ def compare_list(item, _list):
     return False
 
 # add cat to xml file
-def add_cat(cat):
-    print('adding... ' + cat)
+def add_cat(cat, cats):
+    new_cat = ET.Element("ThreatCategory")
+    name = ET.SubElement(new_cat, 'Name')
+    # set category name
+    name.text = str(cat)
+    id = ET.SubElement(new_cat, 'Id')
+    # generate GUID for category
+    id.text = str(uuid.uuid4())
+
+    ET.SubElement(new_cat, 'ShortDescription')
+    ET.SubElement(new_cat, 'LongDescription')
+    # insert new element
+    root[4].insert(0, new_cat)
+    print('added category: ' + cat)
+
 
 # loop each list, compare, and add if not found
 def compare_cats(_surplus, _cats):
     for item in _surplus:
     # compare each category in surplus list
         result = compare_list(item, _cats)
-        # don't add surplus category
+        # dont compare category GUIDs
         if result == True:
-            print('found: ' + item)
             continue
     # add surplus category
         else:
-            print('not found: ' + item)
-            add_cat(item)
+            print('Threat category not found: ' + item)
+            add_cat(item, _cats)
     return
 
 # take a threat category GUID and look it up in the category dict
@@ -84,10 +100,10 @@ def guid2str(cat, cats):
              return key
 
 # # take a threat category and look up it's GUID in the dict
-# def cat2guid(cat, cats):
-#     for key, value in cats.items():
-#          if cat == key:
-#              return value
+def str2guid(cat, cats):
+    for key, value in cats.items():
+        if cat == key:
+            return value
 
 cats = find_cats()
 # print(cats)
@@ -149,8 +165,8 @@ with open(template_path, newline='') as csvfile:
     else:
         # add extra csv categories
         if surplus not in categories:
-            print('comparing new categories found: ' )
-            print(*surplus)
+            print('comparing new categories found...' )
+            #print(*surplus)
             key_cats = []
             for keys,value in cats.items():
                 key_cats.append(keys)
@@ -165,7 +181,7 @@ with open(template_path, newline='') as csvfile:
             # add each threat new in template.csv from the surplus's category list
         # remove missing csv category threats
         if deficit not in csv_categories:
-            print('removing threats from category not found: ' + str(deficit))
+            print('Removing all threats from category not found: ' + str(deficit))
             # delete each threat in deficit's category list
             # remove category entirely if not STRIDE
 
@@ -173,4 +189,5 @@ with open(template_path, newline='') as csvfile:
     # TODO: compare guids, always choose template.csv's guid for any non matching guids
 
 # TODO: remove and replace with function that copies to new .tb7 file
+tree.write(folder_path)
 #cleanUp(folder_path)

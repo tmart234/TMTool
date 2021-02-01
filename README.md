@@ -12,6 +12,6 @@ scripts for .tm7 model files:
 
 - cvss.py (work in progress) - expiremental script for scoring threat IDs with CVSS
 
-- jira_issues.py - expiremental script to add generated threat list file to Jira Project as a set of issues
+- jira_issues.py - expiremental script to add generated threat list file to Jira Project as a set of issues. See empty_creds.py accessing your JIRA 
 
 View threat_modeling_notes.txt for more

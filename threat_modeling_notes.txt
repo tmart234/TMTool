@@ -1,23 +1,18 @@
  *A collection of my thoughts on different parts of the threat modeling process*
 
-WIP scripts:
-- csv2template.py
-- cvss.py
-
-Project Goals: 
-	Modeling:
-	- to utilize TMT's built-in reporting and threat auditing features but with more usability (scoring, deriving mitigations, and any other processes in Threat Modeling)
-	- explore what metrics can be inferred from the model, making less work for the threat modeler and automating the process of analyzing derived threats as much as possible
-		- It is NOT a goal of this project to create the "perfect" threat model, but rather improve upon the overall threat modeling process. "Perfect is the enemy of good"
-	Templates:
-	- make it easier for a template developer to make mass edits, whether it be to elements, guids, threat logic, etc.
-	- explore auditing templates and writing test models to verify that threats are/aren't being derived (TMT is some CLI program so this might be challenging)
+Project Goals:
+	- improve and automate upon the overall process of threat modeling while provide supplemental scripts for the threat modeling process for where TMT misses the mark
+		- It is NOT a goal of this project to create the "perfect" threat model or model template. "Perfect is the enemy of good"
+	- infer threat and model metrics from element properties, threat properties, or model notes. (See model2csv.py)
+	- explore scoring derived threats within TMT's analysis mode (metrics as threat properties)
+	- explore feeding report into JIRA
+	- make it easier for template developers to manage a threat database and make mass edits to a template's elements, guids, threats, threat logic, etc.
+	Future goals:
+	- explore auditing models based on compliance standards
+	- explore writing and verifying "test models" to check that threats are/aren't being derived by a template
 
 The typical TM process:
 Scope -> Model -> Analyze - Mitigate -> Document
-
-Just getting Started?
-Read MS threat modeling security fundamentals: https://docs.microsoft.com/en-us/learn/paths/tm-threat-modeling-fundamentals/
 
 Future diffing scripts:
 - diff template produced .csv files (produced in template2csv.py script) for template developers to compare and possibly to partially integrate new threats into their template. Categories: Major: missing stencils, flows, or threats entirely Minor: modified threat definition, modified threat logic, modified flow & stencil properties
@@ -30,6 +25,7 @@ Modeling:
 		- ex: CVSS environmental metrics like Security Requirements (based on risk level) or the Target Distribution (proportion of vulnerable systems)
 
 Analyzing & Auditing:
+- utilize TMT's built-in Analysis as much as possible
 - "Export to CSV" function will only grab threat IDs and their threat properties
 	- using the exported csv along with the model.csv (produced from model2csv.py script), we can begin to automatically audit threats
 - when auditing the generated threat IDs, if a False positive is identified, set status to: "not applicable"
@@ -41,7 +37,6 @@ Python scoring script
 	- pro : consists of just 2 metrics Probability & Impact
 		- low (5), medium (10), high (15) 
 	- con: both Probability & Impact can't be inferred without adding more built-in metrics or explicitly setting via scoring each threat.
-- could access complexity be baked into the threat database as a metric for each threat?
 - could and should authentication be represented in the template more than just flow element properties?
 - CVSS will have score threshold. The threat's CVSS score can be mapped to the threat's "priority" level in Threat properties? (https://docs.microsoft.com/en-us/azure/security/develop/threat-modeling-tool-feature-overview#priority-change)
 	Workflow:
@@ -54,17 +49,20 @@ Python scoring script
 
 	
 Documenting
+- utilize TMT's built-in reporting as much as possible:
 - address how can we view access vector (an element property) within the generated threat model report?
 - address how can we view authentication (an element property) within the generated threat model report?
 	- script that fills in an empty Threat Property after finding or not finding the element property required (ex: [flow] has Auth is 'Yes')
 	
 Template
 - Answers: "what are we building?" and "what could go wrong?"
-- in test_template.tm7: added C.I.A. (base) and severity (environmental) metrics, CVSS score, and Compliance Tags to Threat Properties
-- PyTM has a good database of threats that could be part of any template: https://github.com/izar/pytm/blob/master/docs/threats.md
-	- has metrics: Severity, Mitigations, conditional logic (will have to be modified) & pre-requirements, and links to CAPEC and CWE tags
+- in test_template.tm7, we've added the following as Threat Properties: C.I.A. metrics (CVSS base), Access complexity (base), severity (environmental), CVSS overall score, and HTML Compliance Tags
+	- asses if we should pre-set Access Complexity and Severity threat properties within our threat database
+	- PyTM has a good database of threats that could be part of any template: https://github.com/izar/pytm/blob/master/docs/threats.md
+		- contains metrics: Severity, Mitigations, conditional logic (will have to be modified) & pre-requirements, and links to CAPEC and CWE HTML compliance tags
+- explore pre-setting Access Complexity in our template/threat database
 - Address and explore how templates and/or threat databases can provide different data-flow diagram depth layers: https://docs.microsoft.com/en-us/learn/modules/tm-provide-context-with-the-right-depth-layer/
-	Layer 0: major system parts. Layer 1: secondary system parts. Layer 2: system's sub-components. Layer 3: every process and low-level system subpart
+	- Layer 0: major system parts. Layer 1: secondary system parts. Layer 2: system's sub-components. Layer 3: every process and low-level system subpart
 
 Mitigations
 - Answers: "what are we going to do about it?"
@@ -73,4 +71,8 @@ Mitigations
 	- unfortunately these mitigations are not baked into the TMT in a sensible way where we can derive them
 	- maybe we can categorize this mitigation list further based on STRIDE's desired properties
 		- Workflow: generate a threat -> look up STRIDE desired property -> derive mitigation Class -> implementation of mitigation/ device security requirements (TMT shouldn't derive, but should give basic suggestions on how)
-- will need to answer the final question after settling on a mitigation: "did we do a good enough job?". Can we address this in Threat's Justification? or another metric?
+- will need to answer the final question after settling on a mitigation: "did we do a good enough job?". We can address that answer in Threat's Justification section. would imply a second analysis after deciding on a mitigation
+
+Resources
+Just getting Started?: Read MS threat modeling security fundamentals: https://docs.microsoft.com/en-us/learn/paths/tm-threat-modeling-fundamentals/
+Threat Modeling in SecDevOps: https://github.com/DinisCruz/Book_SecDevOps_Risk_Workflow/tree/master/content/2.Risk-workflow/Threat-Models

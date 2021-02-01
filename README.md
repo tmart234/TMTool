@@ -10,4 +10,8 @@ scripts for .tb7 template files:
 scripts for .tm7 model files:
 -	model2csv.py - enumerate a model's flows, notes, elements, element properties, and any other information from a model which we cannot get from TMT's built-in csv file generation but which will later be used in conjunction with the generated csv file.
 
+- cvss.py (work in progress) - expiremental script for scoring threat IDs with CVSS
+
+- jira_issues.py (work in progress) - expiremental script to add generated threat list file to Jira Project as a set of issues
+
 View threat_modeling_notes.txt for more

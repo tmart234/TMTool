@@ -14,4 +14,6 @@ scripts for .tm7 model files:
 
 - jira_issues.py - expiremental script to add generated threat list file to Jira Project as a set of issues. See empty_creds.py accessing your JIRA 
 
+- fix_report_hyperlinks.py - Since MS TMT encodes HTML entities within their generated report, this script will fix report hyperlinks that are broken
+
 View threat_modeling_notes.txt for more

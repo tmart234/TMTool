@@ -22,7 +22,7 @@ root = tk.Tk()
 root.withdraw()
 
 tm7_path = filedialog.askopenfilename(parent=root, filetypes=[("template tb7 file", "*.tb7")])
-template_path = filedialog.askopenfilename(parent=root, filetypes=[("template csv file", "template.csv")])
+csv_path = filedialog.askopenfilename(parent=root, filetypes=[("template csv file", "template.csv")])
 
 # copy and rename file extension for tm7 file
 folder_path = os.path.join(script_path, "temp_template.xml")
@@ -39,6 +39,21 @@ def cleanUp(_folder_path):
         return
     else:
         print("The temp file does not exist")
+
+# search csv for headder, get colmn values in a list
+def get_column(reader, hddr, col):
+    csv_column = []
+    found = False
+    for row in reader:
+        if row[col] == hddr:
+            found = True
+            continue
+        elif found is True:
+            csv_column.append(row[col])
+            continue
+        else:
+            break
+    return csv_column
  
 
 # pull all available threat Categories and their GUIDs from the XML
@@ -127,6 +142,7 @@ for types in root.iter('ThreatType'):
         continue
     elif _id == 'EU':
         continue
+    # TODO: redo this
     # get threat categories of threats we are using in the .tb7 file
     # these categories can not contain 0 threats
     for subelem in types.findall('Category'):
@@ -136,27 +152,13 @@ for types in root.iter('ThreatType'):
         categories.append(category)
 #print(categories)
 
-# get threat categories of all the threats we have in csv file
-csv_categories = []
-with open(template_path, newline='') as csvfile:
+with open(csv_path, 'r') as csvfile:
     csv_reader = csv.reader(csvfile, delimiter=',')
-    line_count = 0
-    for row in csv_reader:
-        # skip empty rows
-        if row[0] == '':
-            break
-        elif row[0] == 'Threats' or row[0] == 'Category':
-            # start at line +2 to get first threat
-            line_count += 1
-            continue
-        elif line_count >= 2:
-            csv_categories.append(row[0])
-            line_count += 1
-            continue
-        else:
-            break
+    # get threat category names of all the threats we have in csv file
+    csv_categories = get_column(csv_reader, 'Threat Categories', 1)
 
     # compare both category lists
+    print('comparing categories...' )
     surplus = list(set(set(csv_categories) - set(categories)))
     deficit = list(set(set(categories) - set(csv_categories)))
     if not surplus and not deficit:
@@ -164,23 +166,21 @@ with open(template_path, newline='') as csvfile:
     # modify xml file here
     else:
         # add extra csv categories
-        if surplus not in categories:
-            print('comparing new categories found...' )
-            #print(*surplus)
+        if surplus and surplus not in categories:
+            print('Adding all threats from categories found: ' + str(surplus))
             key_cats = []
             for keys,value in cats.items():
                 key_cats.append(keys)
             if key_cats and surplus:
                 # loop each list, compare, and add if not found
                 compare_cats(surplus, cats)
-                # TODO: make work with deficit
             else:
                 print('empty lists')
                 print(key_cats)
-                
-            # add each threat new in template.csv from the surplus's category list
+
+        # TODO: make work with deficit
         # remove missing csv category threats
-        if deficit not in csv_categories:
+        if deficit and deficit not in csv_categories:
             print('Removing all threats from category not found: ' + str(deficit))
             # delete each threat in deficit's category list
             # remove category entirely if not STRIDE

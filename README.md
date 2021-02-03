@@ -1,7 +1,7 @@
 # TMT
 Microsoft Threat Modeling Tool python scripts to increase TMT’s utility for both template developers and model makers. For template design, this project hopes to address some of the complexities that come with managing a “database” of threats and stencils. For modeling, this project experiments with extracting information from our model and improving on the overall process of Threat Modeling. 
 
-scripts for .tb7 template files:
+Scripts for .tb7 template files:
 -	template2csv.py - enumerate a template's stencils, threat categories, and threats, and threat logic. Save elements/stencils and threats as a csv file.
 
 - csv2template.py (work in progress) - script to convert template.csv file back into a .tb7 file. For merging new threats or editing templates, you would modify and convert back to .tb7 format
@@ -13,7 +13,7 @@ Scripts for .tm7 model files:
 - cvss.py (work in progress) - expiremental script for scoring threat IDs with CVSS
 
 Scripts for MS TMT generated .csv threat list files:
-- jira_issues.py - expiremental script to add generated threat list file to Jira Project as a set of issues. See empty_creds.py accessing your JIRA 
+- jira_issues.py - expiremental script to add generated threat list to Jira Project as a set of issues. Also set priority level and description. See empty_creds.py accessing your JIRA
 
 Scripts for .htm report files:
 - fix_report_hyperlinks.py - This script will fix report hyperlinks that are broken since MS TMT encodes HTML entities within their generated report

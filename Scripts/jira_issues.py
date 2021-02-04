@@ -4,28 +4,38 @@ and add each threat to a Jira project as a set of issues.
 in Projects/<proj_key>/Project settings/Issue types add <issue_type>
 including standard fields such as priority, assignee, and lables
 TODO: add functionality to see if issue being added already exists in JIRA
+https://atlassian-python-api.readthedocs.io/jira.html
  """
+
 from jira import JIRA
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 import csv
+
+from jira.resources import Project
 
 # create a creds file with values
 import creds
-
-root = tk.Tk()
-root.withdraw()
-
-threat_path = filedialog.askopenfilename(parent=root, filetypes=[("threat csv file", "*.csv")])
 
 # Jira project constants (fill in)
 proj_key = 'TMT'
 # TODO: added code to automatically addded category to JIRA?
 issue_type = 'ThreatModel'
 
+def includeThreatStatus():
+    MsgBox = tk.messagebox.askyesno(title='Include Status?',message='Include the threat ID status (JIRA Issue types must be set up)')
+    return MsgBox
+
+root = tk.Tk()
+# hide root window
+root.withdraw()
+# get CSV
+threat_path = filedialog.askopenfilename(parent=root, filetypes=[("threat csv file", "*.csv")])
+
 def get_mulList(*args):
     return map(list,zip(*args))
-
+# see if issue type exists
 def check_issue_type(jira, issue):
     try:
         type_found = jira.issue_type_by_name(issue)
@@ -36,7 +46,7 @@ def check_issue_type(jira, issue):
     except:
         print('issue type not found')
         return False
-
+# see if project exists
 def check_proj(jira, proj):
     try:
         projects = list(jira.projects())
@@ -48,12 +58,53 @@ def check_proj(jira, proj):
         print('project not found')
         return False
 
+# deletes all project issues, used to clean up
+def delete_issues(jira, proj_key):
+    search_str = str("project=" + proj_key)
+    try:
+        issues = jira.search_issues(search_str, startAt=0, maxResults=50, validate_query=True, fields=None, expand=None, json_result=None)
+        for issue in issues:
+            issue.delete()
+        return True
+    except:
+        return False
+# see if we can transition from list of availible transitions
+def checkTransitions(jira, issue):
+    transitions = jira.transitions(issue)
+    trans_list = ['Mitigated', 'Not Started', 'Needs Investigation', 'Not Applicable']
+    jira_trans = []
+    for t in transitions:
+        jira_trans.append(t['name'])
+    for name in trans_list:
+        if name in jira_trans:
+            return True
+        else:
+            return False
+# transistion issue to desired state
+def set_transition(jira, issue, state):
+    # get transition ID
+    transition_id = None
+    transitions = jira.transitions(issue)
+    for t in transitions:
+        if t['name'] == state:
+            transition_id = t['id']
+    if transition_id == None:
+        print("error could not find transition id")
+    jira.transition_issue(issue, transition_id)
+
 def main():
     options = {
     'server': creds.server
     }
     jira = JIRA(options, basic_auth=(creds.user,creds.api_key))
-   
+
+    # uncomment to not delete all previous issues
+    stat = delete_issues(jira, proj_key)
+    if stat:
+        print('Deleted all issues!')
+    # UI option to include the threat status
+    include_status = includeThreatStatus()
+
     csv_data = open(threat_path,'r')
     # creates a dictionary of lists from the TMT produced .csv threat file
     data = list(csv.reader(csv_data))
@@ -70,9 +121,11 @@ def main():
             new_issue = jira.create_issue(project=proj_key, summary=titles[i],
                             description=dis[i], issuetype={'name': issue_type},
                             assignee ={'id': creds.acct_id}, priority={'name': str(priorities[i]).capitalize()})            
-            # TODO: find transistions and set issue's state
-            transitions = jira.transitions(new_issue)
-            print([(t['id'], t['name']) for t in transitions])
+            # find transistions and set issue's state
+            if include_status and checkTransitions(jira, new_issue):
+                # make sure all transistions exist for issue
+                set_transition(jira, new_issue, states[i])
+
 
 if __name__ == '__main__':
    main()

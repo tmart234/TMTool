@@ -13,7 +13,7 @@ Scripts for .tm7 model files:
 - cvss.py (work in progress) - expiremental script for scoring threat IDs with CVSS
 
 Scripts for MS TMT generated .csv threat list files:
-- jira_issues.py - expiremental script to add generated threat list to Jira Project as a set of issues. Also set priority level and description. See empty_creds.py accessing your JIRA
+- jira_issues.py - expiremental script to add generated threat list to Jira Project as a set of issues. Also sets issue priority level and issue description from the threat. See empty_creds.py accessing your JIRA. This script can set the issue status to the threat's status if the JIRA transistions are available.
 
 Scripts for .htm report files:
 - fix_report_hyperlinks.py - This script will fix report hyperlinks that are broken since MS TMT encodes HTML entities within their generated report

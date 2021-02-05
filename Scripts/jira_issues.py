@@ -14,7 +14,6 @@ from tkinter import messagebox
 import csv
 
 from jira.resources import Project
-
 # create a creds file with values
 import creds
 
@@ -23,18 +22,31 @@ proj_key = 'TMT'
 # TODO: added code to automatically addded category to JIRA?
 issue_type = 'ThreatModel'
 
-def includeThreatStatus():
-    MsgBox = tk.messagebox.askyesno(title='Include Status?',message='Include the threat ID status (JIRA Issue types must be set up)')
-    return MsgBox
-
 root = tk.Tk()
 # hide root window
 root.withdraw()
 # get CSV
 threat_path = filedialog.askopenfilename(parent=root, filetypes=[("threat csv file", "*.csv")])
 
+def includeThreatStatus():
+    MsgBox = tk.messagebox.askyesno(title='Include Status?',message='Include the threat ID status (JIRA Issue types must be set up)')
+    return MsgBox
+
+def deleteMessage():
+    MsgBox = tk.messagebox.askyesno(title='Delete old project threats?',message='WARNING: This option will delete all project threats. Please select no or refine the delete_issues() function',icon='warning')
+    return MsgBox
+
+# ask user delete old issues
+def deleteOld(jira):
+    if deleteMessage():
+        if delete_issues(jira, proj_key):
+            print('Deleted all issues!')
+        else:
+            print('Error deleting old issues, check project key')
+
 def get_mulList(*args):
     return map(list,zip(*args))
+    
 # see if issue type exists
 def check_issue_type(jira, issue):
     try:
@@ -68,18 +80,24 @@ def delete_issues(jira, proj_key):
         return True
     except:
         return False
+
 # see if we can transition from list of availible transitions
-def checkTransitions(jira, issue):
+def checkTransitions(jira, issue, state):
     transitions = jira.transitions(issue)
-    trans_list = ['Mitigated', 'Not Started', 'Needs Investigation', 'Not Applicable']
+    # transistions availible in MS
+    ms_trans = ['Mitigated', 'Not Started', 'Needs Investigation', 'Not Applicable']
+    # transistions availible in jira
     jira_trans = []
     for t in transitions:
         jira_trans.append(t['name'])
-    for name in trans_list:
-        if name in jira_trans:
-            return True
-        else:
-            return False
+    # find in both lists
+    for trans1 in ms_trans:
+        for trans2 in jira_trans:
+            # found
+            if state == trans2 and state == trans1:
+                return True
+    return False
+
 # transistion issue to desired state
 def set_transition(jira, issue, state):
     # get transition ID
@@ -98,10 +116,8 @@ def main():
     }
     jira = JIRA(options, basic_auth=(creds.user,creds.api_key))
 
-    # uncomment to not delete all previous issues
-    stat = delete_issues(jira, proj_key)
-    if stat:
-        print('Deleted all issues!')
+    # ask user to delete old issues
+    deleteOld(jira)
     # UI option to include the threat status
     include_status = includeThreatStatus()
 
@@ -122,7 +138,7 @@ def main():
                             description=dis[i], issuetype={'name': issue_type},
                             assignee ={'id': creds.acct_id}, priority={'name': str(priorities[i]).capitalize()})            
             # find transistions and set issue's state
-            if include_status and checkTransitions(jira, new_issue):
+            if include_status and checkTransitions(jira, new_issue, states[i]):
                 # make sure all transistions exist for issue
                 set_transition(jira, new_issue, states[i])
 

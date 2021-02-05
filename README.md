@@ -6,7 +6,7 @@ Scripts for .tb7 template files:
 
 - csv2template.py (work in progress) - script to convert template.csv file back into a .tb7 file. For merging new threats or editing templates, you would modify and convert back to .tb7 format
 
-- template2sql.py (work in progress) - enumerate a template's threats and stencils/elements. Save as sqlite db
+- template2sql.py - enumerate a template's threats and stencils/elements. Save as sqlite db
 
 
 Scripts for .tm7 model files:

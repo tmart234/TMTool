@@ -69,14 +69,16 @@ def write_threats(root, cur):
             # remove curley braces for output
             title = subelem.text.translate({ord('{'):None, ord('}'):None})
             title = title.replace(".Name","")
+            title = title.replace("'", "")
         for subelem in types.findall('Description'):
             desc = subelem.text.translate({ord('{'):None, ord('}'):None})
             desc = desc.replace(".Name","")
+            desc = desc.replace("'", "")
         # get all property data (all child elements)
-        properties = types.find('PropertiesMetaData')
-        prop_str = ET.tostring(properties, encoding='utf8', method='xml')
-        # have to dump as json because we have an ordereddicts within ordereddicts
-        prop_str = str(json.loads(json.dumps(xmltodict.parse(prop_str,process_namespaces=True,namespaces=namespaces))))
+        # properties = types.find('PropertiesMetaData')
+        # prop_str = ET.tostring(properties, encoding='utf8', method='xml')
+        # # have to dump as json because we have an ordereddicts within ordereddicts
+        # prop_str = str(json.loads(json.dumps(xmltodict.parse(prop_str,process_namespaces=True,namespaces=namespaces))))
         # TODO: get element constraints?
         # build sql string
         search = str("\'" + category +"\',\'"+title+"\',\'"+threat_id+"\',\'"+ desc + "\',\'" +include+ "\',\'" +exclude+ "\'")
@@ -94,6 +96,7 @@ class Elements():
                             self.ele_id = str(subelem.text)
                     for subelem in types.findall('Description'):
                             self.ele_desc = str(subelem.text)
+                            self.ele_desc = self.ele_desc.replace("'", "")
                     for subelem in types.findall('ParentElement'):
                             self.ele_parent = str(subelem.text)
                     for subelem in types.findall('Hidden'):

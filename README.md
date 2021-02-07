@@ -12,6 +12,8 @@ Scripts for .tb7 template files:
 Scripts for .tm7 model files:
 -	model2csv.py - enumerate a model's flows, notes, stencils, stencil properties, and any other information from a model which we cannot get from TMT's built-in csv file generation but which will later be used in conjunction with the generated csv file.
 
+- set_metadata_tags.py (work in progress) - set a model's metadata such as risk level and compliance standards
+
 - cvss.py (work in progress) - expiremental script for scoring threat IDs with CVSS
 
 Scripts for MS TMT generated .csv threat list files:

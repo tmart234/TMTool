@@ -22,6 +22,6 @@ Scripts for MS TMT generated .csv threat list files:
 Scripts for .htm report files:
 - fix_report_hyperlinks.py - This script will fix report hyperlinks that are broken since MS TMT encodes HTML entities within their generated report
 
-- confluence.py (work in progress) - Script will publish a HTML report to confluence
+- confluence.py - Script will publish a HTML and docx report to confluence as an attachment
 
 View threat_modeling_notes.txt for more

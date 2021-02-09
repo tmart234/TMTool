@@ -35,7 +35,7 @@ $ pip install TMTool
 MS Threat Model generated .csv threat list files:
 - jira_issues.py - experimental script to add generated threat list to Jira Project as a set of issues. Also sets issue priority level and issue description from the threat. See empty_creds.py accessing your JIRA. This script can set the issue status to the threat's status if the JIRA transitions are available.
 
-  ![](.\README.assets\TMT_boards.png)
+  ![](https://github.com/tmart234/TMT/blob/main/README.assets/TMT_boards.png)
 
 HTML report files:
 - fix_report_hyperlinks.py - This script will fix report hyperlinks that are broken since MS TMT encodes HTML entities within their generated report

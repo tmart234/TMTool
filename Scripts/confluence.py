@@ -5,13 +5,14 @@ https://confluence.atlassian.com/conf64/html-macro-936511039.html
 # TODO: embed the report into the page's body
  """
 
-from atlassian import Confluence
 import tkinter as tk
 from tkinter import filedialog
 # create a creds file with values
 import creds
 import datetime
 import os
+
+from atlassian import Confluence
 import pypandoc
 
 # Confluence project constants (fill in)

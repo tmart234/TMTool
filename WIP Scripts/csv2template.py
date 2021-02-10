@@ -102,8 +102,12 @@ def add_cat(cat, cats_dict=None):
     root[4].insert(0, new_cat)
     print('added category: ' + cat)
 
-def delete_cat(cat, cats):
-    
+def delete_cat(cat):
+    for item in root[4].iter():
+        for subelem in item.findall('Name'):
+            if subelem.text == cat:
+                root[4].remove(item)
+                print('removed category: ' + cat)
     return
 
 def compare_cats(surplus, deficit, csv_cats):
@@ -121,7 +125,7 @@ def compare_cats(surplus, deficit, csv_cats):
             print('Removing all threats from category not found: ' + str(*deficit))
             if x in categories:
                 # loop each list, compare, and add if not found
-                delete_cat(x, csv_cats)
+                delete_cat(x)
             else:
                 print('error with deficit lists')
                 print(*categories)

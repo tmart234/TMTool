@@ -133,3 +133,7 @@ dmypy.json
 
 *.toml
 .vscode/*
+
+# we shouldn't ever need these extensions anyways
+*.csv
+*.xml

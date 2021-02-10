@@ -25,7 +25,7 @@ tm7_path = filedialog.askopenfilename(parent=root, filetypes=[("template tb7 fil
 csv_path = filedialog.askopenfilename(parent=root, filetypes=[("template csv file", "template.csv")])
 
 # copy and rename file extension for tm7 file
-folder_path = os.path.join(script_path, "temp_template.xml")
+folder_path = str(os.path.join(script_path, "temp_template.xml"))
 shutil.copy(tm7_path, folder_path)
 # parse xml
 tree = ET.parse(folder_path)
@@ -42,18 +42,22 @@ def cleanUp(_folder_path):
 
 # search csv for headder, get colmn values in a list
 def get_column(reader, hddr, col):
-    csv_column = []
+    column1 = []
+    column2 = []
     found = False
     for row in reader:
         if row[col] == hddr:
             found = True
             continue
+        elif row[col] == '':
+            break
         elif found is True:
-            csv_column.append(row[col])
+            column1.append(row[col])
+            column2.append(row[(col+1)])
             continue
         else:
             break
-    return csv_column
+    return column1, column2
  
 
 # pull all available threat Categories and their GUIDs from the XML
@@ -78,14 +82,19 @@ def compare_list(item, _list):
     return False
 
 # add cat to xml file
-def add_cat(cat, cats):
+def add_cat(cat, cats_dict=None):
     new_cat = ET.Element("ThreatCategory")
     name = ET.SubElement(new_cat, 'Name')
     # set category name
     name.text = str(cat)
-    id = ET.SubElement(new_cat, 'Id')
-    # generate GUID for category
-    id.text = str(uuid.uuid4())
+    
+    id_ele = ET.SubElement(new_cat, 'Id')
+    if cats_dict is None:
+        # generate GUID for category
+        id_ele.text = str(uuid.uuid4())
+    else:
+        # set ID
+        id_ele.text = str(cats_dict.get(cat)) 
 
     ET.SubElement(new_cat, 'ShortDescription')
     ET.SubElement(new_cat, 'LongDescription')
@@ -93,20 +102,29 @@ def add_cat(cat, cats):
     root[4].insert(0, new_cat)
     print('added category: ' + cat)
 
-
-# loop each list, compare, and add if not found
-def compare_cats(_surplus, _cats):
-    for item in _surplus:
-    # compare each category in surplus list
-        result = compare_list(item, _cats)
-        # dont compare category GUIDs
-        if result == True:
-            continue
-    # add surplus category
-        else:
-            print('Threat category not found: ' + item)
-            add_cat(item, _cats)
+def delete_cat(cat, cats):
+    
     return
+
+def compare_cats(surplus, deficit, csv_cats):
+    if surplus:
+        # add extra csv categories
+        print('Adding all threats from categories found: ' + str(*surplus))
+        for x in surplus:
+            if x not in categories:
+                add_cat(x, csv_cats)
+            else:
+                print('error adding')
+    if deficit:
+        for x in deficit:
+        # remove missing csv categories from template file
+            print('Removing all threats from category not found: ' + str(*deficit))
+            if x in categories:
+                # loop each list, compare, and add if not found
+                delete_cat(x, csv_cats)
+            else:
+                print('error with deficit lists')
+                print(*categories)
 
 # take a threat category GUID and look it up in the category dict
 def guid2str(cat, cats):
@@ -114,76 +132,28 @@ def guid2str(cat, cats):
          if cat == value:
              return key
 
-# # take a threat category and look up it's GUID in the dict
-def str2guid(cat, cats):
-    for key, value in cats.items():
-        if cat == key:
-            return value
+# get csv threat categories & id as dict
+def find_csv_cats(_reader):
+    keys,values = get_column(_reader, 'Threat Categories', 0)
+    cats = dict(zip(keys,values))
+    return cats
 
-cats = find_cats()
-# print(cats)
-categories = []
-# enumerate temp_xml threats categories
-for types in root.iter('ThreatType'):
-        # get ID and skip row if ID is a 'root' category
-    _id = ''
-    category = ''
-    for subelem in types.findall('Id'):
-         _id = subelem.text
-    if _id == 'SU':
-        continue
-    elif _id == 'TU':
-        continue
-    elif _id == 'RU':
-        continue
-    elif _id == 'IU':
-        continue
-    elif _id == 'DU':
-        continue
-    elif _id == 'EU':
-        continue
-    # TODO: redo this
-    # get threat categories of threats we are using in the .tb7 file
-    # these categories can not contain 0 threats
-    for subelem in types.findall('Category'):
-        category = subelem.text
-        category = guid2str(category, cats)
-        # get guid list
-        categories.append(category)
-#print(categories)
+categories = list(find_cats().keys())
 
 with open(csv_path, 'r') as csvfile:
     csv_reader = csv.reader(csvfile, delimiter=',')
-    # get threat category names of all the threats we have in csv file
-    csv_categories = get_column(csv_reader, 'Threat Categories', 1)
-
+    csv_cats = find_csv_cats(csv_reader)
+    csv_categories = list(csv_cats.keys())
     # compare both category lists
     print('comparing categories...' )
-    surplus = list(set(set(csv_categories) - set(categories)))
-    deficit = list(set(set(categories) - set(csv_categories)))
+    surplus = list(sorted(set(csv_categories) - set(categories)))
+    deficit = list(sorted(set(categories) - set(csv_categories)))
+    print(categories)
     if not surplus and not deficit:
         print('Same categories')
-    # modify xml file here
     else:
-        # add extra csv categories
-        if surplus and surplus not in categories:
-            print('Adding all threats from categories found: ' + str(surplus))
-            key_cats = []
-            for keys,value in cats.items():
-                key_cats.append(keys)
-            if key_cats and surplus:
-                # loop each list, compare, and add if not found
-                compare_cats(surplus, cats)
-            else:
-                print('empty lists')
-                print(key_cats)
-
-        # TODO: make work with deficit
-        # remove missing csv category threats
-        if deficit and deficit not in csv_categories:
-            print('Removing all threats from category not found: ' + str(deficit))
-            # delete each threat in deficit's category list
-            # remove category entirely if not STRIDE
+        # modify xml file
+        compare_cats(surplus, deficit, csv_cats)
 
     # TODO: compare individual threats by "short title", add/sub to xml
     # TODO: compare guids, always choose template.csv's guid for any non matching guids

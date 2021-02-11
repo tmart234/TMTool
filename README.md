@@ -10,8 +10,10 @@ Microsoft Threat Modeling Tool python scripts to increase TMT’s utility for bo
 
 ## Installation
 
+Since this repo is currently a set of scripts, install with the pip target flag
+
 ```
-$ pip install TMTool
+$ pip install TMTool -t /path/to/directory
 ```
 
 ## Scripts

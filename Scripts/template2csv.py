@@ -38,7 +38,6 @@ def find_cats():
         cats[cat_name]=cat_ID
     return cats
 
-
 # take a threat category GUID and look it up in the category dict
 def cat2str(cat, cats):
     for key, value in cats.items():
@@ -78,15 +77,21 @@ class Elements():
                     # have to dump as json because we have an ordereddicts within ordereddicts
                     self.attribs = json.loads(json.dumps(xmltodict.parse(self.attribs,process_namespaces=True,namespaces=namespaces)))
 
-                    writer.writerow([self.ele_name,self.ele_id,self.ele_desc,self.ele_parent,self.hidden,self.rep,self.attribs])
+                    writer.writerow([self.ele_name,ele_type,self.ele_id,self.ele_desc,self.ele_parent,self.hidden,self.rep,self.attribs])
 
 namespaces = {
         'http://www.w3.org/2001/XMLSchema-instance': None # skip this namespace
         }
 
 with open('template.csv', 'w', newline='') as r:
+    title = ''
+    category = ''
+    threat_id = ''
+    desc = ''
+    include = ''
+    exclude = ''
+    
     writer = csv.writer(r)
-
     # write template threat categories
     cats = find_cats()
     writer.writerow(['Threat Categories', 'IDs'])
@@ -95,8 +100,7 @@ with open('template.csv', 'w', newline='') as r:
 
     writer.writerow([''])
     # write threats in csv file
-    writer.writerow(['Threats'])
-    writer.writerow(['Category','Short Title','ID','Description', 'Include Logic', 'Exclude Logic','Properties'])
+    writer.writerow(['Threat Title','Category','ID','Description', 'Include Logic', 'Exclude Logic','Properties'])
 
     for types in root.iter('ThreatType'):
         # get ID and skip row if ID is a 'root' category
@@ -141,20 +145,14 @@ with open('template.csv', 'w', newline='') as r:
         # TODO: get element constraints? 
 
         # WRITE EACH ROW ITERATIVELY 
-        writer.writerow([category,title.replace(".Name",""),threat_id,desc.replace(".Name",""),include,exclude,prop_str])
+        writer.writerow([title.replace(".Name",""),category,threat_id,desc.replace(".Name",""),include,exclude,prop_str])
 
     writer.writerow('')
-    writer.writerow(['Generic Elements'])
-    writer.writerow(['Name', 'ID', 'Description','Parent', 'Hidden_bool', 'Representation', 'Attributes'])
+    writer.writerow(['Stencil Name', 'Type', 'ID', 'Description','Parent', 'Hidden_bool', 'Representation', 'Attributes'])
 
-    # generic elements
+    # write generic elements
     Elements(root, writer, "GenericElements")
-
-    writer.writerow('')
-    writer.writerow(['Standard Elements'])
-    writer.writerow(['Name', 'ID', 'Description','Parent', 'Hidden_bool', 'Representation', 'Attributes'])
-
-    # standard elements
+    # write standard elements
     Elements(root, writer, "StandardElements")
 
     # delete temp .xml file created

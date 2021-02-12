@@ -9,7 +9,6 @@ work in progress!!!
 
 import csv
 import os
-import shutil
 import tkinter as tk
 import xml.etree.ElementTree as ET
 from tkinter import filedialog
@@ -32,6 +31,14 @@ def cat2str(cat, cats):
     for key, value in cats.items():
          if cat == value:
              return key
+    return None
+
+# take a threat category GUID and look it up in the category dict
+def cat2guid(cat, cats):
+    for key, value in cats.items():
+         if cat == key:
+             return value
+    return None
 
 # TODO: refactor duplicate code!
 # deletes temp xml file
@@ -98,10 +105,11 @@ def find_cats():
     return cats
 
 # get threats from .tb7 file as dict
-def find_threats(root):
+def find_threats():
     threats = dict()
-    title = ''
+    threat = dict().fromkeys({'Threat Title','Category','ID','Description', 'Include Logic', 'Exclude Logic','Properties'})
     _id = ''
+    title = ''
     desc = ''
     category = ''
     for threat in root.iter('ThreatType'):
@@ -128,6 +136,9 @@ def find_threats(root):
             category = cat2str(subelem.text, find_cats())
         threats[_id]=[title,desc,category]
     return threats
+# 
+def find_elements():
+    return
 
 # find if an item occures in list
 def compare_list(item, _list):
@@ -138,27 +149,70 @@ def compare_list(item, _list):
 
 # add cat to xml file
 def add_cat(cat, cats_dict=None):
+    _uuid = ''
     new_cat = ET.Element("ThreatCategory")
     name = ET.SubElement(new_cat, 'Name')
     # set category name
     name.text = str(cat)
     
     id_ele = ET.SubElement(new_cat, 'Id')
-    if cats_dict is None:
+    if cats_dict.get(cat) is None:
         # generate GUID for category
-        id_ele.text = str(uuid.uuid4())
+        _uuid = str(uuid.uuid4())
+        id_ele.text = _uuid
     else:
         # set ID
-        id_ele.text = str(cats_dict.get(cat)) 
+        id_ele.text = str(cats_dict.get(cat))
+        _uuid = str(id_ele.text)
 
     ET.SubElement(new_cat, 'ShortDescription')
     ET.SubElement(new_cat, 'LongDescription')
     # insert new element
     root[4].insert(0, new_cat)
     print('added category: ' + cat)
+    return _uuid
 
-def add_threat():
-    return
+# find threat from id in csv_threat_dict and add to .tb7
+def add_threat(threat_id, threats):
+    threat = threats.get(threat_id)
+    new_threat = ET.Element("ThreatType")
+
+    _uuid = ''
+    filter = ET.SubElement(new_threat, 'GenerationFilters')
+    include_ele = ET.SubElement(filter, 'Include')
+    include_ele.text = threat.get('Include Logic')
+    exclude_ele = ET.SubElement(filter, 'Exclude')
+    exclude_ele.text = threat.get('Exclude Logic')
+    # check id
+    id_ele = ET.SubElement(new_threat, 'Id')
+    if threat.get('Id') is None:
+        # generate GUID if not present
+        _uuid = str(uuid.uuid4())
+        id_ele.text = _uuid
+    else:
+        # sets to ID if present
+        id_ele.text = threat_id
+
+    name = ET.SubElement(new_threat, 'ShortTitle')
+    # set threat name
+    name.text = threat.get('Threat Title')
+
+    cat = ET.SubElement(new_threat, 'Category')
+    # set as cat guid
+    _cat = cat2guid(threat.get('Category'),find_cats())
+    if not _cat:
+        # add if it does not exist
+        _cat = add_cat(threat.get('Category'),find_cats())
+    cat.text = _cat
+    ET.SubElement(new_threat, 'RelatedCategory')  
+
+    desc = ET.SubElement(new_threat, 'Description')
+    desc.text = threat.get('Description')
+    ET.SubElement(new_threat, 'PropertiesMetaData')
+    # insert new threat
+    root[5].insert(0, new_threat)
+    print('added threat: ' + str(name.text) + ' ' + str(id_ele.text))
+    return _uuid
 
 def add_element():
     return
@@ -171,7 +225,13 @@ def delete_cat(cat):
                 print('removed category: ' + cat)
     return
 
-def delete_threat(threat):
+# deletes threat based on threat_id
+def delete_threat(threat_id):
+    for item in root[5].iter():
+        for subelem in item.findall('Id'):
+            if subelem.text == threat_id:
+                root[5].remove(item)
+                print('removed threat: ' + threat_id)
     return
 
 def delete_element(element):
@@ -180,7 +240,7 @@ def delete_element(element):
 def compare(surplus, deficit, _type, _list, csv_dict):
     if surplus:
         # add extra to xml file
-        print('Adding all '+ _type +' found: ' + str(*surplus))
+        print('Adding all '+ _type +' found: ' + str(surplus))
         for x in surplus:
             if x not in _list:
                 if _type == 'categories':
@@ -197,7 +257,7 @@ def compare(surplus, deficit, _type, _list, csv_dict):
     if deficit:
         for x in deficit:
         # remove missing from xml file
-            print('Removing all '+ _type+' found: ' + str(*deficit))
+            print('Removing all '+ _type+' found: ' + str(deficit))
             if x in _list:
                 if _type == 'categories':
                     delete_cat(x)
@@ -217,19 +277,25 @@ def find_csv_cats(_reader):
     cats = dict(zip(keys,values))
     return cats
     
-# get csv threats as dict
+# returns csv threats as dict of threats
 def find_csv_threats(_reader):
     threat_list = get_rows(_reader, 'Threat Title', 6)
     threats = dict()
-    key = ''
-    value = []
-    for threat in threat_list:
+    threat = dict().fromkeys({'Threat Title','Category','ID','Description', 'Include Logic', 'Exclude Logic','Properties'})
+    for t in threat_list:
         # guid as key
-        key = threat[2]
-        # everything else as values
-        value = [threat[0], threat[1], threat[3]]
-        threats.update({key:value})
+        threat['ID'] =  t[2]
+        threat['Threat Title'] =  t[0]
+        threat['Category'] =  t[1]
+        threat['Description'] =  t[3]
+        threat['Include Logic'] =  t[4]
+        threat['Exclude Logic'] =  t[5]
+        # add to dict with guid as key
+        threats.update({t[2]:threat})
     return threats
+
+def find_csv_elements():
+    return
 
 
 categories = list(find_cats().keys())
@@ -242,7 +308,6 @@ with open(csv_path, 'r') as csvfile:
     print('comparing categories...' )
     surplus = list(sorted(set(csv_categories) - set(categories)))
     deficit = list(sorted(set(categories) - set(csv_categories)))
-    print(categories)
     if not surplus and not deficit:
         print('Same categories')
     else:
@@ -251,19 +316,29 @@ with open(csv_path, 'r') as csvfile:
 
     threat_ids = list(find_threats().keys())
     csv_threats = find_csv_threats(csv_reader)
-    csv_threat_ids = list(csv_cats.keys())
+    csv_threat_ids = list(csv_threats.keys())
     print('comparing threats...' )
     surplus = list(sorted(set(csv_threat_ids) - set(threat_ids)))
     deficit = list(sorted(set(threat_ids) - set(csv_threat_ids)))
-    print(csv_threats)
     if not surplus and not deficit:
         print('Same threats')
     else:
         # modify xml file
         compare(surplus, deficit, 'threats', threat_ids, csv_threats)
 
-    # TODO: compare individual threats by "short title", add/sub to xml
-    # TODO: compare guids, always choose template.csv's guid for any non matching guids
+"""    
+ element_ids = list(find_elements().keys())
+    csv_elements = find_csv_elements(csv_reader)
+    csv_element_ids = list(csv_elements.keys())
+    print('comparing elements...')
+     surplus = list(sorted(set(csv_element_ids) - set(element_ids)))
+    deficit = list(sorted(set(element_ids) - set(csv_element_ids)))
+    print(csv_elements)
+    if not surplus and not deficit:
+        print('Same elements')
+    else:
+        # modify xml file
+        compare(surplus, deficit, 'stencils', element_ids, csv_elements)
+         """
 
-# TODO: remove and replace with function that copies to new .tb7 file
 tree.write(tm7_path)

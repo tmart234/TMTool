@@ -20,9 +20,9 @@ $ pip install TMTool -t /path/to/directory
 
 .tb7 template files:
 
--	template2csv.py - enumerate a template's stencils, threat categories, and threats, and threat logic. Save elements/stencils and threats as a csv file.
+-	template2xlsx.py - enumerate a template's stencils, threat categories, and threats, and threat logic. Save elements/stencils and threats as a .xlsx file.
 
-- csv2template.py (work in progress) - script to convert template.csv file back into a .tb7 file. For merging new threats or editing templates, you would modify and convert back to .tb7 format
+- xlsx2template.py (work in progress) - script to convert template.csv file back into a .tb7 file. For merging new threats or editing templates, you would modify and convert back to .tb7 format
 
 - template2sql.py - enumerate a template's threats and stencils/elements. Save as SQLite .db file.
 

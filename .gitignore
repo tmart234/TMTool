@@ -137,3 +137,4 @@ dmypy.json
 # we shouldn't ever need these extensions anyways
 *.csv
 *.xml
+*.xlsx

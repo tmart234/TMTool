@@ -1,4 +1,6 @@
 ###### Requirements without Version Specifiers ######
+openpyxl
+xlsxwriter
 
 ###### Requirements with Version Specifiers ######
 atlassian >= 3.5.0

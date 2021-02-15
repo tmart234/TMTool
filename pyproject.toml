@@ -1,0 +1,21 @@
+[project]
+name = "TMTool"
+version = "0.0.7"
+description = "python tool for Microsoft Threat modeling tool"
+authors = [
+    "Tyler M <tmart234@gmail.com>"
+]
+license = "MIT"
+readme = "README.md"
+python = "^3.7"
+homepage = "https://github.com/tmart234/TMT"
+repository = "https://github.com/tmart234/TMT"
+documentation = "https://github.com/tmart234/TMT"
+
+
+[build-system]
+requires = [
+    "setuptools >= 50.0.0",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"

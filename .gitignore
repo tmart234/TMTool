@@ -131,10 +131,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-*.toml
 .vscode/*
 
 # we shouldn't ever need these extensions anyways
 *.csv
 *.xml
 *.xlsx
+cleanup.py

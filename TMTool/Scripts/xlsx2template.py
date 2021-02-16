@@ -14,21 +14,6 @@ from tkinter import filedialog
 import uuid
 import openpyxl
 
-script_path = os.path.dirname(os.path.abspath(__file__))
-
-root = tk.Tk()
-root.withdraw()
-
-xlsx_path = filedialog.askopenfilename(parent=root, filetypes=[("template xlsx file", "template.xlsx")])
-tm7_path = filedialog.askopenfilename(parent=root, filetypes=[("template tb7 file", "*.tb7")])
-
-# Open Workbook
-wb = openpyxl.load_workbook(filename=xlsx_path, data_only=True)
-
-# parse xml
-tree = ET.parse(tm7_path)
-root = tree.getroot()
-
 # take a threat category GUID and look it up in the category dict
 def cat2str(cat, cats):
     for key, value in cats.items():
@@ -54,7 +39,7 @@ def cleanUp(_folder_path):
 
 # pull all available threat Categories and their GUIDs from the XML
 # some may be empty (contains 0 threats)
-def find_cats():
+def find_cats(root):
     cats= dict()
     cat_ID=''
     cat_name=''
@@ -67,7 +52,7 @@ def find_cats():
     return cats
 
 # get threats from .tb7 file as dict
-def find_threats():
+def find_threats(root):
     threats = dict()
     _id = ''
     title = ''
@@ -99,7 +84,7 @@ def find_threats():
     return threats
 
 # get all elements from .tb7 file as dict
-def find_elements():
+def find_elements(root):
     name = ''
     _id = ''
     desc = ''
@@ -143,7 +128,7 @@ def find_elements():
     return elements
 
 # add cat to xml file
-def add_cat(cat, cats_dict=None):
+def add_cat(root, cat, cats_dict=None):
     _uuid = ''
     new_cat = ET.Element("ThreatCategory")
     name = ET.SubElement(new_cat, 'Name')
@@ -168,7 +153,7 @@ def add_cat(cat, cats_dict=None):
     return _uuid
 
 # find threat from id in xlsx_threat_dict and add to .tb7
-def add_threat(threat_id, threats):
+def add_threat(root, threat_id, threats):
     threat = threats.get(threat_id)
     new_threat = ET.Element("ThreatType")
 
@@ -212,7 +197,7 @@ def add_threat(threat_id, threats):
     return _uuid
 
 # find threat from id in xlsx_threat_dict and add to .tb7
-def add_element(ele_id, elements, _type):
+def add_element(root, ele_id, elements, _type):
     element = elements.get(ele_id)
     new_ele = ET.Element("ElementType")
     _uuid = ''
@@ -257,7 +242,7 @@ def add_element(ele_id, elements, _type):
     print('added element: ' + str(name.text) + ' ' + str(id_ele.text))
     return _uuid
 
-def delete_cat(cat):
+def delete_cat(root, cat):
     for item in root[4].iter():
         for subelem in item.findall('Name'):
             if subelem.text == cat:
@@ -266,7 +251,7 @@ def delete_cat(cat):
     return
 
 # deletes threat based on threat_id
-def delete_threat(threat_id):
+def delete_threat(root, threat_id):
     for item in root[5].iter():
         for subelem in item.findall('Id'):
             if subelem.text == threat_id:
@@ -275,7 +260,7 @@ def delete_threat(threat_id):
     return
 
 # deletes element/stencil based on ele_id
-def delete_element(ele_id):
+def delete_element(root, ele_id):
     for item in root[3].iter():
         for subelem in item.findall('Id'):
             if subelem.text == ele_id:
@@ -288,18 +273,18 @@ def delete_element(ele_id):
                 print('removed element: ' + ele_id)
     return
 
-def compare(surplus, deficit, _type, _list, xlsx_dict):
+def compare(root, surplus, deficit, _type, _list, xlsx_dict):
     if surplus:
         # add extra to xml file
         print('Adding all '+ _type +' found: ' + str(surplus))
         for x in surplus:
             if x not in _list:
                 if str(_type) == 'categories':
-                    add_cat(x, xlsx_dict)
+                    add_cat(root, x, xlsx_dict)
                 elif str(_type) == 'threats':
-                    add_threat(x, xlsx_dict)
+                    add_threat(root, x, xlsx_dict)
                 elif str(_type) == 'stencils':
-                    add_element(x, xlsx_dict, _type)
+                    add_element(root, x, xlsx_dict, _type)
                 else:
                     print('bad type. Chose type from categories, threats, or stencils')
             else:
@@ -311,11 +296,11 @@ def compare(surplus, deficit, _type, _list, xlsx_dict):
         # remove missing from xml file
             if x in _list:
                 if _type == 'categories':
-                    delete_cat(x)
+                    delete_cat(root, x)
                 elif _type == 'threats':
-                    delete_threat(x)
+                    delete_threat(root, x)
                 elif _type == 'threats':
-                    delete_element(x, xlsx_dict)
+                    delete_element(root, x, xlsx_dict)
                 else:
                     print('bad type. Chose type from categories, threats, or stencils')
             else:
@@ -383,44 +368,58 @@ def find_xlsx_elements(wb):
             elements[_id] = element
     return elements
     
+def main():
+    root = tk.Tk()
+    root.withdraw()
 
-categories = list(find_cats().keys())
+    xlsx_path = filedialog.askopenfilename(parent=root, filetypes=[("template xlsx file", "template.xlsx")])
+    tm7_path = filedialog.askopenfilename(parent=root, filetypes=[("template tb7 file", "*.tb7")])
 
-# Get All Sheets
-a_sheet_names = wb.sheetnames
-# check for sheets
-if ('Threats' and 'Stencils') in a_sheet_names:
-    print("found!")
-else:
-    print("Error! Threats and Stencils not found")
-    quit()
+    # Open Workbook
+    wb = openpyxl.load_workbook(filename=xlsx_path, data_only=True)
 
-#xlsx_cats = find_xlsx_cats(wb)
-#xlsx_categories = list(xlsx_cats.keys())
+    # parse xml
+    tree = ET.parse(tm7_path)
+    root = tree.getroot()
 
-threat_ids = list(find_threats().keys())
-xlsx_threats = find_xlsx_threats(wb)
-xlsx_threat_ids = list(xlsx_threats.keys())
-print('comparing threats...' )
-surplus = list(sorted(set(xlsx_threat_ids) - set(threat_ids)))
-deficit = list(sorted(set(threat_ids) - set(xlsx_threat_ids)))
-if not surplus and not deficit:
-    print('Same threats')
-else:
-    # modify xml file
-    compare(surplus, deficit, 'threats', threat_ids, xlsx_threats)
+    # Get All Sheets
+    a_sheet_names = wb.sheetnames
+    # check for sheets
+    if ('Threats' and 'Stencils') in a_sheet_names:
+        print("found!")
+    else:
+        print("Error! Threats and Stencils not found")
+        quit()
 
-element_ids = list(find_elements().keys())
-xlsx_elements = find_xlsx_elements(wb)
-xlsx_element_ids = list(xlsx_elements.keys())
-print('comparing elements...')
-surplus = list(sorted(set(xlsx_element_ids) - set(element_ids)))
-deficit = list(sorted(set(element_ids) - set(xlsx_element_ids)))
-if not surplus and not deficit:
-    print('Same elements')
-else:
-    # modify xml file
-    compare(surplus, deficit, 'stencils', element_ids, xlsx_elements)
+    #xlsx_cats = find_xlsx_cats(wb)
+    #xlsx_categories = list(xlsx_cats.keys())
 
-print('Finished!')
-tree.write(tm7_path)
+    threat_ids = list(find_threats(root).keys())
+    xlsx_threats = find_xlsx_threats(wb)
+    xlsx_threat_ids = list(xlsx_threats.keys())
+    print('comparing threats...' )
+    surplus = list(sorted(set(xlsx_threat_ids) - set(threat_ids)))
+    deficit = list(sorted(set(threat_ids) - set(xlsx_threat_ids)))
+    if not surplus and not deficit:
+        print('Same threats')
+    else:
+        # modify xml file
+        compare(root, surplus, deficit, 'threats', threat_ids, xlsx_threats)
+
+    element_ids = list(find_elements(root).keys())
+    xlsx_elements = find_xlsx_elements(wb)
+    xlsx_element_ids = list(xlsx_elements.keys())
+    print('comparing elements...')
+    surplus = list(sorted(set(xlsx_element_ids) - set(element_ids)))
+    deficit = list(sorted(set(element_ids) - set(xlsx_element_ids)))
+    if not surplus and not deficit:
+        print('Same elements')
+    else:
+        # modify xml file
+        compare(root, surplus, deficit, 'stencils', element_ids, xlsx_elements)
+
+    print('Finished!')
+    tree.write(tm7_path)
+
+if __name__ == '__main__':
+    main()

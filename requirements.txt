@@ -1,8 +1,9 @@
 ###### Requirements without Version Specifiers ######
 openpyxl
 xlsxwriter
+Click
 
 ###### Requirements with Version Specifiers ######
-atlassian >= 3.5.0
+atlassian-python-api >= 3.5.0
 pypandoc >= 1.5
 xmltodict >= 0.12.0

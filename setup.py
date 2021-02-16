@@ -1,4 +1,4 @@
-import setuptools
+from setuptools import setup, find_packages
 import os
 
 thelibFolder = os.path.dirname(os.path.realpath(__file__))
@@ -10,14 +10,15 @@ if os.path.isfile(requirementPath):
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-setuptools.setup(
+setup(
     name='TMTool',
-    version='0.0.8',
+    version='0.0.11',
     author_email="tmart234@gmail.com",
     description='python tool for Microsoft Threat modeling tool',
     url="https://github.com/tmart234/TMT",
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     long_description=long_description,
+    include_package_data=True,
     long_description_content_type="text/markdown",
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -26,7 +27,8 @@ setuptools.setup(
     ],
     python_requires='>=3.7',
     install_requires = requirements,
-    entry_points = {
-        'console_scripts': ['TMTool=TMTool.command_line:main'],
-    }
+    entry_points = '''
+        [console_scripts]
+        TMTool=TMTool.cli:cli
+    ''',
 )

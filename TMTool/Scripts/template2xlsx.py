@@ -14,6 +14,20 @@ namespaces = {
         'http://www.w3.org/2001/XMLSchema-instance': None # skip this namespace
         }
 
+# blocking
+def close_wb(_wb):
+    while True:
+        try:
+            _wb.close()
+        except xlsxwriter.exceptions.FileCreateError as e:
+            decision = input("Exception caught in workbook.close(): %s\n"
+                                "Please close the file if it is open in Excel.\n"
+                                "Try to write file again? [Y/n]: " % e)
+            if decision != 'n':
+                continue
+
+        break
+
 # pull all threat Categories and their GUIDs from the XML
 def find_cats(root):
     cats={}
@@ -67,7 +81,6 @@ class Elements():
         return
 
 def main():
-
     # Create a workbook and add a worksheet.
     workbook = xlsxwriter.Workbook('tm_template.xlsx')
 
@@ -80,7 +93,15 @@ def main():
     root = tk.Tk()
     root.withdraw()
 
-    file_path = filedialog.askopenfilename(parent=root, filetypes=[("MS threat template files", "*.tb7")])
+    file_path = None
+    try:
+        file_path = filedialog.askopenfilename(parent=root, filetypes=[("MS threat template files", "*.tb7")])
+    except FileNotFoundError:
+        print('Must choose file path, quitting... ')
+        quit()
+    if not file_path:
+        print('Must choose file path, quitting... ')
+        quit()
 
     root = ET.parse(file_path).getroot()
 
@@ -151,7 +172,7 @@ def main():
     Ele.write_row(root, "GenericElements", stencil_worksheet)
     Ele.write_row(root, "StandardElements", stencil_worksheet)
 
-    workbook.close()
+    close_wb(workbook)
 
 if __name__ == '__main__':
     main()

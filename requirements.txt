@@ -7,3 +7,4 @@ Click
 atlassian-python-api >= 3.5.0
 pypandoc >= 1.5
 xmltodict >= 0.12.0
+jira >= 2.0.0

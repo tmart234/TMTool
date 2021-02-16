@@ -4,9 +4,9 @@
 
 
 
-# TMT
+# TMTool
 
-Microsoft Threat Modeling Tool python scripts to increase TMT’s utility for both template developers and model makers. For template design, this project hopes to address some of the complexities that come with managing a “database” of threats and stencils. For modeling, this project experiments with extracting information from our model and improving on the overall process of Threat Modeling. 
+A Threat Modeling GUI utility that works with Microsoft Threat Modeling Tool. This project aims to assist with the workfolw of template developers and model makers. For template design, this project hopes to address some of the complexities that come with managing a “database” of threats and stencils. For modeling, this project experiments with extracting information from our model and improving how Threat Modeling fits within DevOps and SDLC.
 
 ## Installation
 

@@ -15,18 +15,12 @@ import csv
 
 from jira.resources import Project
 # create a creds file with values
-import creds
+from . import creds
 
 # Jira project constants (fill in)
-proj_key = 'TMT'
+proj_key = creds.proj_key
 # TODO: added code to automatically addded category to JIRA?
-issue_type = 'ThreatModel'
-
-root = tk.Tk()
-# hide root window
-root.withdraw()
-# get CSV
-threat_path = filedialog.askopenfilename(parent=root, filetypes=[("threat csv file", "*.csv")])
+issue_type = creds.issue_type
 
 def includeThreatStatus():
     MsgBox = tk.messagebox.askyesno(title='Include Status?',message='Include the threat ID status (JIRA Issue types must be set up)')
@@ -74,7 +68,7 @@ def check_proj(jira, proj):
 def delete_issues(jira, proj_key):
     search_str = str("project=" + proj_key)
     try:
-        issues = jira.search_issues(search_str, startAt=0, maxResults=50, validate_query=True, fields=None, expand=None, json_result=None)
+        issues = jira.search_issues(search_str, startAt=0, maxResults=100, validate_query=True, fields=None, expand=None, json_result=None)
         for issue in issues:
             issue.delete()
         return True
@@ -111,10 +105,24 @@ def set_transition(jira, issue, state):
     jira.transition_issue(issue, transition_id)
 
 def main():
+    
+    root = tk.Tk()
+    # hide root window
+    root.withdraw()
+    # get CSV
+    try:
+        threat_path = filedialog.askopenfilename(parent=root, filetypes=[("threat csv file", "*.csv")])
+    except FileNotFoundError:
+        print('Must choose file path, quitting... ')
+        quit()
+    if not threat_path:
+        print('Must choose file path, quitting... ')
+        quit()
+
     options = {
     'server': creds.server
     }
-    jira = JIRA(options, basic_auth=(creds.user,creds.api_key))
+    jira = JIRA(options, basic_auth=(creds.user,creds.api_token))
 
     # ask user to delete old issues
     deleteOld(jira)

@@ -3,8 +3,6 @@ This script will take a .tb7 file and template.xlsx file
 It will compare threat categories, individual threats, and threat GUIDs in order
 If, there are more or less categories/threats present in template.xlsx,
 that difference will be added or subtracted to the xml and saved as a new .tb7 file
- 
-work in progress!!!
 """
 
 import os
@@ -372,9 +370,18 @@ def main():
     root = tk.Tk()
     root.withdraw()
 
-    xlsx_path = filedialog.askopenfilename(parent=root, filetypes=[("template xlsx file", "template.xlsx")])
-    tm7_path = filedialog.askopenfilename(parent=root, filetypes=[("template tb7 file", "*.tb7")])
-
+    xlsx_path = None
+    tm7_path = None
+    try:
+        xlsx_path = filedialog.askopenfilename(parent=root, filetypes=[("template xlsx file", "template.xlsx")])
+        tm7_path = filedialog.askopenfilename(parent=root, filetypes=[("template tb7 file", "*.tb7")])
+    except FileNotFoundError:
+        print('Must choose file path, quitting... ')
+        quit()
+    root.destroy()
+    if not xlsx_path and tm7_path:
+        print('Must choose file path, quitting... ')
+        quit()
     # Open Workbook
     wb = openpyxl.load_workbook(filename=xlsx_path, data_only=True)
 

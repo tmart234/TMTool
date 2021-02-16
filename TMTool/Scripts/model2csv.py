@@ -6,30 +6,14 @@ import xml.etree.ElementTree as ET
 import csv
 import tkinter as tk
 from tkinter import filedialog
-import shutil
-import os
 
-script_path = os.path.dirname(os.path.abspath(__file__))
-
-root = tk.Tk()
-root.withdraw()
-
-file_path = filedialog.askopenfilename(parent=root, filetypes=[("MS threat model files", "*.tm7")])
-# copy and rename file extension
-folder_path = os.path.join(script_path, "temp_model.xml")
-shutil.copy(file_path, folder_path)
-
-tree = ET.parse(folder_path)
-root = tree.getroot()
-
-# set up dictionaries
-# single element dict
-element = dict.fromkeys(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid', 'properties'])
-# namespace for prop elements
-ele_namespace = {'b': 'http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase'}
-any_namespace = {'a': 'http://schemas.microsoft.com/2003/10/Serialization/Arrays'}
-
-def write_element(ele2):
+def write_element(ele2, writer):
+     # set up dictionaries
+    # single element dict
+    element = dict.fromkeys(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid', 'properties'])
+    # namespace for prop elements
+    ele_namespace = {'b': 'http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase'}
+    any_namespace = {'a': 'http://schemas.microsoft.com/2003/10/Serialization/Arrays'}
     # create a custom element properties dict
     ele_prop = dict.fromkeys(['PropName', 'PropGUID', 'PropValues', 'SelectedIndex'])
     ele_props = []
@@ -91,40 +75,54 @@ def write_element(ele2):
             writer.writerow([element['GenericTypeId'], element['GUID'], element['Name'], element['SourceGuid'], element['TargetGuid'], element['properties']])
             ele_props.clear()
 
-with open('model.csv', 'w', newline='') as r:
-    writer = csv.writer(r)
-    for child in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}DrawingSurfaceList'):
-        for ele in child.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}DrawingSurfaceModel'):
-            for borders in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Borders'):
-                # write element headders
-                writer.writerow(['Stencils'])
-                writer.writerow(['GenericTypeId','GUID','Name', '', '', 'Element Properties'])
-                write_element(borders)
-            for lines in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Lines'):
-                # create a new line with same doc and write element headders
-                writer.writerow([''])
-                writer.writerow(['Flows'])
-                # unlike stencils, flows have a source and target guids
-                writer.writerow(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid', 'Element Properties'])
-                write_element(lines)
-    # write note headders
-    writer.writerow([''])
-    writer.writerow(['Notes'])
-    writer.writerow(['ID','Message'])
-    _id = ''
-    _message = ''
-    # find all note elements
-    for notes in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Notes'):
-        for note in notes.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Note'):
-            for id in note.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Id'):
-                _id = id.text
-            for message in note.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Message'):
-                _message = message.text
-            writer.writerow([_id,_message])
-               
-    
-# delete temp .xml file created
-if os.path.exists(folder_path):
-  os.remove(folder_path)
-else:
-  print("The temp file does not exist")
+def main():
+    root = tk.Tk()
+    root.withdraw()
+
+    try:
+        file_path = filedialog.askopenfilename(parent=root, filetypes=[("MS threat model files", "*.tm7")])
+    except FileNotFoundError:
+        print('Must choose file path, quitting... ')
+        quit()
+    if not file_path:
+        print('Must choose file path, quitting... ')
+        quit()
+    root.destroy()
+    tree = ET.parse(file_path)
+    root = tree.getroot()
+
+    with open('model.csv', 'w', newline='') as r:
+        writer = csv.writer(r)
+        for child in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}DrawingSurfaceList'):
+            for ele in child.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}DrawingSurfaceModel'):
+                for borders in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Borders'):
+                    # write element headders
+                    writer.writerow(['Stencils'])
+                    writer.writerow(['GenericTypeId','GUID','Name', '', '', 'Element Properties'])
+                    write_element(borders, writer)
+                for lines in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Lines'):
+                    # create a new line with same doc and write element headders
+                    writer.writerow([''])
+                    writer.writerow(['Flows'])
+                    # unlike stencils, flows have a source and target guids
+                    writer.writerow(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid', 'Element Properties'])
+                    write_element(lines, writer)
+        # write note headders
+        writer.writerow([''])
+        writer.writerow(['Notes'])
+        writer.writerow(['ID','Message'])
+        _id = ''
+        _message = ''
+        # find all note elements
+        for notes in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Notes'):
+            for note in notes.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Note'):
+                for id in note.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Id'):
+                    _id = id.text
+                for message in note.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Message'):
+                    _message = message.text
+                writer.writerow([_id,_message])
+
+
+if __name__ == '__main__':
+   main()
+

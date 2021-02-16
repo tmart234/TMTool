@@ -111,7 +111,7 @@ def main():
                 exclude = exclude_logic.text
         # get elements
         for subelem in types.findall('Category'):
-            category = str(cat2str(subelem.text, find_cats(), root))
+            category = str(cat2str(subelem.text, find_cats(root)))
         for subelem in types.findall('Id'):
             threat_id = subelem.text
         for subelem in types.findall('ShortTitle'):

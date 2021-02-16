@@ -79,7 +79,7 @@ def find_threats(root):
         for subelem in threat.findall('Description'):
             desc = subelem.text.translate({ord('{'):None, ord('}'):None})
         for subelem in threat.findall('Category'):
-            category = cat2str(subelem.text, find_cats())
+            category = cat2str(subelem.text, find_cats(root))
         threats[_id]=[title,desc,category]
     return threats
 
@@ -179,12 +179,12 @@ def add_threat(root, threat_id, threats):
 
     cat = ET.SubElement(new_threat, 'Category')
     # set as cat guid
-    _cat = cat2guid(threat.get('Category'),find_cats())
+    _cat = cat2guid(threat.get('Category'),find_cats(root))
     if not _cat:
         # add if it does not exist
         print('warning no category found: '+ threat.get('Category'))
         # 
-        _cat = add_cat(threat.get('Category'),find_cats())
+        _cat = add_cat(threat.get('Category'),find_cats(root))
     cat.text = _cat
     ET.SubElement(new_threat, 'RelatedCategory')  
 

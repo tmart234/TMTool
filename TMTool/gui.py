@@ -9,7 +9,6 @@ from TMTool.Scripts import template2xlsx
 from TMTool.Scripts import xlsx2template
 from TMTool.Scripts import jira_issues
 from TMTool.Scripts import fix_report_hyperlinks
-from TMTool.Scripts import model2csv
 
 def open_script1():
     try:
@@ -43,13 +42,13 @@ def open_script4():
         messagebox.showerror("Error", str("Error script failed: " + str(ex)))
     return
 
-def open_script5():
-    try:
-        model2csv.main()
-        print("executed model2csv")
-    except Exception as ex:
-        messagebox.showerror("Error", str("Error script failed: " + str(ex)))
-    return
+# def open_script5():
+#     try:
+#         model2csv.main()
+#         print("executed model2csv")
+#     except Exception as ex:
+#         messagebox.showerror("Error", str("Error script failed: " + str(ex)))
+#     return
 
 
 def main():
@@ -83,9 +82,9 @@ def main():
                     text="fix report hyperlinks",
                     command=open_script4)
 
-    button5 = ttk.Button(window,
-                    text="model2csv",
-                    command=open_script5)
+    # button5 = ttk.Button(window,
+    #                 text="model2csv",
+    #                 command=open_script5)
 
     # light green
     text1 = ttk.Label(window,
@@ -104,7 +103,7 @@ def main():
     button2.grid(row=2, column=0, sticky=W+E)
     button3.grid(row=1, column=1, sticky=W+E)
     button4.grid(row=2, column=1, sticky=W+E)
-    button5.grid(row=3, column=1, sticky=W+E)
+    # button5.grid(row=3, column=1, sticky=W+E)
     root.mainloop()
 
 

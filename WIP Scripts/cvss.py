@@ -125,7 +125,6 @@ class CVSS():
     # takes in a cvss dict
     def __init__(self, cvss_dict):
         # static value, assume target exists in env on a considerable scale
-        # TODO: input Security requirements and TD
         self.TD = 1.0
         self.temporal_score = None
         self.cvss_dict = cvss_dict

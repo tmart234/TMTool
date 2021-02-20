@@ -1,9 +1,3 @@
-
-
-
-
-
-
 # TMTool
 
 A Threat Modeling GUI utility that works with Microsoft Threat Modeling Tool. This project aims to assist with the workfolw of template developers and model makers. For template design, this project hopes to address some of the complexities that come with managing a “database” of threats and stencils. For modeling, this project experiments with extracting metrics from our model and improving how Threat Modeling fits within DevOps/SDLC.
@@ -32,7 +26,7 @@ $ TMTool
 
 
 .tm7 model files:
--	set_metadata_tags.py (work in progress) - set a model's metadata such as risk level and compliance standards.
+-	set_metadata_tags.py - sets a model's metadata, such as risk level and compliance standards, in a Note entry
 -	model_score.py (work in progress) - enumerate a model's notes, stencils, stencil properties (model metrics which we cannot get from TMT's built-in csv file generation). Then sets CVSS threat properties based on found element properties.
 - cvss.py - script for scoring with CVSS v2. Imports pre-score metrics as a Dictionary.
 

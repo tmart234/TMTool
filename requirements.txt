@@ -2,6 +2,7 @@
 openpyxl
 xlsxwriter
 Click
+lxml
 
 ###### Requirements with Version Specifiers ######
 atlassian-python-api >= 3.5.0

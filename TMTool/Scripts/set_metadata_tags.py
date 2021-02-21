@@ -9,32 +9,26 @@ from tkinter.ttk import Combobox
 from lxml import etree
 import datetime
 
-def check_cb():
-    if not cb1.get():
-        return False
-    elif not cb2.get():
-        return False
-    elif not cb3.get():
-        return False
-    elif not cb4.get():
-        return False
-    else:
-        return True
-
 def get_boxes_and_destroy():
     global notes_dict
     notes_dict = dict.fromkeys(['CR','IR', 'AR', 'TD','CWE','CAPEC'])
-    if check_cb():
-        notes_dict['CR'] = cb1.get() 
-        notes_dict['IR'] = cb2.get() 
-        notes_dict['AR'] = cb3.get() 
-        notes_dict['TD'] = cb4.get()
-        notes_dict['CWE'] = c1.get()
-        notes_dict['CAPEC'] = c2.get()
-        #print(notes_dict)
-    else:
-        print('must choose values for comboboxes')
+    notes_dict['CR'] = cb1.get() 
+    notes_dict['IR'] = cb2.get() 
+    notes_dict['AR'] = cb3.get() 
+    notes_dict['TD'] = cb4.get()
+    notes_dict['CWE'] = c1.get()
+    notes_dict['CAPEC'] = c2.get()
+    #print(notes_dict)
     save_to_xml()
+    quit()
+
+def delete_note(root, _id):
+    for item in root[2].iter():
+        for subelem in item.findall('Id'):
+            if subelem.text == _id:
+                root[2].remove(item)
+                print('removed note: ' + _id)
+    return
 
 def save_to_xml():
     _root = tk.Tk()
@@ -54,16 +48,30 @@ def save_to_xml():
         quit()
 
     id = None
-    ids = []
+    msgs = dict()
     
-    # find next _id
+    # find all note elements
     for notes in _root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Notes'):
         for note in notes.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Note'):
-            for _id in note.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Id'):
-                # should be an int
-                ids.append(int(_id.text))
+            for id in note.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Id'):
+                _id = id.text
+            for message in note.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Message'):
+                _message = str(message.text)
+            msgs[_id] = _message
 
-    id = ids[-1] + 1
+    if not msgs:
+        id = 1
+    else:
+        k = list(msgs.keys())
+        id = int(k[-1]) + 1
+        # overwrite if tag exists
+        for key,value in msgs.items():
+            if 'METADATA:' in value:
+                print("Warning: model already contains METADATA note")
+                print("Overwriting note..")
+                id = int(key)
+                # delete
+                delete_note(_root, id)
 
     new_note = etree.Element("Note")
     added = etree.SubElement(new_note, 'AddedBy')
@@ -76,7 +84,7 @@ def save_to_xml():
     _id = etree.SubElement(new_note, 'Id')
     _id.text = str(id)
     message = etree.SubElement(new_note, 'Message')
-    message.text = str('METADATA: '+ notes_dict)
+    message.text = str('METADATA: '+ str(notes_dict))
     # insert in Notes in last position
     _root[2].insert((id-1), new_note)
     print('added note: ' + str(notes_dict))
@@ -169,27 +177,31 @@ def main():
 
     T2.place(x=25, y=75)
     T3.place(x=25, y=100)
-    data=("Low", "Medium", "High")
+    data=("Not Defined", "Low", "Medium", "High")
     global cb1
     cb1=ttk.Combobox(root, values=data)
+    cb1.current(0)
     cb1.place(x=25, y=125)
 
     T4.place(x=25, y=165)
-    data=("Low", "Medium", "High")
+    data=("Not Defined", "Low", "Medium", "High")
     global cb2
     cb2=ttk.Combobox(root, values=data)
+    cb2.current(0)
     cb2.place(x=25, y=190)
 
     T5.place(x=25, y=240)
-    data=("Low", "Medium", "High")
+    data=("Not Defined", "Low", "Medium", "High")
     global cb3
     cb3=ttk.Combobox(root, values=data)
+    cb3.current(0)
     cb3.place(x=25, y=265)
 
     T6.place(x=200, y=240)
     data=("None","Low", "Medium", "High")
     global cb4
     cb4=ttk.Combobox(root, values=data)
+    cb4.current(0)
     cb4.place(x=200, y=265)
 
     R1.place(x=150,y=318)
@@ -203,7 +215,7 @@ def main():
         "This allows the final score to be tuned according to the users' environment.")
 
     root.mainloop()
-    return
+    quit()
 
 if __name__ == '__main__':
     main()

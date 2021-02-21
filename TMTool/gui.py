@@ -57,15 +57,15 @@ def main():
 
     # model scripts (blue)
     button3 = ttk.Button(window,
-                    text="upload jira issues",
+                    text="Upload as jira issues",
                     command=open_script3)
 
     button4 = ttk.Button(window,
-                    text="fix report hyperlinks",
+                    text="Fix report hyperlinks",
                     command=open_script4)
 
     button5 = ttk.Button(window,
-                    text="set metadata tags",
+                    text="Set Model metadata",
                     command= (lambda: open_script5(root)))
 
     # light green
@@ -83,9 +83,9 @@ def main():
     text2.grid(row=0, column=1, sticky=W+E)
     button1.grid(row=1, column=0, sticky=W+E)
     button2.grid(row=2, column=0, sticky=W+E)
-    button3.grid(row=1, column=1, sticky=W+E)
+    button3.grid(row=3, column=1, sticky=W+E)
     button4.grid(row=2, column=1, sticky=W+E)
-    button5.grid(row=3, column=1, sticky=W+E)
+    button5.grid(row=1, column=1, sticky=W+E)
     root.mainloop()
     return
 

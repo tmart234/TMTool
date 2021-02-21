@@ -1,7 +1,9 @@
 # this script will set a model's metadata (such as risk level and compliance)
 # as a set of tags in a threat model's Note entries
-
-from tkinter import *
+from tkinter import ttk
+from tkinter.ttk import *
+import tkinter as tk
+from ttkthemes import ThemedStyle
 from tkinter import filedialog
 from tkinter.ttk import Combobox
 from lxml import etree
@@ -27,18 +29,16 @@ def get_boxes_and_destroy():
         notes_dict['IR'] = cb2.get() 
         notes_dict['AR'] = cb3.get() 
         notes_dict['TD'] = cb4.get()
-        notes_dict['CWE'] = v1.get()
-        notes_dict['CAPEC'] = v2.get()
+        notes_dict['CWE'] = c1.get()
+        notes_dict['CAPEC'] = c2.get()
         #print(notes_dict)
-        root.destroy()
-        return
     else:
         print('must choose values for comboboxes')
-        return
+    save_to_xml()
 
 def save_to_xml():
-    _root = Tk()
-    # hide root window
+    _root = tk.Tk()
+    # hide window
     _root.withdraw()
 
     # get CSV
@@ -62,7 +62,7 @@ def save_to_xml():
             for _id in note.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Id'):
                 # should be an int
                 ids.append(int(_id.text))
-    
+
     id = ids[-1] + 1
 
     new_note = etree.Element("Note")
@@ -83,76 +83,65 @@ def save_to_xml():
     print('ID: ' + str(id))
 
     tree.write(model_path)
+    return
 
 
 def main():
-    global root
-    root = Tk()
-    root.configure(background='#243447')
+    root = tk.Tk()
+    root.configure(background='#404040')
+    root.title('Model Metadata')
+    root.geometry("400x350+10+10")
+    style = ThemedStyle(root)
+    style.set_theme("equilux")
 
-    global v1
-    global v2                
-    v1 = IntVar()
-    v2 = IntVar()
-    t1 = StringVar()
-    t2 = StringVar()
-    t3 = StringVar()
-    t4 = StringVar()
-    t5 = StringVar()
-    t6 = StringVar()
+    global c1
+    global c2
+    c1 = tk.IntVar()    
+    c2 = tk.IntVar()      
     # Create text widget and specify size. 
-    T1 = Label(root, textvariable=t1, bg="#243447", fg='#ffffff')
-    T2 = Label(root, textvariable=t2, bg="#243447", fg='#ffffff')
-    T3 = Label(root, textvariable=t3, bg="#243447", fg='#ffffff')
-    T4 = Label(root, textvariable=t4, bg="#243447", fg='#ffffff')
-    T5 = Label(root, textvariable=t5, bg="#243447", fg='#ffffff')
-    T6 = Label(root, textvariable=t6, bg="#243447", fg='#ffffff')
-    R1=Button(root, text="Done", bg="#243447", fg='#ffffff', command=get_boxes_and_destroy)
+    T1 = ttk.Label(root, text='Compliance Standards:')
+    T2 = ttk.Label(root, text='Security Requirements:')
+    T3 = ttk.Label(root, text='Confidentiality')
+    T4 = ttk.Label(root, text='Integrity')
+    T5 = ttk.Label(root, text='Availability')
+    T6 = ttk.Label(root, text='Target Distribution')
+    R1= Button(root, text="Done", command=get_boxes_and_destroy)
 
-    t1.set('Compliance Standards:')
     T1.place(x=25, y=15)
-    C1 = Checkbutton(root, text = "CWE", variable = v1, background="#243447",fg='#ffffff', selectcolor='#000000')
-    C2 = Checkbutton(root, text = "CAPEC", variable = v2, background="#243447",fg='#ffffff', selectcolor='#000000')
+    C1 = tk.Checkbutton(root, text = "CWE", variable = c1, background='#404040', fg='#ffffff', selectcolor='#000000')
+    C2 = tk.Checkbutton(root, text = "CAPEC", variable = c2, background='#404040', fg='#ffffff', selectcolor='#000000')
     C1.place(x=25, y=40)
     C2.place(x=105, y=40)
 
-    t2.set('Security Requirements:')
     T2.place(x=25, y=75)
-    t3.set('Confidentiality')
     T3.place(x=25, y=100)
     data=("Low", "Medium", "High")
     global cb1
-    cb1=Combobox(root, values=data)
+    cb1=ttk.Combobox(root, values=data)
     cb1.place(x=25, y=125)
 
-    t4.set('Integrity')
-    T4.place(x=25, y=150)
+    T4.place(x=25, y=165)
     data=("Low", "Medium", "High")
     global cb2
-    cb2=Combobox(root, values=data)
-    cb2.place(x=25, y=175)
+    cb2=ttk.Combobox(root, values=data)
+    cb2.place(x=25, y=190)
 
-    t5.set('Availability')
-    T5.place(x=25, y=200)
+    T5.place(x=25, y=250)
     data=("Low", "Medium", "High")
     global cb3
-    cb3=Combobox(root, values=data)
-    cb3.place(x=25, y=225)
+    cb3=ttk.Combobox(root, values=data)
+    cb3.place(x=25, y=275)
 
-    t6.set('Target Distribution')
-    T6.place(x=200, y=200)
+    T6.place(x=200, y=250)
     data=("None","Low", "Medium", "High")
     global cb4
-    cb4=Combobox(root, values=data)
-    cb4.place(x=200, y=225)
+    cb4=ttk.Combobox(root, values=data)
+    cb4.place(x=200, y=275)
 
-    R1.place(x=150,y=260)
+    R1.place(x=150,y=318)
 
-    root.title('Model Metadata')
-    root.geometry("400x300+10+10")
     root.mainloop()
-    save_to_xml()
-
+    return
 
 if __name__ == '__main__':
     main()

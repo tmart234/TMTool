@@ -1,8 +1,8 @@
 from tkinter import ttk
-from tkinter import messagebox
 # override the basic Tk widgets
 from tkinter.ttk import *
 from tkinter import *
+from click.decorators import argument
 from ttkthemes import ThemedStyle
 
 from TMTool.Scripts import template2xlsx
@@ -12,50 +12,32 @@ from TMTool.Scripts import fix_report_hyperlinks
 from TMTool.Scripts import set_metadata_tags
 
 def open_script1():
-    try:
-        template2xlsx.main()
-        print("executed template2xlsx")
-    except Exception as ex:
-        messagebox.showerror("Error", str("Error script failed: " + str(ex)))
-    return
+    template2xlsx.main()
+    print("executed template2xlsx")
 
 def open_script2():
-    try:
-        xlsx2template.main()
-        print("executed xlsx2template")
-    except Exception as ex:
-        messagebox.showerror("Error", str("Error script failed: " + str(ex)))
-    return
+    xlsx2template.main()
+    print("executed xlsx2template")
 
 def open_script3():
-    try:
-        jira_issues.main()
-        print("executed jira_issues")
-    except Exception as ex:
-        messagebox.showerror("Error", str("Error script failed: " + str(ex)))
-    return
+    jira_issues.main()
+    print("executed jira_issues")
 
 def open_script4():
-    try:
-        fix_report_hyperlinks.main()
-        print("executed fix_report_hyperlinks")
-    except Exception as ex:
-        messagebox.showerror("Error", str("Error script failed: " + str(ex)))
-    return
+    fix_report_hyperlinks.main()
+    print("executed fix_report_hyperlinks")
 
-def open_script5():
-    try:
-        set_metadata_tags.main()
-        print("executed model2csv")
-    except Exception as ex:
-        messagebox.showerror("Error", str("Error script failed: " + str(ex)))
-    return
+def open_script5(root):
+    root.destroy()
+    set_metadata_tags.main()
+    print("executed set_metadata_tags")
 
 
 def main():
     root = Tk()
     root.configure(background='#404040')
     root.title("TMTool GUI")
+    root.geometry("400x200")
     # Setting Theme
     style = ThemedStyle(root)
     style.set_theme("equilux")
@@ -85,7 +67,7 @@ def main():
 
     button5 = ttk.Button(window,
                     text="set metadata tags",
-                    command=open_script5)
+                    command= (lambda: open_script5(root)))
 
     # light green
     text1 = ttk.Label(window,
@@ -106,7 +88,7 @@ def main():
     button4.grid(row=2, column=1, sticky=W+E)
     button5.grid(row=3, column=1, sticky=W+E)
     root.mainloop()
-
+    return
 
 if __name__ == '__main__':
     main()

@@ -23,11 +23,12 @@ def get_boxes_and_destroy():
     quit()
 
 def delete_note(root, _id):
-    for item in root[2].iter():
-        for subelem in item.findall('Id'):
-            if subelem.text == _id:
-                root[2].remove(item)
-                print('removed note: ' + _id)
+    for notes in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Notes'):
+        for note in notes.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Note'):
+            for id in note.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Id'):
+                if int(id.text) == int(_id):
+                    root[2].remove(note)
+                    print('removed note: ' + str(_id))
     return
 
 def save_to_xml():
@@ -70,7 +71,6 @@ def save_to_xml():
                 print("Warning: model already contains METADATA note")
                 print("Overwriting note..")
                 id = int(key)
-                # delete
                 delete_note(_root, id)
 
     new_note = etree.Element("Note")

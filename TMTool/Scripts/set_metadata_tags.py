@@ -86,6 +86,60 @@ def save_to_xml():
     return
 
 
+class CreateToolTip(object):
+    """
+    create a tooltip for a given widget
+    """
+    def __init__(self, widget, text='widget info'):
+        self.waittime = 500     #miliseconds
+        self.wraplength = 180   #pixels
+        self.widget = widget
+        self.text = text
+        self.widget.bind("<Enter>", self.enter)
+        self.widget.bind("<Leave>", self.leave)
+        self.widget.bind("<ButtonPress>", self.leave)
+        self.id = None
+        self.tw = None
+
+    def enter(self, event=None):
+        self.schedule()
+
+    def leave(self, event=None):
+        self.unschedule()
+        self.hidetip()
+
+    def schedule(self):
+        self.unschedule()
+        self.id = self.widget.after(self.waittime, self.showtip)
+
+    def unschedule(self):
+        id = self.id
+        self.id = None
+        if id:
+            self.widget.after_cancel(id)
+
+    def showtip(self, event=None):
+        x = y = 0
+        x, y, cx, cy = self.widget.bbox("insert")
+        x += self.widget.winfo_rootx() + 25
+        y += self.widget.winfo_rooty() + 20
+        # creates a toplevel window
+        self.tw = tk.Toplevel(self.widget)
+        # Leaves only the label and removes the app window
+        self.tw.wm_overrideredirect(True)
+        self.tw.wm_geometry("+%d+%d" % (x, y))
+        label = tk.Label(self.tw, text=self.text, justify='left',
+                       background="#ffffff", relief='solid', borderwidth=1,
+                       wraplength = self.wraplength)
+        label.pack(ipadx=1)
+
+    def hidetip(self):
+        tw = self.tw
+        self.tw= None
+        if tw:
+            tw.destroy()
+
+
 def main():
     root = tk.Tk()
     root.configure(background='#404040')
@@ -99,8 +153,8 @@ def main():
     c1 = tk.IntVar()    
     c2 = tk.IntVar()      
     # Create text widget and specify size. 
-    T1 = ttk.Label(root, text='Compliance Standards:')
-    T2 = ttk.Label(root, text='Security Requirements:')
+    T1 = ttk.Label(root, text='Compliance Standards:', font=(None, 13, 'bold'))
+    T2 = ttk.Label(root, text='Security Requirements:', font=(None, 13, 'bold'))
     T3 = ttk.Label(root, text='Confidentiality')
     T4 = ttk.Label(root, text='Integrity')
     T5 = ttk.Label(root, text='Availability')
@@ -126,19 +180,27 @@ def main():
     cb2=ttk.Combobox(root, values=data)
     cb2.place(x=25, y=190)
 
-    T5.place(x=25, y=250)
+    T5.place(x=25, y=240)
     data=("Low", "Medium", "High")
     global cb3
     cb3=ttk.Combobox(root, values=data)
-    cb3.place(x=25, y=275)
+    cb3.place(x=25, y=265)
 
-    T6.place(x=200, y=250)
+    T6.place(x=200, y=240)
     data=("None","Low", "Medium", "High")
     global cb4
     cb4=ttk.Combobox(root, values=data)
-    cb4.place(x=200, y=275)
+    cb4.place(x=200, y=265)
 
     R1.place(x=150,y=318)
+
+    # have-over definitions
+    CreateToolTip(T1, \
+        "select the desired compliance standards. Compliance tag URLs will show up in the generated report"
+        " after fixing the hyperlinks with TMTool")
+    CreateToolTip(T2, \
+        "determine the specific security requirements for confidentiality, integrity and availability. "
+        "This allows the final score to be tuned according to the users' environment.")
 
     root.mainloop()
     return

@@ -2,7 +2,6 @@ from tkinter import ttk
 # override the basic Tk widgets
 from tkinter.ttk import *
 from tkinter import *
-from click.decorators import argument
 from ttkthemes import ThemedStyle
 
 from TMTool.Scripts import template2xlsx

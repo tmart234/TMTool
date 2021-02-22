@@ -1,14 +1,15 @@
-## this script will parse a model's elements to a csv file
-## the script enumerates element's names, IDs, source GUID and target GUID of flows, 
-## all element properties, and all model notes
+## Steps: load the MS TMT produced .csv file and model file, find "interactor" flow for each threat,
+## parse flow elements find elemnt properties, fill in AV and Auth as threat properties (from element properites),
+## load metadata (notes) and threat props into cvss dicts, and score dicts w/ cvss.py
+## TODO: this method currently involves setting CIA + severity (CVSS threat props) in analysis mode (solve w/ data classification)
 
-import xml.etree.ElementTree as ET
-import csv
+
+from lxml import etree
 import tkinter as tk
 from tkinter import filedialog
 
-def write_element(ele2, writer):
-     # set up dictionaries
+def get_element(ele2):
+    # set up dictionaries
     # single element dict
     element = dict.fromkeys(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid', 'properties'])
     # namespace for prop elements
@@ -71,14 +72,13 @@ def write_element(ele2, writer):
             # save prop list to element dict
             element['properties'] = ele_props
             # print(element['properties'])
-            # write to csv
-            writer.writerow([element['GenericTypeId'], element['GUID'], element['Name'], element['SourceGuid'], element['TargetGuid'], element['properties']])
             ele_props.clear()
+            return element['GUID'], element
 
 def main():
     root = tk.Tk()
     root.withdraw()
-
+    # get model file
     try:
         file_path = filedialog.askopenfilename(parent=root, filetypes=[("MS threat model files", "*.tm7")])
     except FileNotFoundError:
@@ -87,40 +87,40 @@ def main():
     if not file_path:
         print('Must choose file path, quitting... ')
         quit()
+    # get CSV file
+    try:
+        threat_path = filedialog.askopenfilename(parent=root, filetypes=[("threat csv file", "*.csv")])
+    except FileNotFoundError:
+        print('Must choose file path, quitting... ')
+        quit()
+    if not threat_path:
+        print('Must choose file path, quitting... ')
+        quit()
     root.destroy()
-    tree = ET.parse(file_path)
+    tree = etree.parse(file_path)
     root = tree.getroot()
 
-    with open('model.csv', 'w', newline='') as r:
-        writer = csv.writer(r)
-        for child in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}DrawingSurfaceList'):
-            for ele in child.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}DrawingSurfaceModel'):
-                for borders in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Borders'):
-                    # write element headders
-                    writer.writerow(['Stencils'])
-                    writer.writerow(['GenericTypeId','GUID','Name', '', '', 'Element Properties'])
-                    write_element(borders, writer)
-                for lines in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Lines'):
-                    # create a new line with same doc and write element headders
-                    writer.writerow([''])
-                    writer.writerow(['Flows'])
-                    # unlike stencils, flows have a source and target guids
-                    writer.writerow(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid', 'Element Properties'])
-                    write_element(lines, writer)
-        # write note headders
-        writer.writerow([''])
-        writer.writerow(['Notes'])
-        writer.writerow(['ID','Message'])
-        _id = ''
-        _message = ''
+    elements = dict()
+    for child in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}DrawingSurfaceList'):
+        for ele in child.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}DrawingSurfaceModel'):
+            for borders in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Borders'):
+                _id, ele = get_element(borders)
+                elements[_id] = ele
+            for lines in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Lines'):
+                # unlike stencils, flows have a source and target guids
+                _id, ele = get_element(lines)
+                elements[_id] = ele
+
         # find all note elements
+        _id = ''
+        msgs = dict()
         for notes in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Notes'):
             for note in notes.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Note'):
                 for id in note.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Id'):
                     _id = id.text
                 for message in note.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Message'):
                     _message = message.text
-                writer.writerow([_id,_message])
+                msgs[_id] = _message
 
 
 if __name__ == '__main__':

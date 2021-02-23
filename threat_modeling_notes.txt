@@ -60,6 +60,7 @@ Template
 - in test_template.tm7, we've added the following as Threat Properties: C.I.A. metrics (CVSS base), Access complexity (base), severity (environmental), CVSS overall score, and HTML Compliance Tags
 	- asses if we should pre-set Access Complexity, Severity, and  HTML Compliance Tags (threat properties) within our threat database
 	- PyTM has a good example of these metrics within a database of threats: https://github.com/izar/pytm/blob/master/docs/threats.md
+	- so does threagile: https://github.com/Threagile/threagile/tree/master/risks/built-in
 - Address and explore how templates and/or threat databases can provide different data-flow diagram depth layers: https://docs.microsoft.com/en-us/learn/modules/tm-provide-context-with-the-right-depth-layer/
 	- Layer 0: major system parts. Layer 1: secondary system parts. Layer 2: system's sub-components. Layer 3: every process and low-level system subpart
 	- how would each layer look different in enterprise, mobile, and IoT applications?

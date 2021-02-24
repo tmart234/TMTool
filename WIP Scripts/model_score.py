@@ -76,6 +76,7 @@ def get_element(_ele):
                 ele_props.append(ele_prop.copy())
                 ele_prop.clear()
         # save prop list to element dict
+        # TODO: search metrics should be a list
         element['AV'] = get_metric(ele_props, 'access vector')
         element['Auth'] = get_metric(ele_props, 'has authentication')
         return element
@@ -116,8 +117,29 @@ def get_flows(root):
             return flows
     return None
 
-def set_TPs(root, flows):
+# returns threat props as dict
+def get_TPs(root):
+    TPs = dict()
+    for ele in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}KnowledgeBase'):
+        for e2 in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase}ThreatMetaData'):
+            for e3 in e2.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}PropertiesMetaData'):
+                for e4 in e3.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}ThreatMetaDatum'):
+                    _id = ''
+                    _label = ''
+                    for e5 in e4.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Id'):
+                        _id = e5.text
+                    for e5 in e4.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}Label'):
+                        _label = e5.text
+                    TPs[_id] = _label
+    return TPs
 
+# finds threat ineractor (flow) and fills in flow values (AV and auth)
+def set_TPs(root, flows):
+    TPs = get_TPs(root)
+    for ele in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}ThreatInstances//*//{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Value//{http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase}Properties'):
+        for ele2 in ele.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}KeyValueOfstringstring'):
+            for ele3 in ele2:      
+                print(ele3)
     return
 
 
@@ -143,7 +165,6 @@ def main():
         print('No meta found, choosing defualts')
 
     flows = get_flows(root)
-    print(flows)
     set_TPs(root, flows)
 
 

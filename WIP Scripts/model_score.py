@@ -7,6 +7,7 @@ from lxml import etree
 import tkinter as tk
 from tkinter import filedialog
 import json
+from . import cvss
 
 # checks element props for anything containing <_name>
 # returns props selected index value
@@ -186,6 +187,59 @@ def flow_val(_flows, _key, _flow_name):
     print(_key +' Not found for ' + _flow_name)
     return None
 
+# sees if current TP is a CVSS metric, return CVSS key or None
+def check_TP(_TPs, _guid):
+    my_list = ['Confidentiality','Integrity','Availability','Access Complexity','Access Vector','Authentication','Severity']
+    for key,val in _TPs.items():
+        for i, j in enumerate(my_list):
+            if j == val:
+                m = my_list[i]
+                if m is 'Confidentiality':
+                    return 'C'
+                elif m is 'Integrity':
+                    return 'I'
+                elif m is 'Availability':
+                    return 'A'
+                elif m is 'Access Complexity':
+                    return 'AC'
+                elif m is 'Access Vector':
+                    return 'AV'
+                elif m is 'Authentication':
+                    return 'Au'
+                elif m is 'Severity':
+                    return 'CDP'
+                else:
+                    print('error getting ' + val)
+                    return None
+            else:
+                continue
+    return None
+
+# goes through threat ids, collects cvss data
+def score_threats(root, meta):
+    TPs = get_TPs(root)
+    for ele in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}ThreatInstances//*//{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Value'):
+        cvss_dict = dict.fromkeys('ID','AV','AC','Au','C','I','A','CDP','TD','CR','IR','AR')
+        # set metrics from notes
+        cvss_dict['TD'] = meta.get('TD')
+        cvss_dict['CR'] = meta.get('CR')
+        cvss_dict['IR'] = meta.get('IR')
+        cvss_dict['AR'] = meta.get('AR')
+        for id in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase}Id'):
+            cvss_dict['ID'] = id.text
+        for e2 in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase}Properties'):
+            for ele2 in e2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}KeyValueOfstringstring'):
+                for ele3 in ele2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Key'):
+                    _key = check_TP(TPs, ele3.text)
+                    # not a CVSS metric
+                    if not _key:
+                        continue
+                    else:
+                        for ele4 in ele2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Value'):
+                            cvss_dict[_key] = ele4.text
+        score = cvss.CVSS(cvss_dict)
+        print('scored threat ID ' + cvss_dict['ID'] + ' with a score of ' + score.overall_score)
+
 def main():
     root = tk.Tk()
     root.withdraw()
@@ -209,7 +263,8 @@ def main():
 
     flows = get_flows(root)
     set_TPs(root, flows)
-    
+    score_threats(root, meta)
+
     print('Finished!')
     tree.write(file_path)
 

@@ -148,9 +148,9 @@ def set_TPs(root, flows):
 
     for ele in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}ThreatInstances//*//{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Value'):
         _interaction = ''
-        _id = ''
+        threat_id = ''
         for id in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase}Id'):
-            _id = id.text
+            threat_id = id.text
         for e2 in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase}Properties'):
             for ele2 in e2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}KeyValueOfstringstring'):
                 for ele3 in ele2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Key'):
@@ -158,28 +158,33 @@ def set_TPs(root, flows):
                         for e in ele2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Value'):
                             # get interactor
                             _interaction = e.text
-                            set_TP(root, flows, 'AV', _interaction, _id)
-                            set_TP(root, flows, 'Auth',  _interaction, _id)
-                            continue
+                            set_TP(root, flow_val(flows, 'AV', _interaction), threat_id, TP_AV_id)
+                            set_TP(root, flow_val(flows, 'Auth', _interaction), threat_id, TP_Auth_id)
     return
 
-def set_TP(root, flows, _key, _interaction, _id,):
-    # find metric value from _interaction and flows
-    _value = ''
-    
+# set a single threat prop <TP_id> to <_val>
+def set_TP(root, _val, _id, TP_id):
     for ele in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}ThreatInstances//*//{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Value'):
         for id in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase}Id'):
             if _id == id.text:
                 for e2 in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase}Properties'):
                     for ele2 in e2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}KeyValueOfstringstring'):
                         for ele3 in ele2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Key'):
-                            if ele3.text == _key:
+                            if ele3.text == TP_id:
                                 for ele4 in ele2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Value'):
                                     # set element TP here
-                                    ele4.text = _value
-    
+                                    ele4.text = _val
+                                    print('set threat ID: ' + _id +  ' threat prop id: ' + TP_id +' to val: ' + _val) 
     return
 
+# check flows dictionary for <_flow_name>
+# return the value of the flow's dictionary key <_key>
+def flow_val(_flows, _key, _flow_name):
+    for item,value in _flows.items():
+        if value.get('Name') == _flow_name:
+            return value.get(_key)
+    print(_key +' Not found for ' + _flow_name)
+    return None
 
 def main():
     root = tk.Tk()
@@ -204,7 +209,9 @@ def main():
 
     flows = get_flows(root)
     set_TPs(root, flows)
-
+    
+    print('Finished!')
+    tree.write(file_path)
 
 if __name__ == '__main__':
    main()

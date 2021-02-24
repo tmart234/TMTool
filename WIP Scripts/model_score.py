@@ -8,7 +8,8 @@ import tkinter as tk
 from tkinter import filedialog
 import json
 
-# checks element props for their selected index for a given <_name>
+# checks element props for anything containing <_name>
+# returns props selected index value
 def get_metric(_props, _name):
     for prop in _props:
         for key,value in dict(prop).items():
@@ -17,6 +18,7 @@ def get_metric(_props, _name):
                 return prop.get('PropValues')[index]
     return None
 
+# returns element as dictionary
 def get_element(_ele):
     # set up dictionaries
     # single element dict
@@ -136,10 +138,46 @@ def get_TPs(root):
 # finds threat ineractor (flow) and fills in flow values (AV and auth)
 def set_TPs(root, flows):
     TPs = get_TPs(root)
-    for ele in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}ThreatInstances//*//{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Value//{http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase}Properties'):
-        for ele2 in ele.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}KeyValueOfstringstring'):
-            for ele3 in ele2:      
-                print(ele3)
+    TP_AV_id = ''
+    TP_Auth_id = ''
+    for key,value in TPs.items():
+        if value == 'Access Vector':
+            TP_AV_id = key 
+        if value == 'Authentication':
+            TP_Auth_id = key
+
+    for ele in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}ThreatInstances//*//{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Value'):
+        _interaction = ''
+        _id = ''
+        for id in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase}Id'):
+            _id = id.text
+        for e2 in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase}Properties'):
+            for ele2 in e2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}KeyValueOfstringstring'):
+                for ele3 in ele2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Key'):
+                    if ele3.text == 'InteractionString':
+                        for e in ele2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Value'):
+                            # get interactor
+                            _interaction = e.text
+                            set_TP(root, flows, 'AV', _interaction, _id)
+                            set_TP(root, flows, 'Auth',  _interaction, _id)
+                            continue
+    return
+
+def set_TP(root, flows, _key, _interaction, _id,):
+    # find metric value from _interaction and flows
+    _value = ''
+    
+    for ele in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}ThreatInstances//*//{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Value'):
+        for id in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase}Id'):
+            if _id == id.text:
+                for e2 in ele.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase}Properties'):
+                    for ele2 in e2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}KeyValueOfstringstring'):
+                        for ele3 in ele2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Key'):
+                            if ele3.text == _key:
+                                for ele4 in ele2.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}Value'):
+                                    # set element TP here
+                                    ele4.text = _value
+    
     return
 
 

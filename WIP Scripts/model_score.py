@@ -8,10 +8,19 @@ import tkinter as tk
 from tkinter import filedialog
 import json
 
+# checks element props for their selected index for a given <_name>
+def get_metric(_props, _name):
+    for prop in _props:
+        for key,value in dict(prop).items():
+            if key is 'PropName' and _name in value:
+                index = int(prop.get('SelectedIndex'))
+                return prop.get('PropValues')[index]
+    return None
+
 def get_element(_ele):
     # set up dictionaries
     # single element dict
-    element = dict.fromkeys(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid', 'properties'])
+    element = dict.fromkeys(['GenericTypeId','GUID','Name','SourceGuid','TargetGuid', 'AV', 'Auth'])
     # namespace for prop elements
     ele_namespace = {'b': 'http://schemas.datacontract.org/2004/07/ThreatModeling.KnowledgeBase'}
     any_namespace = {'a': 'http://schemas.microsoft.com/2003/10/Serialization/Arrays'}
@@ -67,9 +76,8 @@ def get_element(_ele):
                 ele_props.append(ele_prop.copy())
                 ele_prop.clear()
         # save prop list to element dict
-        element['properties'] = ele_props
-        # print(element['properties'])
-        ele_props.clear()
+        element['AV'] = get_metric(ele_props, 'access vector')
+        element['Auth'] = get_metric(ele_props, 'has authentication')
         return element
 
 def get_meta(root):
@@ -103,9 +111,14 @@ def get_flows(root):
                 for line in lines.findall('{http://schemas.microsoft.com/2003/10/Serialization/Arrays}KeyValueOfguidanyType'):
                 # unlike stencils, flows have a source and target guids
                     ele = get_element(line)
+                    #print(ele['properties'])
                     flows[ele.get('GUID')] = ele
             return flows
     return None
+
+def set_TPs(root, flows):
+
+    return
 
 
 def main():
@@ -131,6 +144,7 @@ def main():
 
     flows = get_flows(root)
     print(flows)
+    set_TPs(root, flows)
 
 
 if __name__ == '__main__':

@@ -1,13 +1,15 @@
-## Steps: load the MS TMT produced .csv file and model file, find "interactor" flow for each threat,
-## parse flow elements find elemnt properties, fill in AV and Auth as threat properties (from element properites),
-## load metadata (notes) and threat props into cvss dicts, and score dicts w/ cvss.py
-## TODO: this method currently involves setting CIA + severity (CVSS threat props) in analysis mode (solve w/ data classification)
+## Steps: load the model file, parse flow elements find elemnt properties,
+## find the "interactor" flow for each threat, fill in AV and Auth as threat properties (from element properites),
+## load metadata (notes) and threat props into cvss dicts
+# TODO: score dicts w/ cvss.py
+# TODO: get flow CIA + severity from CIA_form.py and set threat properties within this script
 
 from lxml import etree
 import tkinter as tk
 from tkinter import filedialog
 import json
 from . import cvss
+from . import CIA_form
 
 # checks element props for anything containing <_name>
 # returns props selected index value
@@ -239,6 +241,7 @@ def score_threats(root, meta):
                             cvss_dict[_key] = ele4.text
         score = cvss.CVSS(cvss_dict)
         print('scored threat ID ' + cvss_dict['ID'] + ' with a score of ' + score.overall_score)
+        # TODO: set CVSS score string
 
 def main():
     root = tk.Tk()
@@ -261,12 +264,13 @@ def main():
     if not meta:
         print('No meta found, choosing defualts')
 
-    flows = get_flows(root)
-    set_TPs(root, flows)
-    score_threats(root, meta)
+    flows = CIA_form.main(get_flows(root))
+    print(flows)
+    # set_TPs(root, flows)
+    # score_threats(root, meta)
 
-    print('Finished!')
-    tree.write(file_path)
+    # print('Finished!')
+    # tree.write(file_path)
 
 if __name__ == '__main__':
    main()

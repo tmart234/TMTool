@@ -1,4 +1,4 @@
-*A collection of my thoughts on threat modeling and TMTool*
+*A scattered collection of my thoughts on threat modeling and TMTool*
 
 
 
@@ -20,23 +20,26 @@ Scope -> Model -> TMTool Set Metadata (model's risk level, target distribution) 
 
 ### Modeling:
 
-- model notes could contain system metadata for scripts and other variables that shouldn't change.
+- model notes contain system metadata for scoring scripts and other variables that shouldn't change.
 	- ex: CVSS environmental metrics like Security Requirements (based on risk level) or the Target Distribution (proportion of vulnerable systems)
 - TODO: explore importing threats via free/open sourced vulnerability management platform
 
 ### Analyzing & Auditing:
 
-- utilize TMT's built-in Analysis as much as possible
-  - CVSS threat properties can always be overridden Analysis mode before scoring, setting and scoring should always be separate processes
-- "Export to CSV" function doesn't get everything we need, therefore using the model XML file would be better
+- (TODO: CIA_form.py) Will be focused on describing assets of each flow and deriving CVSS impact metrics (C.I.A. + severity)
+  - forum should include: severity metrics of the asset (Safety, financial, operational & privacy/legislation), an asset weight, and defined list of either consequences, cost, or loss factors of the asset
+  - While this project derives threats with STRIDE (threat & attacker-centric), I believe the CVSS Impact metrics and analysis should attempt to be more asset centric
+  - Severity will be chosen from a worst case decision between asset severity and threat property severity. 
+  - list of asset Cost/loss factors are statically mapped to CIA metrics in a table. C.I.A. is also mapped to STRIDE (S->C(IA*), T->IA, R->C, I->C, D-> A, E->CIA) as such to decide which impact metrics to set 
+  -  and asset weight w/ other assets are assessed from each threat ID's flow to determine the CIA levels
+- CVSS threat properties can always be overridden in Analysis Mode before and after scoring (just remember to re-score)
+- Microsoft's "Export to CSV" function doesn't get everything needed as far as stencil properties, therefore we parse and edit the model file directly
 - when auditing the generated threat IDs, if a False positive is identified, set status to: "not applicable"
-  - Scoring script should ignore these
-- (TODO: CIA_form.py) Enumerate model's flows and set CIA + severity metrics for each flow with a GUI
-  - with data classification of each flow+ the stride category we could infer CIA metrics, needs exploring
+  - (TODO) Scoring and CIA script should ignore these
 
 ### Scoring script
 
-- Use CVSS base metrics + environmental metrics as threat properties.
+- Use CVSS v2 base metrics + environmental metrics as threat properties.
 
   -  This seems easier than other complex things like [OWASP Risk rating methodology](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology)
 
@@ -48,10 +51,10 @@ Scope -> Model -> TMTool Set Metadata (model's risk level, target distribution) 
 
 ### Reporting/Documenting
 
-- All scoring metrics are threat properties or notes and therefore will show up in the HTML report!
-  - scoring metrics that are element properties are mapped to threat properties before scoring
+- All scoring metrics are threat properties and/or notes, therefore will show up in the HTML report!
+  - scoring metrics that are element properties are first mapped to threat properties before scoring
 - Improve TMT's built-in HTML reporting
-  - because of MS TMT's HTML sanitizer, we need to decode the HTML elements (~4 times) back to usable links within the report document
+  - because of MS TMT's HTML sanitizer, this project needs to decode the HTML elements (~4 times) back to usable links within the report document
   - TODO: filter selected compliance standards from metadata note
   - TODO: color code the priority levels in report
 
@@ -60,9 +63,9 @@ Scope -> Model -> TMTool Set Metadata (model's risk level, target distribution) 
 - Answers: "what are we building?" and "what could go wrong?" (threat database)
 - (TODO) Explore merging CVSS metrics from script (adds stencil and threat properties)
 - in test_template.tm7, I've added the following as Threat Properties: C.I.A. metrics (CVSS base), Access complexity (base), severity (environmental), CVSS overall score, and HTML Compliance Tags
-	- asses if we should pre-set Access Complexity, Severity, and  HTML Compliance Tags (threat properties) within our threat database
-	- PyTM has a good example of these metrics within a [database of threats](https://github.com/izar/pytm/blob/master/docs/threats.md)
-	- so does [threagile]( https://github.com/Threagile/threagile/tree/master/risks/built-in)
+  - (TODO) severity is only metric that should be in both asset-centric and threat-centric; a likelihood metric and an impact metric. Meaning it should reside as a threat property and be derived from asset discovery then be a worst case decision.
+
+  - PyTM has a good example of these metrics within a [database of threats](https://github.com/izar/pytm/blob/master/docs/threats.md) ... so does [threagile]( https://github.com/Threagile/threagile/tree/master/risks/built-in)
 - Address and explore how templates and/or threat databases can provide different [data-flow diagram depth layers](https://docs.microsoft.com/en-us/learn/modules/tm-provide-context-with-the-right-depth-layer/)
 	- Layer 0: major system parts. Layer 1: secondary system parts. Layer 2: system's sub-components. Layer 3: every process and low-level system subpart
 	- how would each layer look different in enterprise, mobile, and IoT applications? Would this require different templates for different depth layers?
@@ -77,7 +80,7 @@ Scope -> Model -> TMTool Set Metadata (model's risk level, target distribution) 
 - (TODO) Create a Jira "Issue Type" named Requirements and upload the threat's mitigation to requirements
 	-  link Jira Issues to requirements. both are linked/synced to threat IDs
 
-## Scripts
+## Scripts/Workflows
 
 .tb7 template files:
 

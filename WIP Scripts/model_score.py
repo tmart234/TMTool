@@ -9,7 +9,7 @@ import tkinter as tk
 from tkinter import filedialog
 import json
 import cvss
-import CIA_form
+import asset_form
 
 # checks element props for anything containing <_name>
 # returns props selected index value
@@ -264,7 +264,7 @@ def main():
     if not meta:
         print('No meta found, choosing defualts')
 
-    flows = CIA_form.main(get_flows(root))
+    flows = asset_form.main(get_flows(root))
     print(flows)
     # set_TPs(root, flows)
     # score_threats(root, meta)

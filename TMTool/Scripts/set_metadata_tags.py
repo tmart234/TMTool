@@ -163,9 +163,9 @@ def main():
     # Create text widget and specify size. 
     T1 = ttk.Label(root, text='Compliance Standards:', font=(None, 13, 'bold'))
     T2 = ttk.Label(root, text='Security Requirements:', font=(None, 13, 'bold'))
-    T3 = ttk.Label(root, text='Confidentiality')
-    T4 = ttk.Label(root, text='Integrity')
-    T5 = ttk.Label(root, text='Availability')
+    T3 = ttk.Label(root, text='Confidentiality Requirement')
+    T4 = ttk.Label(root, text='Integrity Requirement')
+    T5 = ttk.Label(root, text='Availability Requirement')
     T6 = ttk.Label(root, text='Target Distribution')
     R1= Button(root, text="Done", command=get_boxes_and_destroy)
 
@@ -208,11 +208,14 @@ def main():
 
     # have-over definitions
     CreateToolTip(T1, \
-        "select the desired compliance standards. Compliance tag URLs will show up in the generated report"
+        "Select the desired compliance standards. Compliance tag URLs will show up in the generated report"
         " after fixing the hyperlinks with TMTool")
     CreateToolTip(T2, \
-        "determine the specific security requirements for confidentiality, integrity and availability. "
-        "This allows the final score to be tuned according to the users' environment.")
+        "Determine the specific security requirements for confidentiality, integrity and availability. "
+        "This allows the final score to be tuned according to the users' environment and is similar to the users' risk threshold")
+    CreateToolTip(T6, \
+        "Determine the proportion of vulnerable systems within the environment. "
+        "Ex: a threat ID affects only Windows, but half the environment systems run MacOS. Can be over ridden in analysis mode.")
 
     root.mainloop()
     quit()

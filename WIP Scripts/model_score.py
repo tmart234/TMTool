@@ -8,8 +8,8 @@ from lxml import etree
 import tkinter as tk
 from tkinter import filedialog
 import json
-from . import cvss
-from . import CIA_form
+import cvss
+import CIA_form
 
 # checks element props for anything containing <_name>
 # returns props selected index value

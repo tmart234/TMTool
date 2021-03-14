@@ -13,6 +13,7 @@ from tkinter import ttk
 # override the basic Tk widgets
 from tkinter import *
 from ttkthemes import ThemedStyle
+import tooltip as TP
 
 class AssetsWindow(ttk.Frame):
     def __init__(self, master, flows, *args, **kwargs):
@@ -42,42 +43,72 @@ class AssetsWindow(ttk.Frame):
         style = ThemedStyle(self.new_f)
         style.set_theme("equilux")
 
-        a_B1 = ttk.Button(self.new_f, text="Add", command=self.quit_new_asset)
+        a_B1 = ttk.Button(self.new_f, text="Add Asset", command=self.quit_new_asset)
         _lb1 = Listbox(self.new_f, selectmode='multiple', background='#404040', foreground='#FFFFFF')
-        _t1 = ttk.Label(self.new_f, text="Asset Severity:")
-        _t2 = ttk.Label(self.new_f, text="Flows Impacted:")
+        _lb2 = Listbox(self.new_f, selectmode='multiple', background='#404040', foreground='#FFFFFF')
+        _t1 = ttk.Label(self.new_f, text="Severity Impact:", font=(None, 12, 'bold'))
+        _t2 = ttk.Label(self.new_f, text="Flows Impacted:",  font=(None, 12, 'bold'))
+
         safe_data=("No Injuries", "Light Injuries", "Severe Injuries", "Life-threatening")
         fin_data=("No Financial Impact", "Low Impact", "Substantial Loss", "Devastating")
         op_data=("No Effect", "Minor Disruption", "Moderate Disruption", "Major Disruption", "Fails Saftey Reqs")
         priv_data=("No Effect", "Low", "Medium", "High")
+        asset_knowledge=("Public","Restricted","Sensitive","Critical")
+        asset_weights=("Low","Medium","High")
+        asset_loss_factors = ("IP", "Personal Identifiers", "Health Data (PHI)", "Strategic Info", "Reputation", "Monetary", "Regulations", "Forensic/Logging" )
+
         _t3 = ttk.Label(self.new_f, text="Asset Safty Impact")
         _t4 = ttk.Label(self.new_f, text="Asset Financial Impact")
         _t5 = ttk.Label(self.new_f, text="Asset Operational Impact")
         _t6 = ttk.Label(self.new_f, text="Asset Privacy Impact")
-        _t7 = ttk.Label(self.new_f, text="Asset Name:")
+
+        _t7 = ttk.Label(self.new_f, text="Short Title:", font=(None, 12, 'bold'))
         _e1 = ttk.Entry(self.new_f)
+        _t8 = ttk.Label(self.new_f, text="Description:")
+        _e2 = ttk.Entry(self.new_f)
+
+        _t9 = ttk.Label(self.new_f, text="Required Knowledge:",  font=(None, 12, 'bold'))
+        _t10 = ttk.Label(self.new_f, text="Asset Valued Weight:",  font=(None, 12, 'bold'))
+        _t11 = ttk.Label(self.new_f, text="Cost/Loss Item:",  font=(None, 12, 'bold'))
+
         _cb1 = ttk.Combobox(self.new_f, values=safe_data)
         _cb2 = ttk.Combobox(self.new_f, values=fin_data)
         _cb3 = ttk.Combobox(self.new_f, values=op_data)
         _cb4 = ttk.Combobox(self.new_f, values=priv_data)
-
+        _cb5 = ttk.Combobox(self.new_f, values=asset_knowledge)
+        _cb6 = ttk.Combobox(self.new_f, values=asset_weights)
+        _cb1.current(0)
+        _cb2.current(0)
+        _cb3.current(0)
+        _cb4.current(0)
+        _cb5.current(0)
+        _cb6.current(0)
         # get list of model flow names
         flo_names = list()
         for i in range(0, len(self.flows)):
             flo_names.append(str(dict(list(self.flows.values())[i]).get('Name')))
-        # fill Listbox    
+        # fill Listboxes    
         for item in flo_names:
             _lb1.insert('end', item)
+        for item in asset_loss_factors:
+            _lb2.insert('end', item)
+        # keep LB selection when clicking elsewhere
+        _lb1.configure(exportselection=False)
+        _lb2.configure(exportselection=False)
         
-        self.new_f.rowconfigure(0, weight=1)
-        self.new_f.rowconfigure(1, weight=1)
         self.new_f.columnconfigure(0, weight=1)
         self.new_f.columnconfigure(1, weight=1)
 
         _t7.grid(row=0, column= 0, sticky='nsew')
         _e1.grid(row=1, column= 0, sticky='nsew')
-        _t2.grid(row=2, column= 0, sticky='nsew')
-        _lb1.grid(row=3, rowspan=6, column= 0, sticky='nsew')
+        _t8.grid(row=2, column= 0, sticky='nsew')
+        _e2.grid(row=3, column= 0, sticky='nsew')
+        # Listboxes
+        _t2.grid(row=4, column= 0, sticky='nsew')
+        _lb1.grid(row=5, rowspan=5, column= 0, sticky='nsew')
+        _t11.grid(row=10, column= 0, sticky='nsew')
+        _lb2.grid(row=11, rowspan=2, column= 0, sticky='nsew')
+        # comboboxes
         _t1.grid(row=0, column= 1, sticky='nsew')
         _t3.grid(row=1, column= 1, sticky='nsew')
         _cb1.grid(row=2, column= 1, sticky='nsew')
@@ -87,7 +118,23 @@ class AssetsWindow(ttk.Frame):
         _cb3.grid(row=6, column= 1, sticky='nsew')
         _t6.grid(row=7, column= 1, sticky='nsew')
         _cb4.grid(row=8, column= 1, sticky='nsew')
-        a_B1.grid(row=9, column= 0, columnspan=2, sticky='nsew')
+        _t9.grid(row=9, column= 1, sticky='nsew')
+        _cb5.grid(row=10, column= 1, sticky='nsew')
+        _t10.grid(row=11, column= 1, sticky='sew')
+        _cb6.grid(row=12, column= 1, rowspan=1, sticky='new')
+
+        a_B1.grid(row=13, column= 0, columnspan=2, sticky='nsew')
+        # hover-over tips
+        TP.CreateToolTip(_t1, \
+            "Select all severity Impact Levels which apply")
+        TP.CreateToolTip(_t2, \
+            "Select all model flows which interact with the asset")
+        TP.CreateToolTip(_t9, \
+            "Availability of the asset's information")
+        TP.CreateToolTip(_t10, \
+            "Importance of this asset compared to other assets")
+        TP.CreateToolTip(_t11, \
+            "Consequences of a compromised asset")
         self.new_f.mainloop()
 
     ## quit the "new asset" window
@@ -99,7 +146,7 @@ class AssetsWindow(ttk.Frame):
         # add asset to dict
         self.Assets[a_len]='new'+str(a_len)
         # add label
-        self.label_list.insert(0, ttk.Label(self.label_frame, text=self.Assets.get(a_len)))
+        self.label_list.insert(1, ttk.Label(self.label_frame, text=self.Assets.get(a_len)))
         for widget in self.label_frame.children.values():
             widget.grid_forget() 
         for ndex, i in enumerate(self.label_list):

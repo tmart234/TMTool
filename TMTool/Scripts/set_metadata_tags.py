@@ -8,6 +8,7 @@ from tkinter import filedialog
 from tkinter.ttk import Combobox
 from lxml import etree
 import datetime
+import tooltip as TP
 
 def get_boxes_and_destroy():
     global notes_dict
@@ -93,61 +94,6 @@ def save_to_xml():
     tree.write(model_path)
     return
 
-
-class CreateToolTip(object):
-    """
-    create a tooltip for a given widget
-    """
-    def __init__(self, widget, text='widget info'):
-        self.waittime = 500     #miliseconds
-        self.wraplength = 180   #pixels
-        self.widget = widget
-        self.text = text
-        self.widget.bind("<Enter>", self.enter)
-        self.widget.bind("<Leave>", self.leave)
-        self.widget.bind("<ButtonPress>", self.leave)
-        self.id = None
-        self.tw = None
-
-    def enter(self, event=None):
-        self.schedule()
-
-    def leave(self, event=None):
-        self.unschedule()
-        self.hidetip()
-
-    def schedule(self):
-        self.unschedule()
-        self.id = self.widget.after(self.waittime, self.showtip)
-
-    def unschedule(self):
-        id = self.id
-        self.id = None
-        if id:
-            self.widget.after_cancel(id)
-
-    def showtip(self, event=None):
-        x = y = 0
-        x, y, cx, cy = self.widget.bbox("insert")
-        x += self.widget.winfo_rootx() + 25
-        y += self.widget.winfo_rooty() + 20
-        # creates a toplevel window
-        self.tw = tk.Toplevel(self.widget)
-        # Leaves only the label and removes the app window
-        self.tw.wm_overrideredirect(True)
-        self.tw.wm_geometry("+%d+%d" % (x, y))
-        label = tk.Label(self.tw, text=self.text, justify='left',
-                       background="#ffffff", relief='solid', borderwidth=1,
-                       wraplength = self.wraplength)
-        label.pack(ipadx=1)
-
-    def hidetip(self):
-        tw = self.tw
-        self.tw= None
-        if tw:
-            tw.destroy()
-
-
 def main():
     root = tk.Tk()
     root.configure(background='#404040')
@@ -207,14 +153,14 @@ def main():
     R1.place(x=150,y=318)
 
     # have-over definitions
-    CreateToolTip(T1, \
+    TP.CreateToolTip(T1, \
         "Select the desired compliance standards. Compliance tag URLs will show up in the generated report"
         " after fixing the hyperlinks with TMTool")
-    CreateToolTip(T2, \
+    TP.CreateToolTip(T2, \
         "Determine the specific security requirements for confidentiality, integrity and availability. "
         "This allows the final score to be tuned according to the users' environment and is similar to the users' risk threshold")
-    CreateToolTip(T6, \
-        "Determine the proportion of vulnerable systems within the environment. "
+    TP.CreateToolTip(T6, \
+        "Determine the proportion of vulnerable systems within the model. "
         "Ex: a threat ID affects only Windows, but half the environment systems run MacOS. Can be over ridden in analysis mode.")
 
     root.mainloop()

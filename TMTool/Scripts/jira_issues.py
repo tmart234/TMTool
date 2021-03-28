@@ -13,7 +13,6 @@ from tkinter import filedialog
 from tkinter import messagebox
 import csv
 
-from jira.resources import Project
 # create a creds file with values
 from . import creds
 

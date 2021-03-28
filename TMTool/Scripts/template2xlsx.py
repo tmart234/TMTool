@@ -3,12 +3,14 @@
 ## and it will also pull all template's generic + standard elements
 ## after, it creates a template.xlsx file
 
-import xml.etree.ElementTree as ET
 import xlsxwriter
+import xmltodict
+
+import xml.etree.ElementTree as ET
 import tkinter as tk
 from tkinter import filedialog
-import xmltodict
 import json
+import os
 
 namespaces = {
         'http://www.w3.org/2001/XMLSchema-instance': None # skip this namespace
@@ -47,7 +49,7 @@ def cat2str(cat, cats):
          if cat == value:
              return key
 
-# gets elements (stencils, flows boundarys)
+# gets elements (stencils, flows, and boundarys)
 class Elements():
     def __init__(self):
         self.row = 1
@@ -69,7 +71,7 @@ class Elements():
                 # will not get <Image>, <StrokeThickness>, <ImageLocation>, or sencil constraints
                         # get all property data (all child elements)
                 elemnent_attribs = types.find('Attributes')
-                self.attribs = ET.tostring(elemnent_attribs, encoding='utf8', method='xml')
+                self.attribs = ET.tostring(elemnent_attribs, encoding='utf-8', method='xml')
                 # have to dump as json because we have an ordereddicts within ordereddicts
                 self.attribs = json.loads(json.dumps(xmltodict.parse(self.attribs,process_namespaces=True,namespaces=namespaces)))
                 self.attribs = str(self.attribs)
@@ -81,15 +83,7 @@ class Elements():
         return
 
 def main():
-    # Create a workbook and add a worksheet.
-    workbook = xlsxwriter.Workbook('tm_template.xlsx')
-
-    # Add a bold format to use to highlight cells.
-    bold = workbook.add_format({'bold': 1})
-
-    threat_worksheet = workbook.add_worksheet('Threats')
-    stencil_worksheet = workbook.add_worksheet('Stencils')
-
+    
     root = tk.Tk()
     root.withdraw()
 
@@ -102,8 +96,21 @@ def main():
     if not file_path:
         print('Must choose file path, quitting... ')
         quit()
-
+    
     root = ET.parse(file_path).getroot()
+
+    # rename file extension
+    base = os.path.splitext(file_path)[0]
+    os.rename(file_path, base + '.xlsx')
+    
+    # Create a workbook and add a worksheet.
+    workbook = xlsxwriter.Workbook(file_path)
+
+    # Add a bold format to use to highlight cells.
+    bold = workbook.add_format({'bold': 1})
+
+    threat_worksheet = workbook.add_worksheet('Threats')
+    stencil_worksheet = workbook.add_worksheet('Stencils')
 
     title = ''
     category = ''

@@ -4,6 +4,7 @@
 
 import xml.etree.ElementTree as ET
 import csv
+import os
 import tkinter as tk
 from tkinter import filedialog
 
@@ -87,11 +88,16 @@ def main():
     if not file_path:
         print('Must choose file path, quitting... ')
         quit()
+
     root.destroy()
     tree = ET.parse(file_path)
     root = tree.getroot()
 
-    with open('model.csv', 'w', newline='') as r:
+    # remame extension
+    base = os.path.splitext(file_path)[0]
+    os.rename(file_path, base + '.csv')
+
+    with open(file_path, 'w', newline='') as r:
         writer = csv.writer(r)
         for child in root.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}DrawingSurfaceList'):
             for ele in child.findall('{http://schemas.datacontract.org/2004/07/ThreatModeling.Model}DrawingSurfaceModel'):

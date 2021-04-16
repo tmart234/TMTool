@@ -13,6 +13,7 @@ from TMTool.Scripts import set_metadata_tags
 def open_script1():
     template2xlsx.main()
     print("executed template2xlsx")
+    return
 
 def open_script2():
     xlsx2template.main()

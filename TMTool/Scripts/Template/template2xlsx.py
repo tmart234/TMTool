@@ -12,6 +12,7 @@ import tkinter as tk
 from tkinter import filedialog
 import json
 import os
+import io
 from shutil import copyfile
 
 namespaces = {
@@ -99,15 +100,16 @@ def main():
         print('Must choose file path, quitting... ')
         quit()
     
-    tree = etree.parse(file_path)
+    with io.open(file_path, 'r', encoding='utf-8') as f:
+        tree = etree.parse(f)
     xml_root = tree.getroot()
 
     # copy file and rename  extension
     base = os.path.splitext(file_path)[0]
-    copyfile(file_path, base + '.xlsx')
+    wb_path = base + '.xlsx'
     
     # Create a workbook and add a worksheet.
-    workbook = xlsxwriter.Workbook(file_path)
+    workbook = xlsxwriter.Workbook(wb_path)
 
     # Add a bold format to use to highlight cells.
     bold = workbook.add_format({'bold': 1})
@@ -152,7 +154,7 @@ def main():
             desc = subelem.text
         # get all property data (all child elements)
         properties = types.find('PropertiesMetaData')
-        prop_str = etree.tostring(properties, encoding='utf8', method='xml')
+        prop_str = etree.tostring(properties, encoding='utf-8', method='xml')
         # have to dump as json because we have an ordereddicts within ordereddicts
         prop_str = json.loads(json.dumps(xmltodict.parse(prop_str,process_namespaces=True,namespaces=namespaces)))
         prop_str = str(prop_str)
@@ -183,6 +185,7 @@ def main():
     Ele.write_row(xml_root, "StandardElements", stencil_worksheet)
 
     close_wb(workbook)
+    return
 
 if __name__ == '__main__':
     main()

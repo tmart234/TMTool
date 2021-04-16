@@ -6,7 +6,6 @@ import traceback
 def cli():
     gui.main()
     quit()
-    return
 
 def main():
     cli()

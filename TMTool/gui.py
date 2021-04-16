@@ -4,8 +4,8 @@ from tkinter.ttk import *
 from tkinter import *
 from ttkthemes import ThemedStyle
 
-from TMTool.Scripts import template2xlsx
-from TMTool.Scripts import xlsx2template
+from TMTool.Scripts.Template import template2xlsx
+from TMTool.Scripts.Template import xlsx2template
 from TMTool.Scripts import jira_issues
 from TMTool.Scripts import fix_report_hyperlinks
 from TMTool.Scripts import set_metadata_tags
@@ -29,6 +29,7 @@ def open_script4():
 def open_script5(root):
     root.destroy()
     set_metadata_tags.main()
+    # TODO: inspect block
     print("executed set_metadata_tags")
 
 

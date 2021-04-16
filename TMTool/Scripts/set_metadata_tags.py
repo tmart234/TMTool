@@ -8,7 +8,7 @@ from tkinter import filedialog
 from tkinter.ttk import Combobox
 from lxml import etree
 import datetime
-import tooltip as TP
+from . import tooltip as TP
 
 def get_boxes_and_destroy():
     global notes_dict

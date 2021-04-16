@@ -5,12 +5,14 @@
 
 import xlsxwriter
 import xmltodict
+from io import StringIO
 
-import xml.etree.ElementTree as ET
+from lxml import etree
 import tkinter as tk
 from tkinter import filedialog
 import json
 import os
+from shutil import copyfile
 
 namespaces = {
         'http://www.w3.org/2001/XMLSchema-instance': None # skip this namespace
@@ -71,7 +73,7 @@ class Elements():
                 # will not get <Image>, <StrokeThickness>, <ImageLocation>, or sencil constraints
                         # get all property data (all child elements)
                 elemnent_attribs = types.find('Attributes')
-                self.attribs = ET.tostring(elemnent_attribs, encoding='utf-8', method='xml')
+                self.attribs = etree.tostring(elemnent_attribs, encoding='utf-8', method='xml')
                 # have to dump as json because we have an ordereddicts within ordereddicts
                 self.attribs = json.loads(json.dumps(xmltodict.parse(self.attribs,process_namespaces=True,namespaces=namespaces)))
                 self.attribs = str(self.attribs)
@@ -97,11 +99,12 @@ def main():
         print('Must choose file path, quitting... ')
         quit()
     
-    root = ET.parse(file_path).getroot()
+    tree = etree.parse(file_path)
+    xml_root = tree.getroot()
 
-    # rename file extension
+    # copy file and rename  extension
     base = os.path.splitext(file_path)[0]
-    os.rename(file_path, base + '.xlsx')
+    copyfile(file_path, base + '.xlsx')
     
     # Create a workbook and add a worksheet.
     workbook = xlsxwriter.Workbook(file_path)
@@ -129,7 +132,7 @@ def main():
     threat_worksheet.write('G1', 'Properties', bold)
     # start at row 1
     _row = 1
-    for types in root.iter('ThreatType'):
+    for types in xml_root.iter('ThreatType'):
         # TODO: replace threat logic GUIDs with names in xlsx and make a guid lookup function for elements
         # get threat logic
         for gen_filters in types.findall('GenerationFilters'):
@@ -139,7 +142,7 @@ def main():
                 exclude = exclude_logic.text
         # get elements
         for subelem in types.findall('Category'):
-            category = str(cat2str(subelem.text, find_cats(root)))
+            category = str(cat2str(subelem.text, find_cats(xml_root)))
         for subelem in types.findall('Id'):
             threat_id = subelem.text
         for subelem in types.findall('ShortTitle'):
@@ -149,7 +152,7 @@ def main():
             desc = subelem.text
         # get all property data (all child elements)
         properties = types.find('PropertiesMetaData')
-        prop_str = ET.tostring(properties, encoding='utf8', method='xml')
+        prop_str = etree.tostring(properties, encoding='utf8', method='xml')
         # have to dump as json because we have an ordereddicts within ordereddicts
         prop_str = json.loads(json.dumps(xmltodict.parse(prop_str,process_namespaces=True,namespaces=namespaces)))
         prop_str = str(prop_str)
@@ -176,8 +179,8 @@ def main():
 
     # write generic elements
     Ele = Elements()
-    Ele.write_row(root, "GenericElements", stencil_worksheet)
-    Ele.write_row(root, "StandardElements", stencil_worksheet)
+    Ele.write_row(xml_root, "GenericElements", stencil_worksheet)
+    Ele.write_row(xml_root, "StandardElements", stencil_worksheet)
 
     close_wb(workbook)
 

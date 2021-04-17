@@ -5,7 +5,6 @@ import traceback
 @click.command()
 def cli():
     gui.main()
-    quit()
 
 def main():
     cli()

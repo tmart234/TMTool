@@ -1,22 +1,16 @@
 *A scattered collection of my thoughts on threat modeling and TMTool*
 
+## Project Goals:
 
+ - This project works heavily off of the concept of "scoring methodologies" (such as OWASP Risk Rating and CVSS v2)
+- Each scoring methodology contains metrics that can be further categorized into either Impact or Likelihood based metrics
+  - Because Microsoft's Threat Modeling tool uses STRIDE, it is "threat" and/or "attacker" centric it. TMTool believes a Model's Stencils or Threats can contain the Likelihood based metrics, but determining Impact takes additional insight into the assets at hand: What are we protecting? Therefore, we also aim to provide an "asset centric" method that describes assets in a repeatable way in order to derive these Impact metrics.
+  - Abstract the scoring rubric entirely when dealing with the generated threat list
+- 
 
 ### Typical Threat Modeling process:
 
-Scope -> Model -> Analyze - Mitigate -> Document
-
-### TMTool process:
-
-#### For Templates:
-
-Create threats & stencils within the MS TMT editor -> merge other templates w/ logic within MS TMT editor options -> merge in cvss_props_blank.tm7 template with script -> set CVSS stencil & threat properties -> convert to excel file -> mass modify threat logic (or other values) -> convert back to template file
-
-#### For Models:
-
-Scope -> Model -> TMTool Set Metadata (model's risk level, target distribution) -> TMTool CIA form (describe model flows) -> TMTool Score Model -> Generate HTML report and .csv threat list -> TMTool Jira or report clean up scripts
-
-
+Scope -> Model -> Analyze - Mitigate -> Documents
 
 ### Modeling:
 

@@ -10,14 +10,19 @@ from TMTool.Scripts import jira_issues
 from TMTool.Scripts import fix_report_hyperlinks
 from TMTool.Scripts import set_metadata_tags
 
+root = Tk()
+
 def open_script1():
     template2xlsx.main()
     print("executed template2xlsx")
+    root.destroy()
     return
 
 def open_script2():
     xlsx2template.main()
     print("executed xlsx2template")
+    root.destroy()
+    return
 
 def open_script3():
     jira_issues.main()
@@ -35,7 +40,6 @@ def open_script5(root):
 
 
 def main():
-    root = Tk()
     root.configure(background='#404040')
     root.title("TMTool GUI")
     root.geometry("400x200")
@@ -68,7 +72,7 @@ def main():
 
     button5 = ttk.Button(window,
                     text="Set Model metadata",
-                    command= (lambda: open_script5(root)))
+                    command= open_script5)
 
     # light green
     text1 = ttk.Label(window,
@@ -89,7 +93,7 @@ def main():
     button4.grid(row=2, column=1, sticky=W+E)
     button5.grid(row=1, column=1, sticky=W+E)
     root.mainloop()
-    return
+    quit()
 
 if __name__ == '__main__':
     main()

@@ -9,7 +9,6 @@ def cli():
 
 def main():
     cli()
-    quit()
 
 if __name__ == '__main__':
     main()

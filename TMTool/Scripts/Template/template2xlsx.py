@@ -5,7 +5,6 @@
 
 import xlsxwriter
 import xmltodict
-from io import StringIO
 
 from lxml import etree
 import tkinter as tk
@@ -13,7 +12,6 @@ from tkinter import filedialog
 import json
 import os
 import io
-from shutil import copyfile
 
 namespaces = {
         'http://www.w3.org/2001/XMLSchema-instance': None # skip this namespace
@@ -105,8 +103,8 @@ def main():
     xml_root = tree.getroot()
 
     # copy file and rename  extension
-    base = os.path.splitext(file_path)[0]
-    wb_path = base + '.xlsx'
+    wb_path = os.path.splitext(file_path)[0]
+    wb_path = wb_path + '.xlsx'
     
     # Create a workbook and add a worksheet.
     workbook = xlsxwriter.Workbook(wb_path)

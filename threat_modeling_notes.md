@@ -49,7 +49,8 @@ An asset should be in a Threat (ex: keys in a side channel attack) or within a f
 ### Template
 
 - Answers: "what are we building?" and "what could go wrong?" (threat database)
-- (TODO) Script to add CVSS metrics (adds metrics to stencil and threat properties)
+- (TODO) Script to add risk metrics to stencil and threat properties
+  - Do the risk metrics get added to model file or added to template file and then reapplied to model??
 - in test_template.tm7, we've added the following as Threat Properties: C.I.A. metrics (CVSS base), Access complexity (base), severity (environmental), CVSS overall score, and HTML Compliance Tags
   - (TODO) severity is only metric that should be in both asset-centric and threat-centric; a likelihood metric and an impact metric. Meaning it should reside as a threat property and be derived from asset discovery then be a worst case decision.
 
@@ -99,10 +100,10 @@ Scope -> Model -> Analyze - Mitigate -> Documents
 
 ### Definitions
 
-Elements/stencils: can be either a data store, data flow, process, external entity, or trust boundary
-Threat Property: metadata that can be set for every generated threat
-Element Property: metadata that can be set for every element
-Model Note entry: system level and could contain system metadata
+- Elements/stencils: can be either a data store, data flow, process, external entity, or trust boundary
+- Threat Property: metadata that can be set for every generated threat
+- Element Property: metadata that can be set for every element
+- Model Note entry: system level and could contain system metadata
 
 ### Idea: diffing scripts
 
@@ -111,6 +112,7 @@ Model Note entry: system level and could contain system metadata
 
 ### Future Goals
 
+- Switch to PyQT
 - Auditing a template file threat logic
 - Address and explore how templates and/or threat databases can provide different [data-flow diagram depth layers](https://docs.microsoft.com/en-us/learn/modules/tm-provide-context-with-the-right-depth-layer/)
   - Layer 0: major system parts. Layer 1: secondary system parts. Layer 2: system's sub-components. Layer 3: every process and low-level system subpart

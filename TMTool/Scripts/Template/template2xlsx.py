@@ -84,6 +84,9 @@ def replaceSingleQuote(_root, txt):
             name = getGUIDName(_root, "GenericElements", guid)
             if not name:
                 name = getGUIDName(_root, "StandardElements", guid)
+                if not name:
+                    print("Error: element not found")
+                    continue
             txt.replace(item, name)
     return txt
 

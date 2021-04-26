@@ -20,9 +20,9 @@ $ TMTool
 
 ## Automated Cyber-Risk Scoring
 
-- Parsing Threat element properties from a model: For example flows could have "access vector" set as an element prop. 
-- Next parsing Threat properties from a model: For example you could have "access complexity" set as a threat prop.
-- Then adding a repeatable way to describe assets and apply those assets to a model’s flows in a repeatable way. This step mostly being able to derive CIA of the score.
+- Parsing Element properties from a model: For example a flow could have "access vector" as an element prop. 
+- Parsing Threat properties from a model: For example a threat have "access complexity" as a threat property.
+- And adding a repeatable way to describe assets and apply those assets to a model’s flows or threats in a repeatable way. This step being able to derive CIA, severity, and impact of the score.
 
 ![](https://github.com/tmart234/TMT/blob/main/README.assets/risk_venn_diagram.png)
 

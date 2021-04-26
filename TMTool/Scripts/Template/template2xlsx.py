@@ -58,7 +58,11 @@ def getStrGUID(_s):
     if guid:
         return guid[0]
     else:
-        return None
+        # MS Azure template uses non-guid IDs with periods
+        if ' ' not in _s and '.' in _s:
+            return _s
+        else:
+            return None
 
 # take in GUID and look up the element name
 def getGUIDName(_root, ele_type, _guid):

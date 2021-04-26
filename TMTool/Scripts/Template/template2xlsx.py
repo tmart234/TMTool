@@ -72,15 +72,15 @@ def getGUIDName(_root, ele_type, _guid):
                         print("ErrorGUID not found!")
     return None
 
-# finds all items in single quotes, replace GUIDs with names
-def replaceSingleQuote(txt):
+# finds all items in single quotes, replace any GUIDs with names
+def replaceSingleQuote(_root, txt):
     items = re.findall(r"\(u'(.*?)',\)", txt)
     for item in items:
         guid = getStrGUID(item)
         if guid == None:
             continue
         else:
-            name = getGUIDName(guid)
+            name = getGUIDName(_root, "GenericElements", guid)
             # TODO: find item and replpace with name
     return txt
 

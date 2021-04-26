@@ -69,7 +69,8 @@ def getGUIDName(_root, ele_type, _guid):
                         for subelem in types.findall('Name'):
                             return subelem.text
                     else:
-                        print("ErrorGUID not found!")
+                        continue
+    print("ErrorGUID not found!")
     return None
 
 # finds all items in single quotes, replace any GUIDs with names
@@ -81,7 +82,9 @@ def replaceSingleQuote(_root, txt):
             continue
         else:
             name = getGUIDName(_root, "GenericElements", guid)
-            # TODO: find item and replpace with name
+            if not name:
+                name = getGUIDName(_root, "StandardElements", guid)
+            txt.replace(item, name)
     return txt
 
 # gets elements (stencils, flows, and boundarys)

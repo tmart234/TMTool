@@ -9,9 +9,11 @@ import xmltodict
 from lxml import etree
 import tkinter as tk
 from tkinter import filedialog
+
 import json
 import os
 import io
+import re
 
 namespaces = {
         'http://www.w3.org/2001/XMLSchema-instance': None # skip this namespace
@@ -47,8 +49,40 @@ def find_cats(root):
 # take a threat category GUID and look it up in the category dict
 def cat2str(cat, cats):
     for key, value in cats.items():
-         if cat == value:
-             return key
+        if cat == value:
+            return key
+
+# returns GUID in string using regex
+def getStrGUID(_s):
+    c = re.compile('[0-9a-f]{12}4[0-9a-f]{3}[89ab][0-9a-f]{15}\Z', re.I)
+    guid = c.match(_s)
+    return guid
+
+# take in GUID and look up the name
+def getGUIDName(_root, ele_type, _guid):
+    if _guid:
+        for _type in _root.findall(ele_type):
+            for types in _type.iter('ElementType'):
+                for subelem in types.findall('ID'):
+                    ele_id = subelem.text
+                    if ele_id == _guid:
+                        for subelem in types.findall('Name'):
+                            return subelem.text
+                    else:
+                        print("ErrorGUID not found!")
+    return None
+
+# finds all items in single quotes, replace GUIDs with names
+def replaceSingleQuote(txt):
+    items = re.findall(r"\(u'(.*?)',\)", txt)
+    for item in items:
+        guid = getStrGUID(item)
+        if guid == None:
+            continue
+        else:
+            name = getGUIDName(guid)
+            # TODO: find item and replpace with name
+    return txt
 
 # gets elements (stencils, flows, and boundarys)
 class Elements():
@@ -133,11 +167,14 @@ def main():
     # start at row 1
     _row = 1
     for types in xml_root.iter('ThreatType'):
-        # TODO: replace threat logic GUIDs with names in xlsx and make a guid lookup function for elements
-        # get threat logic
+        # get threat's threat logic
         for gen_filters in types.findall('GenerationFilters'):
             for include_logic in gen_filters.findall('Include'):
                 include = include_logic.text
+                # replace threat logic GUIDs with names
+                # first replace GUIDs in single quotes
+                include = replaceSingleQuote(include)
+                # TODO: then replace GUIDs that are prop names "flow.<guid>"
             for exclude_logic in gen_filters.findall('Exclude'):
                 exclude = exclude_logic.text
         # get elements

@@ -60,7 +60,7 @@ def getStrGUID(_s):
     else:
         return None
 
-# take in GUID and look up the name
+# take in GUID and look up the element name
 def getGUIDName(_root, ele_type, _guid):
     if _guid:
         for _type in _root.findall(ele_type):
@@ -72,6 +72,22 @@ def getGUIDName(_root, ele_type, _guid):
                             return subelem.text
                     else:
                         continue
+    return None
+
+# take in GUID and look up the prop name in element attribs
+def getGUIDProp(_root, ele_type, _guid):
+    if _guid:
+        for _type in _root.findall(ele_type):
+            for types in _type.iter('ElementType'):
+                for subelem in types.findall('Attributes'):
+                    for subelem2 in subelem.findall('Attribute'):
+                        for subelem3 in subelem2.findall('Name'):
+                            prop_id = subelem3.text
+                            if prop_id == _guid:
+                                for d_name in subelem2.findall('DisplayName'):
+                                    return d_name.text
+                            else:
+                                continue
     return None
 
 # finds all items in single quotes, replace any GUIDs with names
@@ -89,6 +105,19 @@ def replaceSingleQuote(_root, txt):
                     print("Error: element not found")
                     continue
             txt = txt.replace(item, name)
+    return txt
+
+def replaceProps(_root, txt):
+    # the remaining guids should be prop guids
+    guids = re.findall("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}", txt)
+    for guid in guids:
+        prop_name = getGUIDProp(_root, "GenericElements", guid)
+        if not prop_name:
+            prop_name = getGUIDProp(_root, "StandardElements", guid)
+            if not prop_name:    
+                print("Error: element not found")
+                continue
+        txt = txt.replace(guid, prop_name)
     return txt
 
 # gets elements (stencils, flows, and boundarys)
@@ -177,12 +206,18 @@ def main():
         # get threat's threat logic
         for gen_filters in types.findall('GenerationFilters'):
             for include_logic in gen_filters.findall('Include'):
-                # replace threat logic GUIDs with names
-                # first replace GUIDs in single quotes
-                include = replaceSingleQuote(xml_root, include_logic.text)
-                # TODO: then replace GUIDs that are prop names "flow.<guid>"
+                include = include_logic.text
+                if include:
+                    # replace threat logic GUIDs with names
+                    # first replace GUIDs in single quotes
+                    include = replaceSingleQuote(xml_root, include)
+                    # then replace GUIDs that are prop names ex: "flow.<guid>"
+                    include = replaceProps(xml_root, include)
             for exclude_logic in gen_filters.findall('Exclude'):
                 exclude = exclude_logic.text
+                if exclude:
+                    exclude = replaceSingleQuote(xml_root, exclude_logic.text)
+                    exclude = replaceProps(xml_root, exclude)
         # get elements
         for subelem in types.findall('Category'):
             category = str(cat2str(subelem.text, find_cats(xml_root)))

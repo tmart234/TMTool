@@ -107,6 +107,7 @@ def replaceSingleQuote(_root, txt):
             txt = txt.replace(item, name)
     return txt
 
+# finds all props within elements and replaces guid with display name
 def replaceProps(_root, txt):
     # the remaining guids should be prop guids
     guids = re.findall("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}", txt)

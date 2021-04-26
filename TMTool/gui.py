@@ -16,7 +16,7 @@ def open_script1():
     template2xlsx.main()
     print("executed template2xlsx")
     root.destroy()
-    return
+    quit()
 
 def open_script2():
     xlsx2template.main()

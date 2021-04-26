@@ -54,9 +54,11 @@ def cat2str(cat, cats):
 
 # returns GUID in string using regex
 def getStrGUID(_s):
-    c = re.compile('[0-9a-f]{12}4[0-9a-f]{3}[89ab][0-9a-f]{15}\Z', re.I)
-    guid = c.match(_s)
-    return guid
+    guid = re.findall("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}", _s)
+    if guid:
+        return guid[0]
+    else:
+        return None
 
 # take in GUID and look up the name
 def getGUIDName(_root, ele_type, _guid):
@@ -70,12 +72,11 @@ def getGUIDName(_root, ele_type, _guid):
                             return subelem.text
                     else:
                         continue
-    print("ErrorGUID not found!")
     return None
 
 # finds all items in single quotes, replace any GUIDs with names
 def replaceSingleQuote(_root, txt):
-    items = re.findall(r"\(u'(.*?)',\)", txt)
+    items = re.findall(r"'(.*?)'", txt, re.DOTALL)
     for item in items:
         guid = getStrGUID(item)
         if guid == None:
@@ -87,7 +88,7 @@ def replaceSingleQuote(_root, txt):
                 if not name:
                     print("Error: element not found")
                     continue
-            txt.replace(item, name)
+            txt = txt.replace(item, name)
     return txt
 
 # gets elements (stencils, flows, and boundarys)
@@ -176,10 +177,9 @@ def main():
         # get threat's threat logic
         for gen_filters in types.findall('GenerationFilters'):
             for include_logic in gen_filters.findall('Include'):
-                include = include_logic.text
                 # replace threat logic GUIDs with names
                 # first replace GUIDs in single quotes
-                include = replaceSingleQuote(include)
+                include = replaceSingleQuote(xml_root, include_logic.text)
                 # TODO: then replace GUIDs that are prop names "flow.<guid>"
             for exclude_logic in gen_filters.findall('Exclude'):
                 exclude = exclude_logic.text

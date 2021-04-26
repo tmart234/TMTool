@@ -22,7 +22,7 @@ $ TMTool
 
 - Parsing Element properties from a model: For example a flow could have "access vector" as an element prop. 
 - Parsing Threat properties from a model: For example a threat have "access complexity" as a threat property.
-- And adding a repeatable way to describe assets and apply those assets to a model’s flows or threats in a repeatable way. This step being able to derive CIA, severity, and impact of the score.
+- And adding a repeatable way to describe assets and apply those assets to a model’s flows or threats. This step being able to derive CIA, severity, and risk impact of the score.
 
 ![](https://github.com/tmart234/TMT/blob/main/README.assets/risk_venn_diagram.png)
 
@@ -30,7 +30,7 @@ $ TMTool
 
 This project experiments with uploading the MS Threat Modeling results to other tools. For Jira, we create a set of issues and set the issue's priority based on the threat ID's risk score. For Confluence, we just upload the generated HTML report to the platform.
 
-- ![](https://github.com/tmart234/TMT/blob/main/README.assets/TMT_boards.png)
+![](https://github.com/tmart234/TMT/blob/main/README.assets/TMT_boards.png)
 
 
 

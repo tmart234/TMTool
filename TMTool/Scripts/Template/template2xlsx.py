@@ -125,6 +125,17 @@ def replaceProps(_root, txt):
         txt = txt.replace(guid, prop_name)
     return txt
 
+# checks if label is an existing header, adds it if not
+# then writes the value to that column and row
+def writeProp(label, val, _ws, row, headers):
+    col = None
+    if label not in headers:
+        _ws.write(0, len(headers), label)
+        headers.append(label)
+    col = headers.index(label)
+    _ws.write(row, col, val)
+    return
+
 # gets elements (stencils, flows, and boundarys)
 class Elements():
     def __init__(self):
@@ -146,15 +157,13 @@ class Elements():
                         self.rep = subelem.text
                 # will not get <Image>, <StrokeThickness>, <ImageLocation>, or sencil constraints
                         # get all property data (all child elements)
-                elemnent_attribs = types.find('Attributes')
-                self.attribs = etree.tostring(elemnent_attribs, encoding='utf-8', method='xml')
-                # have to dump as json because we have an ordereddicts within ordereddicts
-                self.attribs = json.loads(json.dumps(xmltodict.parse(self.attribs,process_namespaces=True,namespaces=namespaces)))
-                self.attribs = str(self.attribs)
 
                 my_list = [self.ele_name,ele_type,self.ele_id,self.ele_desc,self.ele_parent,self.hidden,self.rep, self.attribs]
                 for col_num, data in enumerate(my_list):
                     stencil_worksheet.write(self.row, col_num, data)
+
+                # TODO: reimplement the way we print threat props for elemt attribs
+                #for attribs in types.findall('Attributes'):
                 self.row = self.row + 1
         return
 
@@ -198,13 +207,10 @@ def main():
     exclude = ''
 
     # write threat headers in xlsx worksheet
-    threat_worksheet.write('A1', 'Threat Title', bold)
-    threat_worksheet.write('B1', 'Category', bold)
-    threat_worksheet.write('C1', 'ID', bold)
-    threat_worksheet.write('D1', 'Description', bold)
-    threat_worksheet.write('E1', 'Include Logic', bold)
-    threat_worksheet.write('F1', 'Exclude Logic', bold)
-    threat_worksheet.write('G1', 'Properties', bold)
+    threat_headers = ['Threat Title', 'Category', 'ID', 'Description', 'Include Logic', 'Exclude Logic']
+    for col_num, data in enumerate(threat_headers):
+        threat_worksheet.write(0, col_num, data)
+
     # start at row 1
     _row = 1
     for types in xml_root.iter('ThreatType'):
@@ -233,19 +239,24 @@ def main():
             title = subelem.text
         for subelem in types.findall('Description'):
             desc = subelem.text
-        # get all property data (all child elements)
-        properties = types.find('PropertiesMetaData')
-        prop_str = etree.tostring(properties, encoding='utf-8', method='xml')
-        # have to dump as json because we have an ordereddicts within ordereddicts
-        prop_str = json.loads(json.dumps(xmltodict.parse(prop_str,process_namespaces=True,namespaces=namespaces)))
-        prop_str = str(prop_str)
-        # TODO: get element constraints? 
-
         # WRITE EACH ROW ITERATIVELY 
-        my_list = [title,category,threat_id,desc,include,exclude,prop_str]
+        my_list = [title,category,threat_id,desc,include,exclude]
 
         for col_num, data in enumerate(my_list):
             threat_worksheet.write(_row, col_num, data)
+
+        # get all property data (all child elements)
+        for props in types.findall('PropertiesMetaData'):
+            for prop in props.findall('ThreatMetaDatum'):
+                _label = None
+                _val = None
+                for label in prop.findall('Label'):
+                    _label = label.text
+                for values in prop.findall('Values'):
+                    for val in values.findall('Value'):
+                        _val = val.text
+                if _label:
+                    writeProp(_label, _val, threat_worksheet, _row, threat_headers)
         # increase row
         _row = _row + 1
 

@@ -12,7 +12,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='TMTool',
-    version='0.0.24',
+    version='0.0.26',
     author_email="tmart234@gmail.com",
     description='python tool for Microsoft Threat modeling tool',
     url="https://github.com/tmart234/TMT",

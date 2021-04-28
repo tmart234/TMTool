@@ -4,13 +4,11 @@
 ## after, it creates a template.xlsx file
 
 import xlsxwriter
-import xmltodict
 
 from lxml import etree
 import tkinter as tk
 from tkinter import filedialog
 
-import json
 import os
 import io
 import re
@@ -140,7 +138,7 @@ def writeProp(label, val, _ws, row, headers):
 class Elements():
     def __init__(self):
         self.row = 1
-    def write_row(self, _root, ele_type, stencil_worksheet):
+    def write_row(self, _root, ele_type, stencil_worksheet, headers):
         for _type in _root.findall(ele_type):
             for types in _type.iter('ElementType'):
                 for subelem in types.findall('Name'):
@@ -158,12 +156,25 @@ class Elements():
                 # will not get <Image>, <StrokeThickness>, <ImageLocation>, or sencil constraints
                         # get all property data (all child elements)
 
-                my_list = [self.ele_name,ele_type,self.ele_id,self.ele_desc,self.ele_parent,self.hidden,self.rep, self.attribs]
+                my_list = [self.ele_name,ele_type,self.ele_id,self.ele_desc,self.ele_parent,self.hidden,self.rep]
                 for col_num, data in enumerate(my_list):
                     stencil_worksheet.write(self.row, col_num, data)
 
-                # TODO: reimplement the way we print threat props for elemt attribs
-                #for attribs in types.findall('Attributes'):
+                # write all element attribs
+                for attribs in types.findall('Attributes'):
+                    for attrib in attribs.findall('Attribute'):
+                        _label = None
+                        _val = None
+                        _val_list = []
+                        for name in attrib.findall('DisplayName'):
+                            _label = name.text
+                        for vals in attrib.findall('AttributeValues'):
+                            for _v in vals.iter('Value'):
+                                _val_list.append(_v.text)
+                        # convert list to string
+                        _val = ','.join(_val_list)
+                        writeProp(_label, _val, stencil_worksheet, self.row, headers)
+
                 self.row = self.row + 1
         return
 
@@ -207,7 +218,7 @@ def main():
     exclude = ''
 
     # write threat headers in xlsx worksheet
-    threat_headers = ['Threat Title', 'Category', 'ID', 'Description', 'Include Logic', 'Exclude Logic']
+    threat_headers = ['ID', 'Threat Title', 'Category', 'Description', 'Include Logic', 'Exclude Logic']
     for col_num, data in enumerate(threat_headers):
         threat_worksheet.write(0, col_num, data)
 
@@ -240,7 +251,7 @@ def main():
         for subelem in types.findall('Description'):
             desc = subelem.text
         # WRITE EACH ROW ITERATIVELY 
-        my_list = [title,category,threat_id,desc,include,exclude]
+        my_list = [threat_id, title, category, desc, include, exclude]
 
         for col_num, data in enumerate(my_list):
             threat_worksheet.write(_row, col_num, data)
@@ -262,19 +273,14 @@ def main():
 
     # Elements headders
     #stencil_worksheet.write(['Stencil Name', 'Type', 'ID', 'Description','Parent', 'Hidden_bool', 'Representation', 'Attributes'])
-    stencil_worksheet.write('A1', 'Stencil Name', bold)
-    stencil_worksheet.write('B1', 'Type', bold)
-    stencil_worksheet.write('C1', 'ID', bold)
-    stencil_worksheet.write('D1', 'Description', bold)
-    stencil_worksheet.write('E1', 'Parent', bold)
-    stencil_worksheet.write('F1', 'Hidden_bool', bold)
-    stencil_worksheet.write('G1', 'Representation', bold)
-    stencil_worksheet.write('H1', 'Attributes', bold)
+    stencil_headers = ['Stencil Name', 'Type', 'ID', 'Description', 'Parent', 'Hidden_bool', 'Representation']
+    for col_num, data in enumerate(stencil_headers):
+        stencil_worksheet.write(0, col_num, data)
 
     # write generic elements
     Ele = Elements()
-    Ele.write_row(xml_root, "GenericElements", stencil_worksheet)
-    Ele.write_row(xml_root, "StandardElements", stencil_worksheet)
+    Ele.write_row(xml_root, "GenericElements", stencil_worksheet, stencil_headers)
+    Ele.write_row(xml_root, "StandardElements", stencil_worksheet, stencil_headers)
 
     close_wb(workbook)
     return

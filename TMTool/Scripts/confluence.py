@@ -7,8 +7,8 @@ https://confluence.atlassian.com/conf64/html-macro-936511039.html
 
 import tkinter as tk
 from tkinter import filedialog
-# create a creds file with values
-import creds
+# TODO: if file not found, create creds file with gui
+from . import creds
 import datetime
 import os
 
@@ -27,17 +27,17 @@ def get_space_id(conflu):
     else:
         return None
 
-root = tk.Tk()
-# hide root window
-root.withdraw()
-# get HTML
-report_path = filedialog.askopenfilename(parent=root, filetypes=[("html report", "*.htm")])
-
-# create page title based on date 
-d = datetime.datetime.now()
-page_title = str(os.path.split(report_path)[1])
-
 def main():
+    
+    root = tk.Tk()
+    # hide root window
+    root.withdraw()
+    # get HTML
+    report_path = filedialog.askopenfilename(parent=root, filetypes=[("html report", "*.htm")])
+
+    # create page title based on date 
+    d = datetime.datetime.now()
+    page_title = str(os.path.split(report_path)[1])
     confluence = Confluence(
     url=creds.server,
     username=creds.user,

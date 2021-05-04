@@ -13,7 +13,7 @@ from tkinter import ttk
 # override the basic Tk widgets
 from tkinter import *
 from ttkthemes import ThemedStyle
-import tooltip as TP
+from . import tooltip
 
 class AssetsWindow(ttk.Frame):
     def __init__(self, master, flows, *args, **kwargs):
@@ -125,15 +125,15 @@ class AssetsWindow(ttk.Frame):
 
         a_B1.grid(row=13, column= 0, columnspan=2, sticky='nsew')
         # hover-over tips
-        TP.CreateToolTip(_t1, \
+        tooltip.CreateToolTip(_t1, \
             "Select all severity Impact Levels which apply")
-        TP.CreateToolTip(_t2, \
+        tooltip.CreateToolTip(_t2, \
             "Select all model flows which interact with the asset")
-        TP.CreateToolTip(_t9, \
+        tooltip.CreateToolTip(_t9, \
             "Availability of the asset's information")
-        TP.CreateToolTip(_t10, \
+        tooltip.CreateToolTip(_t10, \
             "Importance of this asset compared to other assets")
-        TP.CreateToolTip(_t11, \
+        tooltip.CreateToolTip(_t11, \
             "Consequences of a compromised asset")
         self.new_f.mainloop()
 

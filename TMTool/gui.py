@@ -12,7 +12,7 @@ from TMTool.Scripts import set_metadata_tags
 
 root = Tk()
 
-def open_script1():
+def open_temp2xlsx():
     template2xlsx.main()
     print("executed template2xlsx")
     root.destroy()
@@ -32,11 +32,11 @@ def open_script4():
     fix_report_hyperlinks.main()
     print("executed fix_report_hyperlinks")
 
-def open_script5(root):
-    root.destroy()
+def open_metadata():
     set_metadata_tags.main()
     # TODO: inspect block
-    print("executed set_metadata_tags")
+    print("set Model's Environmental metrics")
+    return
 
 
 def main():
@@ -47,15 +47,21 @@ def main():
     style = ThemedStyle(root)
     style.set_theme("equilux")
 
-
     # for the main area of the window
     window = ttk.Frame(root)
     window.pack(fill=X, side=TOP)
 
+    # light green
+    text1 = ttk.Label(window,
+                    text="Template Scripts:", foreground='#CCFFCC')
+    # light blue
+    text2 = ttk.Label(window,
+                    text="Model Scripts:", foreground='#CCE5FF')
+
     # template scripts (green background)
     button1 = ttk.Button(window, 
                     text="template2xlsx", 
-                    command=open_script1)
+                    command=open_temp2xlsx)
 
     button2 = ttk.Button(window,
                     text="xlsx2template",
@@ -72,14 +78,7 @@ def main():
 
     button5 = ttk.Button(window,
                     text="Set Model metadata",
-                    command= open_script5)
-
-    # light green
-    text1 = ttk.Label(window,
-                    text="Template Scripts:", foreground='#CCFFCC')
-    # light blue
-    text2 = ttk.Label(window,
-                    text="Model Scripts:", foreground='#CCE5FF')
+                    command= open_metadata)
 
     # configure columns
     window.columnconfigure(0, weight=1)

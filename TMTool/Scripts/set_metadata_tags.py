@@ -164,7 +164,7 @@ def main():
         "Ex: a threat ID affects only Windows, but half the environment systems run MacOS. Can be over ridden in analysis mode.")
 
     root.mainloop()
-    quit()
+    return
 
 if __name__ == '__main__':
     main()

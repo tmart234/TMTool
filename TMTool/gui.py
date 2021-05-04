@@ -9,7 +9,7 @@ from TMTool.Scripts.Template import xlsx2template
 from TMTool.Scripts import jira_issues
 from TMTool.Scripts import fix_report_hyperlinks
 from TMTool.Scripts import set_metadata_tags
-from TMTool.Scripts import asset_form
+from TMTool.Scripts import set_assets
 from TMTool.Scripts import confluence
 
 root = Tk()
@@ -40,7 +40,7 @@ def open_metadata():
     return
 
 def open_assets():
-    asset_form.main()
+    set_assets.main()
     print("set Model's Assets")
     return
 

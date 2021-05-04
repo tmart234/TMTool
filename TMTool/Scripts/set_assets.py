@@ -8,8 +8,9 @@ from lxml import etree
 import tkinter as tk
 from tkinter import filedialog
 import json
-import cvss
-import asset_form
+from . import asset_form
+from .Scoring import cvss
+
 
 # checks element props for anything containing <_name>
 # returns props selected index value

@@ -26,8 +26,8 @@ jobs:
         VERSION=$(pip show tmtool | grep -oP '(?<=Version: ).*')
         echo "Current Version is: ${VERSION}"
         echo "Bumping..."
-        bumpversion --current-version ${VERSION} patch --allow-dirty pyproject.toml
-        N_VERSION=$(grep -oP '(?<=Version: ).*' pyproject.toml)
+        bumpversion --current-version ${VERSION} patch --allow-dirty ./pyproject.toml
+        N_VERSION=$(grep -oP '(?<=Version: ).*' ./pyproject.toml)
         echo "New Version is: ${N_VERSION}"
         cd $GITHUB_WORKSPACE
         python -m build --version ${N_VERSION} --sdist --wheel --outdir $GITHUB_WORKSPACE/dist/ $GITHUB_WORKSPACE

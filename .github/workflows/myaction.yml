@@ -19,17 +19,15 @@ jobs:
       uses: actions/checkout@v2
     - name: Autobump and Build a binary wheel + tarball
       run: |
-        echo $PWD
         cd ../
-        echo $PWD
         pip install bumpversion tmtool
         VERSION=$(pip show tmtool | grep -oP '(?<=Version: ).*')
         echo "Current Version is: ${VERSION}"
         echo "Bumping..."
-        bumpversion --current-version ${VERSION} patch --allow-dirty ./pyproject.toml
-        N_VERSION=$(grep -oP '(?<=Version: ).*' ./pyproject.toml)
-        echo "New Version is: ${N_VERSION}"
         cd $GITHUB_WORKSPACE
+        bumpversion --current-version ${VERSION} patch --allow-dirty pyproject.toml
+        N_VERSION=$(grep -oP '(?<=version = ).*' pyproject.toml)
+        echo "New Version is: ${N_VERSION}"
         python -m build --version ${N_VERSION} --sdist --wheel --outdir $GITHUB_WORKSPACE/dist/ $GITHUB_WORKSPACE
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@master

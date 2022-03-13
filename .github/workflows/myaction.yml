@@ -17,28 +17,18 @@ jobs:
         python -m pip install build --user
     - name: checkout code
       uses: actions/checkout@v2
-    - name: Autobump version
+    - name: Autobump and Build a binary wheel + tarball
       run: |
         cd ../
         pip install bumpversion tmtool
         VERSION=$(pip show tmtool | grep -oP '(?<=Version: ).*')
         echo "Current Version is: ${VERSION}"
         echo "Bumping..."
-        echo $GITHUB_WORKSPACE
-        cd $GITHUB_WORKSPACE
         bumpversion --current-version ${VERSION} patch --allow-dirty pyproject.toml
-        #PLACEHOLDER1='__version__ = "develop"'
-        #PLACEHOLDER2='__version__ = "develop"'
-        #VERSION_FILE2='pyproject.toml'
-        # ensure the placeholder is there. If grep doesn't find the placeholder
-        # it exits with exit code 1 and github actions aborts the build. 
-        #grep "$PLACEHOLDER1" "$VERSION_FILE1"
-        #sed -i "s/$PLACEHOLDER1/__version__ = \"${VERSION}\"/g" "$VERSION_FILE1"
-        #grep "$PLACEHOLDER2" "$VERSION_FILE2"
-        #sed -i "s/$PLACEHOLDER2/__version__ = \"${VERSION}\"/g" "$VERSION_FILE2"
-    - name: Build a binary wheel and a source tarball
-      run: |
-        python -m build --sdist --wheel --outdir $GITHUB_WORKSPACE/dist/ $GITHUB_WORKSPACE
+        N_VERSION=$(grep -oP '(?<=Version: ).*' pyproject.toml)
+        echo "New Version is: ${N_VERSION}"
+        cd $GITHUB_WORKSPACE
+        python -m build --version ${N_VERSION} --sdist --wheel --outdir $GITHUB_WORKSPACE/dist/ $GITHUB_WORKSPACE
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:

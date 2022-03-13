@@ -22,7 +22,6 @@ jobs:
         cd ../
         pip install bumpversion tmtool
         VERSION=$(pip show tmtool | grep -oP '(?<=Version: ).*')
-        pip uninstall tmtool
         echo "Current Version is: ${VERSION}"
         echo "Bumping..."
         echo $GITHUB_WORKSPACE

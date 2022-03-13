@@ -22,20 +22,20 @@ jobs:
         build
         --user
     - name: Autobump version
-            run: |
-              pip install --upgrade bumpversion
-              VERSION=$(pip show tmtool | grep -oP '(?<=Version: ).*')
-              bumpversion --current-version __version__ patch pyproject.toml --allow-dirty
-              echo "Version is: ${VERSION}"
-              #PLACEHOLDER1='__version__ = "develop"'
-              #PLACEHOLDER2='__version__ = "develop"'
-              #VERSION_FILE2='pyproject.toml'
-              # ensure the placeholder is there. If grep doesn't find the placeholder
-              # it exits with exit code 1 and github actions aborts the build. 
-              #grep "$PLACEHOLDER1" "$VERSION_FILE1"
-              #sed -i "s/$PLACEHOLDER1/__version__ = \"${VERSION}\"/g" "$VERSION_FILE1"
-              #grep "$PLACEHOLDER2" "$VERSION_FILE2"
-              #sed -i "s/$PLACEHOLDER2/__version__ = \"${VERSION}\"/g" "$VERSION_FILE2"
+      run: |
+        pip install --upgrade bumpversion
+        VERSION=$(pip show tmtool | grep -oP '(?<=Version: ).*')
+        bumpversion --current-version __version__ patch pyproject.toml --allow-dirty
+        echo "Version is: ${VERSION}"
+        #PLACEHOLDER1='__version__ = "develop"'
+        #PLACEHOLDER2='__version__ = "develop"'
+        #VERSION_FILE2='pyproject.toml'
+        # ensure the placeholder is there. If grep doesn't find the placeholder
+        # it exits with exit code 1 and github actions aborts the build. 
+        #grep "$PLACEHOLDER1" "$VERSION_FILE1"
+        #sed -i "s/$PLACEHOLDER1/__version__ = \"${VERSION}\"/g" "$VERSION_FILE1"
+        #grep "$PLACEHOLDER2" "$VERSION_FILE2"
+        #sed -i "s/$PLACEHOLDER2/__version__ = \"${VERSION}\"/g" "$VERSION_FILE2"
     - name: Build a binary wheel and a source tarball
       run: >-
         python -m

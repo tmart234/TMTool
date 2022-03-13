@@ -138,10 +138,6 @@ def writeProp(label, val, _ws, row, headers, fmt):
 # writes elements (stencils, flows, and boundarys)
 def write_row(_root, ele_type, stencil_worksheet, headers, headder_fmt):
     _row = 1
-    # ele_name = ""
-    # ele_id = ""
-    # ele_desc = ""
-    # ele_parent
 
     for _type in _root.findall(ele_type):
         for types in _type.iter('ElementType'):
@@ -286,6 +282,23 @@ def main():
     stencil_worksheet = workbook.add_worksheet('Stencils')
 
     writeElementsAndThreats(xml_root, threat_worksheet, stencil_worksheet, cell_format)
+
+    # get Manifest attributes
+    atrib_list = ['name','id','version','author']
+    for atrib in xml_root.findall('Manifest'):
+        for index in range(len(atrib_list)):
+            meta_worksheet.write(index, 0, ("Template " + atrib_list[index] + ":" ))
+            meta_worksheet.write(index, 1, atrib.get(atrib_list[index]))
+
+    # get threat categories as a key value pair dictionary
+    # TODO: get descriptions too
+    new_row = len(atrib_list)+1
+    template_cats = find_cats(xml_root)
+    meta_worksheet.write(new_row, 0, "Threat Categories", cell_format)
+    for key,val in template_cats.items():
+        new_row = 1 + new_row
+        meta_worksheet.write(new_row, 0, key)
+        meta_worksheet.write(new_row, 1, val)
     
     close_wb(workbook)
     return

@@ -26,7 +26,8 @@ jobs:
         VERSION=$(pip show tmtool | grep -oP '(?<=Version: ).*')
         echo "Current Version is: ${VERSION}"
         echo "Bumping..."
-        bumpversion --current-version ${VERSION} patch ../pyproject.toml --allow-dirty
+        echo $PWD
+        bumpversion --current-version ${VERSION} patch --allow-dirty
         #PLACEHOLDER1='__version__ = "develop"'
         #PLACEHOLDER2='__version__ = "develop"'
         #VERSION_FILE2='pyproject.toml'

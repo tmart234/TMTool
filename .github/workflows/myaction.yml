@@ -23,7 +23,7 @@ jobs:
         --user
     - name: Autobump version
       run: |
-        pip install --upgrade bumpversion
+        pip install tmtool bumpversion
         VERSION=$(pip show tmtool | grep -oP '(?<=Version: ).*')
         bumpversion --current-version __version__ patch pyproject.toml --allow-dirty
         echo "Version is: ${VERSION}"

@@ -250,6 +250,52 @@ def writeElementsAndThreats(xml_root, threat_worksheet, stencil_worksheet, headd
     write_row(xml_root, "StandardElements", stencil_worksheet, stencil_headers, headder_fmt)
     return
 
+def writeMetadata(xml_root, meta_worksheet, cell_format):
+    # get Manifest attributes
+    atrib_list = ['name','id','version','author']
+    for atrib in xml_root.findall('Manifest'):
+        for index in range(len(atrib_list)):
+            meta_worksheet.write(index, 0, ("Template " + atrib_list[index] + ":" ))
+            meta_worksheet.write(index, 1, atrib.get(atrib_list[index]))
+
+    # get threat categories as a key value pair dictionary
+    # TODO: get descriptions too
+    new_row = len(atrib_list)+1
+    template_cats = find_cats(xml_root)
+    meta_worksheet.write(new_row, 0, "Threat Categories", cell_format)
+    for key,val in template_cats.items():
+        new_row = 1 + new_row
+        meta_worksheet.write(new_row, 0, key)
+        meta_worksheet.write(new_row, 1, val)
+
+    # Get all threat properties available
+    new_row = new_row + 1
+    for props in xml_root.findall('ThreatMetaData'):
+        for priority in props.findall('IsPriorityUsed'):
+            new_row = new_row + 1
+            meta_worksheet.write(new_row, 0, "Is Priority Used", cell_format)
+            meta_worksheet.write(new_row, 1, priority.text)
+        for status in props.findall('IsStatusUsed'):
+            new_row = new_row + 1
+            meta_worksheet.write(new_row, 0, "Is Status Used", cell_format)
+            meta_worksheet.write(new_row, 1, status.text)
+        new_row = new_row + 1
+        meta_worksheet.write(new_row, 0, "Threat Properties MetaData", cell_format)
+        for metaprops in props.findall('PropertiesMetaData'):
+            for threatmeta in metaprops.findall('ThreatMetaDatum'):
+                new_row = new_row + 1
+                for propname in threatmeta.findall('Name'):
+                    print(propname.text)
+                    meta_worksheet.write(new_row, 0, propname.text)
+                for proplabel in threatmeta.findall('Label'):
+                    print(proplabel.text)
+                    meta_worksheet.write(new_row, 1, proplabel.text)
+                for id in threatmeta.findall('Id'):
+                    print(id.text)
+                    meta_worksheet.write(new_row, 2, id.text)
+                # TODO: get list of "Values"
+    return
+
 def main():
     
     root = tk.Tk()
@@ -273,33 +319,15 @@ def main():
     wb_path = os.path.splitext(file_path)[0]
     wb_path = wb_path + '.xlsx'
     
-    # Create a workbook and add a worksheet.
+    # Create a workbook and add worksheets
     workbook = xlsxwriter.Workbook(wb_path)
     cell_format = workbook.add_format({'bold': True})
-
     meta_worksheet = workbook.add_worksheet('Metadata')
     threat_worksheet = workbook.add_worksheet('Threats')
     stencil_worksheet = workbook.add_worksheet('Stencils')
 
+    writeMetadata(xml_root, meta_worksheet, cell_format)
     writeElementsAndThreats(xml_root, threat_worksheet, stencil_worksheet, cell_format)
-
-    # get Manifest attributes
-    atrib_list = ['name','id','version','author']
-    for atrib in xml_root.findall('Manifest'):
-        for index in range(len(atrib_list)):
-            meta_worksheet.write(index, 0, ("Template " + atrib_list[index] + ":" ))
-            meta_worksheet.write(index, 1, atrib.get(atrib_list[index]))
-
-    # get threat categories as a key value pair dictionary
-    # TODO: get descriptions too
-    new_row = len(atrib_list)+1
-    template_cats = find_cats(xml_root)
-    meta_worksheet.write(new_row, 0, "Threat Categories", cell_format)
-    for key,val in template_cats.items():
-        new_row = 1 + new_row
-        meta_worksheet.write(new_row, 0, key)
-        meta_worksheet.write(new_row, 1, val)
-    
     close_wb(workbook)
     return
 

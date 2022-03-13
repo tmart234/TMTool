@@ -30,7 +30,7 @@ jobs:
         # remove quotes
         N_VERSION=$(echo "$N_VERSION" | tr -d '"')
         echo "New Version is: ${N_VERSION}"
-        python -m build --version ${N_VERSION} --sdist --wheel --outdir $GITHUB_WORKSPACE/dist/ $GITHUB_WORKSPACE
+        cd ../
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:

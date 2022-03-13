@@ -25,7 +25,7 @@ jobs:
       run: |
         pip install tmtool bumpversion
         VERSION=$(pip show tmtool | grep -oP '(?<=Version: ).*')
-        bumpversion --current-version ${VERSION} patch pyproject.toml --allow-dirty
+        bumpversion --current-version ${VERSION} patch ${GITHUB_WORKSPACE}/pyproject.toml --allow-dirty
         echo "Current Version is: ${VERSION}"
         echo "Bumping..."
         #PLACEHOLDER1='__version__ = "develop"'

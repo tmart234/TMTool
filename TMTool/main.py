@@ -1,12 +1,9 @@
 import click
-import gui
+import TMTool.gui as _gui
 
 @click.command()
-def cli():
-    gui.main()
-
 def main():
-    cli()
+    _gui.main()
 
 if __name__ == '__main__':
     main()

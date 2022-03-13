@@ -255,7 +255,7 @@ def writeMetadata(xml_root, meta_worksheet, cell_format):
     atrib_list = ['name','id','version','author']
     for atrib in xml_root.findall('Manifest'):
         for index in range(len(atrib_list)):
-            meta_worksheet.write(index, 0, ("Template " + atrib_list[index] + ":" ))
+            meta_worksheet.write(index, 0, ("Template " + atrib_list[index] + ":" ), cell_format)
             meta_worksheet.write(index, 1, atrib.get(atrib_list[index]))
 
     # get threat categories as a key value pair dictionary
@@ -285,13 +285,10 @@ def writeMetadata(xml_root, meta_worksheet, cell_format):
             for threatmeta in metaprops.findall('ThreatMetaDatum'):
                 new_row = new_row + 1
                 for propname in threatmeta.findall('Name'):
-                    print(propname.text)
                     meta_worksheet.write(new_row, 0, propname.text)
                 for proplabel in threatmeta.findall('Label'):
-                    print(proplabel.text)
                     meta_worksheet.write(new_row, 1, proplabel.text)
                 for id in threatmeta.findall('Id'):
-                    print(id.text)
                     meta_worksheet.write(new_row, 2, id.text)
                 # TODO: get list of "Values"
     return

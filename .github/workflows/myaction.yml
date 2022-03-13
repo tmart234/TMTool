@@ -8,10 +8,7 @@ jobs:
   Publish-Pipy:
     runs-on: ubuntu-latest
     steps:
-    - name: Build and publish Python 🐍 distributions 📦 to PyPI
-      if: github.ref == 'refs/heads/master'
-      uses: actions/checkout@v3
-    - name: Set up Python 3.9
+    - name: Set up Python 3.9 🐍
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
@@ -21,13 +18,15 @@ jobs:
         pip install
         build
         --user
+    - name: checkout code
+      uses: actions/checkout@v2
     - name: Autobump version
       run: |
         pip install tmtool bumpversion
         VERSION=$(pip show tmtool | grep -oP '(?<=Version: ).*')
-        bumpversion --current-version ${VERSION} patch ${GITHUB_WORKSPACE}/pyproject.toml --allow-dirty
         echo "Current Version is: ${VERSION}"
         echo "Bumping..."
+        bumpversion --current-version ${VERSION} patch ../pyproject.toml --allow-dirty
         #PLACEHOLDER1='__version__ = "develop"'
         #PLACEHOLDER2='__version__ = "develop"'
         #VERSION_FILE2='pyproject.toml'

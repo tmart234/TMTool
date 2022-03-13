@@ -27,8 +27,10 @@ jobs:
         cd $GITHUB_WORKSPACE
         bumpversion --current-version ${VERSION} patch --allow-dirty pyproject.toml
         N_VERSION=$(grep -oP '(?<=version = ).*' pyproject.toml)
+        # remove quotes
+        N_VERSION=$(echo "$N_VERSION" | tr -d '"')
         echo "New Version is: ${N_VERSION}"
-        python -m build --version ${N_VERSION} --sdist --wheel --outdir $GITHUB_WORKSPACE/dist/ $GITHUB_WORKSPACE
+        python -m build --version ${N_VERSION} --sdist --wheel --outdir ./dist/ .
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:

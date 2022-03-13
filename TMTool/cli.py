@@ -1,6 +1,5 @@
 import click
-from . import gui
-import traceback
+import gui
 
 @click.command()
 def cli():

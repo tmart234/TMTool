@@ -17,9 +17,9 @@ import csv
 from . import creds
 
 # Jira project constants (fill in)
-proj_key = creds.proj_key
+proj_key = creds.api_key
 # TODO: added code to automatically addded category to JIRA?
-issue_type = creds.issue_type
+issue_type = "type"
 
 def includeThreatStatus():
     MsgBox = tk.messagebox.askyesno(title='Include Status?',message='Include the threat ID status (JIRA Issue types must be set up)')

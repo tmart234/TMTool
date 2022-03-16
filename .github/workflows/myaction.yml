@@ -25,12 +25,12 @@ jobs:
         echo "Current Version is: ${VERSION}"
         echo "Bumping..."
         cd $GITHUB_WORKSPACE
-        bumpversion --current-version ${VERSION} patch --allow-dirty pyproject.toml
-        N_VERSION=$(grep -oP '(?<=version = ).*' pyproject.toml)
-        # remove quotes
-        N_VERSION=$(echo "$N_VERSION" | tr -d '"')
-        echo "New Version is: ${N_VERSION}"
-        cd ../
+        # bumpversion --current-version ${VERSION} patch --allow-dirty pyproject.toml
+        # N_VERSION=$(grep -oP '(?<=version = ).*' pyproject.toml)
+        # # remove quotes
+        # N_VERSION=$(echo "$N_VERSION" | tr -d '"')
+        # echo "New Version is: ${N_VERSION}"
+        # cd ../
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:

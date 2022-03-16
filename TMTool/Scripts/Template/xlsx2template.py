@@ -182,7 +182,7 @@ def add_threat(root, threat_id, threats):
         # add if it does not exist
         print('warning no category found: '+ threat.get('Category'))
         # 
-        _cat = add_cat(threat.get('Category'),find_cats(root))
+        _cat = add_cat(root, threat.get('Category'),find_cats(root))
     cat.text = _cat
     ET.SubElement(new_threat, 'RelatedCategory')  
 
@@ -318,7 +318,7 @@ def find_xlsx_threats(wb):
                 threat['Threat Title'] = cell
             elif _col == 2:
                 threat['Category'] = cell
-            elif _col == 3:
+            elif _col == 0:
                 _id = cell
                 threat['ID'] = _id
             elif _col == 4:
@@ -327,8 +327,6 @@ def find_xlsx_threats(wb):
                 threat['Include Logic'] = cell
             elif _col == 6:
                 threat['Exclude Logic'] = cell
-            elif _col == 7:
-                threat['Properties'] = cell
             else:
                 print("error reading xlsx!")
         # add to dict with guid as key
@@ -344,25 +342,25 @@ def find_xlsx_elements(wb):
     for _row in range(2,(int(sheet.max_row)+1)):
             for _col in range(1,int(sheet.max_column)):
                 cell = sheet.cell(row=_row, column=_col).value
-                if _col == 1:
+                if _col == 0:
                     element['Stencil Name'] = cell
-                elif _col == 2:
+                elif _col == 1:
                     element['Type'] = cell
-                elif _col == 3:
+                elif _col == 2:
                     _id = cell
                     element['ID'] = _id
-                elif _col == 4:
+                elif _col == 3:
                     element['Description'] = cell
+                elif _col == 4:
+                    element['Prent'] = cell
                 elif _col == 5:
-                    element['Parent'] = cell
-                elif _col == 6:
                     element['Hidden_bool'] = cell
-                elif _col == 7:
+                elif _col == 6:
                     element['Representation'] = cell
-                elif _col == 8:
+                elif _col == 7:
                     element['Attributes'] = cell
                 else:
-                    print("error reading xlsx!")
+                    print("error reading xlsx! 2")
             elements[_id] = element
     return elements
     
@@ -379,6 +377,7 @@ def main():
         print('Must choose file path, quitting... ')
         quit()
     root.destroy()
+    # create 2nd file till script is g2g
     if not xlsx_path and tm7_path:
         print('Must choose file path, quitting... ')
         quit()
@@ -392,10 +391,10 @@ def main():
     # Get All Sheets
     a_sheet_names = wb.sheetnames
     # check for sheets
-    if ('Threats' and 'Stencils') in a_sheet_names:
-        print("found!")
+    if ('Metadata' and 'Threats' and 'Stencils') in a_sheet_names:
+        print("All Sheets found!")
     else:
-        print("Error! Threats and Stencils not found")
+        print("Error! xlxs worksheets missing")
         quit()
 
     #xlsx_cats = find_xlsx_cats(wb)
@@ -426,6 +425,8 @@ def main():
         compare(root, surplus, deficit, 'stencils', element_ids, xlsx_elements)
 
     print('Finished!')
+    #TODO: remove
+    tm7_path = tm7_path.replace('.tb7','2.tb7')
     tree.write(tm7_path)
 
 if __name__ == '__main__':

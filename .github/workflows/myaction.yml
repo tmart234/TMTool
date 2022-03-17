@@ -25,7 +25,7 @@ jobs:
         echo "Current Version is: ${VERSION}"
         echo "Bumping..."
         cd $GITHUB_WORKSPACE
-        python -m build --version ${N_VERSION} --sdist --wheel --outdir ./dist/ .
+        python -m build --sdist --wheel --outdir ./dist .
         # bumpversion --current-version ${VERSION} patch --allow-dirty pyproject.toml
         # N_VERSION=$(grep -oP '(?<=version = ).*' pyproject.toml)
         # # remove quotes

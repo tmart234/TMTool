@@ -1,7 +1,8 @@
-## this script will pull all threat categories, threats,
-## and threat properties from a MS TMT template files (.tb7)
-## and it will also pull all template's generic + standard elements
-## after, it creates a template.xlsx file
+'''
+this script will pull all threat categories, threats,
+threat properties, generic elements, standard elements, boundaries, and metadata
+from a MS TMT template files (.tb7) after, it creates a template.xlsx file
+'''
 
 import xlsxwriter
 

@@ -6,6 +6,7 @@ from ttkthemes import ThemedStyle
 
 from TMTool.Scripts.Template import template2xlsx
 from TMTool.Scripts.Template import xlsx2template
+from TMTool.Scripts.Template import template_diff
 from TMTool.Scripts import jira_issues
 from TMTool.Scripts import fix_report_hyperlinks
 from TMTool.Scripts import set_metadata_tags
@@ -49,6 +50,12 @@ def upload_confluence():
     print("set Model's Assets")
     return
 
+def open_diff():
+    template_diff.main()
+    print("Diffing...")
+    return
+    
+
 
 def main():
     root.configure(background='#404040')
@@ -80,6 +87,9 @@ def main():
     button2 = ttk.Button(window,
                     text="XLSX -> Template",
                     command=open_xlsx2temp)
+    button8 = ttk.Button(window,
+                text="Diff XLSX vs Template",
+                command=open_diff)
     
     # report Scripts
     button4 = ttk.Button(window,
@@ -111,8 +121,9 @@ def main():
     text2.grid(row=0, column=1, sticky=W+E)
     button1.grid(row=1, column=0, sticky=W+E)
     button2.grid(row=2, column=0, sticky=W+E)
-    text3.grid(row=3, column=0, sticky=W+E)
-    button4.grid(row=4, column=0, sticky=W+E)
+    button8.grid(row=3, column=0, sticky=W+E)
+    text3.grid(row=4, column=0, sticky=W+E)
+    button4.grid(row=5, column=0, sticky=W+E)
     button6.grid(row=1, column=1, sticky=W+E)
     button5.grid(row=2, column=1, sticky=W+E)
     button3.grid(row=3, column=1, sticky=W+E)

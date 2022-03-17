@@ -1,11 +1,12 @@
-""" 
-This script will attempt to convert all information from a 
-TMTool template into a MS TMT template file (.tb7)
-"""
+''''
+This script will take a .tb7 file and template.xlsx file and
+It will compare threat categories, individual threats, and threat GUIDs in order
+'''
+
 
 import os
 import tkinter as tk
-from lxml.etree import Element, SubElement, QName, tounicode, ElementTree
+import xml.etree.ElementTree as ET
 from tkinter import filedialog
 import uuid
 import openpyxl
@@ -126,12 +127,12 @@ def find_elements(root):
 # add cat to xml file
 def add_cat(root, cat, cats_dict=None):
     _uuid = ''
-    new_cat = Element("ThreatCategory")
-    name = SubElement(new_cat, 'Name')
+    new_cat = ET.Element("ThreatCategory")
+    name = ET.SubElement(new_cat, 'Name')
     # set category name
     name.text = str(cat)
     
-    id_ele = SubElement(new_cat, 'Id')
+    id_ele = ET.SubElement(new_cat, 'Id')
     if cats_dict.get(cat) is None:
         # generate GUID for category
         _uuid = str(uuid.uuid4())
@@ -141,8 +142,8 @@ def add_cat(root, cat, cats_dict=None):
         id_ele.text = str(cats_dict.get(cat))
         _uuid = str(id_ele.text)
 
-    SubElement(new_cat, 'ShortDescription')
-    SubElement(new_cat, 'LongDescription')
+    ET.SubElement(new_cat, 'ShortDescription')
+    ET.SubElement(new_cat, 'LongDescription')
     # insert new element
     root[4].insert(0, new_cat)
     print('added category: ' + cat)
@@ -151,16 +152,16 @@ def add_cat(root, cat, cats_dict=None):
 # find threat from id in xlsx_threat_dict and add to .tb7
 def add_threat(root, threat_id, threats):
     threat = threats.get(threat_id)
-    new_threat = Element("ThreatType")
+    new_threat = ET.Element("ThreatType")
 
     _uuid = ''
-    filter = SubElement(new_threat, 'GenerationFilters')
-    include_ele = SubElement(filter, 'Include')
+    filter = ET.SubElement(new_threat, 'GenerationFilters')
+    include_ele = ET.SubElement(filter, 'Include')
     include_ele.text = threat.get('Include Logic')
-    exclude_ele = SubElement(filter, 'Exclude')
+    exclude_ele = ET.SubElement(filter, 'Exclude')
     exclude_ele.text = threat.get('Exclude Logic')
     # check id
-    id_ele = SubElement(new_threat, 'Id')
+    id_ele = ET.SubElement(new_threat, 'Id')
     if threat.get('Id') is None:
         # generate GUID if not present
         _uuid = str(uuid.uuid4())
@@ -169,11 +170,11 @@ def add_threat(root, threat_id, threats):
         # sets to ID if present
         id_ele.text = threat_id
 
-    name = SubElement(new_threat, 'ShortTitle')
+    name = ET.SubElement(new_threat, 'ShortTitle')
     # set threat name
     name.text = threat.get('Threat Title')
 
-    cat = SubElement(new_threat, 'Category')
+    cat = ET.SubElement(new_threat, 'Category')
     # set as cat guid
     _cat = cat2guid(threat.get('Category'),find_cats(root))
     if not _cat:
@@ -182,11 +183,11 @@ def add_threat(root, threat_id, threats):
         # 
         _cat = add_cat(root, threat.get('Category'),find_cats(root))
     cat.text = _cat
-    SubElement(new_threat, 'RelatedCategory')  
+    ET.SubElement(new_threat, 'RelatedCategory')  
 
-    desc = SubElement(new_threat, 'Description')
+    desc = ET.SubElement(new_threat, 'Description')
     desc.text = threat.get('Description')
-    SubElement(new_threat, 'PropertiesMetaData')
+    ET.SubElement(new_threat, 'PropertiesMetaData')
     # insert new threat
     root[5].insert(0, new_threat)
     print('added threat: ' + str(name.text) + ' ' + str(id_ele.text))
@@ -195,12 +196,12 @@ def add_threat(root, threat_id, threats):
 # find threat from id in xlsx_threat_dict and add to .tb7
 def add_element(root, ele_id, elements, _type):
     element = elements.get(ele_id)
-    new_ele = Element("ElementType")
+    new_ele = ET.Element("ElementType")
     _uuid = ''
-    name = SubElement(new_ele, 'Name')
+    name = ET.SubElement(new_ele, 'Name')
     name.text = element.get('Stencil Name')
     # check id
-    id_ele = SubElement(new_ele, 'Id')
+    id_ele = ET.SubElement(new_ele, 'Id')
     if element.get('ID') is None:
         # generate GUID if not present
         _uuid = str(uuid.uuid4())
@@ -209,25 +210,25 @@ def add_element(root, ele_id, elements, _type):
         # sets to ID if present
         id_ele.text = ele_id
 
-    desc = SubElement(new_ele, 'Description')
+    desc = ET.SubElement(new_ele, 'Description')
     desc.text = element.get('Description')
 
-    parent = SubElement(new_ele, 'ParentElement')
+    parent = ET.SubElement(new_ele, 'ParentElement')
     parent.text = element.get('Parent')
     
-    SubElement(new_ele, 'Image')  
-    desc = SubElement(new_ele, 'Hidden')
+    ET.SubElement(new_ele, 'Image')  
+    desc = ET.SubElement(new_ele, 'Hidden')
     desc.text = element.get('Hidden_bool')
-    SubElement(new_ele, 'Representation')
+    ET.SubElement(new_ele, 'Representation')
     desc.text = element.get('Representation')
 
-    ticc = SubElement(new_ele, 'StrokeThickness')
+    ticc = ET.SubElement(new_ele, 'StrokeThickness')
     ticc.text = '0'
-    loc = SubElement(new_ele, 'ImageLocation')
+    loc = ET.SubElement(new_ele, 'ImageLocation')
     # default values
     loc.text = 'Centered on stencil'
-    SubElement(new_ele, 'Attributes')
-    SubElement(new_ele, 'StencilConstraint')
+    ET.SubElement(new_ele, 'Attributes')
+    ET.SubElement(new_ele, 'StencilConstraint')
     # insert new threat
     if str(element.get('Type')) == 'GenericElements':
         root[2].insert(0, new_ele)
@@ -367,18 +368,24 @@ def main():
     root.withdraw()
 
     xlsx_path = None
+    tm7_path = None
     try:
         xlsx_path = filedialog.askopenfilename(parent=root, filetypes=[("template xlsx file", "template.xlsx")])
+        tm7_path = filedialog.askopenfilename(parent=root, filetypes=[("template tb7 file", "*.tb7")])
     except FileNotFoundError:
         print('Must choose file path, quitting... ')
         quit()
     root.destroy()
     # create 2nd file till script is g2g
-    if not xlsx_path:
+    if not xlsx_path and tm7_path:
         print('Must choose file path, quitting... ')
         quit()
     # Open Workbook
     wb = openpyxl.load_workbook(filename=xlsx_path, data_only=True)
+
+    # parse xml
+    tree = ET.parse(tm7_path)
+    root = tree.getroot()
 
     # Get All Sheets
     a_sheet_names = wb.sheetnames
@@ -389,29 +396,37 @@ def main():
         print("Error! xlxs worksheets missing")
         quit()
 
+    #xlsx_cats = find_xlsx_cats(wb)
+    #xlsx_categories = list(xlsx_cats.keys())
 
-    class XMLNamespaces:
-        xsi = 'http://www.w3.org/2001/XMLSchema-instance'
-        xsd = 'http://www.w3.org/2001/XMLSchema'
+    threat_ids = list(find_threats(root).keys())
+    xlsx_threats = find_xlsx_threats(wb)
+    xlsx_threat_ids = list(xlsx_threats.keys())
+    print('comparing threats...' )
+    surplus = list(sorted(set(xlsx_threat_ids) - set(threat_ids)))
+    deficit = list(sorted(set(threat_ids) - set(xlsx_threat_ids)))
+    if not surplus and not deficit:
+        print('Same threats')
+    else:
+        # modify xml file
+        compare(root, surplus, deficit, 'threats', threat_ids, xlsx_threats)
 
-    root = Element(('KnowledgeBase'), nsmap={'xsi':XMLNamespaces.xsi, 'xsd':XMLNamespaces.xsd})
-
-    # Add root's subelements
-    SubElement(root, 'Manifest', name='12345', id='123', version='11', author='tttt')
-    ThreatMetaData = SubElement(root, 'ThreatMetaData')
-    GenericElements = SubElement(root, 'GenericElements')
-    StandardElements = SubElement(root, 'StandardElements')
-    ThreatCategories = SubElement(root, 'ThreatCategories')
-    ThreatTypes = SubElement(root, 'ThreatTypes')
+    element_ids = list(find_elements(root).keys())
+    xlsx_elements = find_xlsx_elements(wb)
+    xlsx_element_ids = list(xlsx_elements.keys())
+    print('comparing elements...')
+    surplus = list(sorted(set(xlsx_element_ids) - set(element_ids)))
+    deficit = list(sorted(set(element_ids) - set(xlsx_element_ids)))
+    if not surplus and not deficit:
+        print('Same elements')
+    else:
+        # modify xml file
+        compare(root, surplus, deficit, 'stencils', element_ids, xlsx_elements)
 
     print('Finished!')
-    # copy file and rename  extension
-    tb7_path = os.path.splitext(xlsx_path)[0] + '.tb7'
-    #TODO: remove once it's working
-    tb7_path = tb7_path.replace('.tb7','2.tb7')
-    outFile = open(tb7_path, 'wb')
-    et = ElementTree(root)
-    et.write(outFile, xml_declaration=True, encoding='utf-8', pretty_print=True) 
+    #TODO: remove
+    tm7_path = tm7_path.replace('.tb7','2.tb7')
+    tree.write(tm7_path)
 
 if __name__ == '__main__':
     main()

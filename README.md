@@ -16,7 +16,9 @@ $ pip install TMTool
 $ TMTool
 ```
 
-
+## Build better Threat Knowelege Bases (templates)
+- Search and quickly refine the threat knowledge base
+- View modifications between 2 knowledge bases
 
 ## Automated Cyber-Risk Scoring
 
@@ -28,7 +30,9 @@ $ TMTool
 
 ## Dev-Ops Integration
 
-This project experiments with uploading the MS Threat Modeling results to other tools. For Jira, we create a set of issues and set the issue's priority based on the threat ID's risk score. For Confluence, we just upload the generated HTML report to the platform.
+This project experiments with uploading the MS Threat Modeling results to other tools. 
+- For Jira, we create a set of issues and set the issue's priority based on the threat ID's risk score. 
+- For Confluence, we just upload the generated HTML report to the platform.
 
 ![](https://github.com/tmart234/TMT/blob/main/README.assets/TMT_boards.png)
 

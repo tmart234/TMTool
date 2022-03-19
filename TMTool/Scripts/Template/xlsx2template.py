@@ -5,7 +5,7 @@ TMTool template into a MS TMT template file (.tb7)
 
 import os
 import tkinter as tk
-from lxml.etree import Element, SubElement, QName, tounicode, ElementTree
+from lxml.etree import Element, SubElement,ElementTree
 from tkinter import filedialog
 import uuid
 import openpyxl
@@ -361,7 +361,27 @@ def find_xlsx_elements(wb):
                     print("error reading xlsx! 2")
             elements[_id] = element
     return elements
-    
+
+def get_manifest(root, ws):
+    _name = ''
+    _id = ''
+    _ver = ''
+    _author = ''
+    for row in ws.iter_rows():
+        for cell in row:
+            if cell.value == "Template name:":
+                # find Tag cell, then get the cell value that's next to the current cell
+                _name = ws.cell(row=cell.row,column=(cell.column + 1)).value
+            elif cell.value == "Template id:":
+                _id = ws.cell(row=cell.row,column=(cell.column + 1)).value
+            elif cell.value == "Template version:":
+                _ver = ws.cell(row=cell.row,column=(cell.column + 1)).value
+            elif cell.value == "Template author:":
+                _author = ws.cell(row=cell.row,column=(cell.column + 1)).value
+    SubElement(root, 'Manifest', name=_name, id=_id, version=_ver, author=_author)
+    return root
+
+
 def main():
     root = tk.Tk()
     root.withdraw()
@@ -396,8 +416,9 @@ def main():
 
     root = Element(('KnowledgeBase'), nsmap={'xsi':XMLNamespaces.xsi, 'xsd':XMLNamespaces.xsd})
 
-    # Add root's subelements
-    SubElement(root, 'Manifest', name='12345', id='123', version='11', author='tttt')
+    # Add xml root's subelements
+    # NOTE: Do not rename the worksheet default names or default title/tags for data (anything that's in bold font)
+    root = get_manifest(root, wb.get_sheet_by_name(name ="Metadata"))
     ThreatMetaData = SubElement(root, 'ThreatMetaData')
     GenericElements = SubElement(root, 'GenericElements')
     StandardElements = SubElement(root, 'StandardElements')

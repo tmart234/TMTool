@@ -139,3 +139,9 @@ dmypy.json
 *.xlsx
 cleanup.py
 *.ini
+*.tb7
+*.tm7
+
+# But not these files...
+!test_template.tb7
+!test_model.tm7

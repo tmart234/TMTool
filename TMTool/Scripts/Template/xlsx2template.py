@@ -1,16 +1,17 @@
 """ 
 This script will attempt to convert all information from a 
-TMTool template into a MS TMT template file (.tb7)
+TMTool template.xlsx file into a MS TMT template file (.tb7)
 """
 
 import os
 import tkinter as tk
-from lxml.etree import Element, SubElement,ElementTree
+from lxml.etree import Element, SubElement, ElementTree
 from tkinter import filedialog
 import uuid
 import openpyxl
 
 # take a threat category GUID and look it up in the category dict
+#TODO: delete
 def cat2str(cat, cats):
     for key, value in cats.items():
          if cat == value:
@@ -18,14 +19,15 @@ def cat2str(cat, cats):
     return None
 
 # take a threat category GUID and look it up in the category dict
+#TODO: delete
 def cat2guid(cat, cats):
     for key, value in cats.items():
          if cat == key:
              return value
     return None
 
-# TODO: refactor duplicate code!
 # deletes temp xml file
+#TODO: delete
 def cleanUp(_folder_path):
     if os.path.exists(_folder_path):
         os.remove(_folder_path)
@@ -35,6 +37,7 @@ def cleanUp(_folder_path):
 
 # pull all available threat Categories and their GUIDs from the XML
 # some may be empty (contains 0 threats)
+#TODO: delete
 def find_cats(root):
     cats= dict()
     cat_ID=''
@@ -238,6 +241,7 @@ def add_element(root, ele_id, elements, _type):
     print('added element: ' + str(name.text) + ' ' + str(id_ele.text))
     return _uuid
 
+#TODO: refactor
 def delete_cat(root, cat):
     for item in root[4].iter():
         for subelem in item.findall('Name'):
@@ -247,6 +251,7 @@ def delete_cat(root, cat):
     return
 
 # deletes threat based on threat_id
+#TODO: refactor
 def delete_threat(root, threat_id):
     for item in root[5].iter():
         for subelem in item.findall('Id'):
@@ -256,6 +261,7 @@ def delete_threat(root, threat_id):
     return
 
 # deletes element/stencil based on ele_id
+#TODO: refactor
 def delete_element(root, ele_id):
     for item in root[3].iter():
         for subelem in item.findall('Id'):
@@ -269,6 +275,7 @@ def delete_element(root, ele_id):
                 print('removed element: ' + ele_id)
     return
 
+#TODO: delete
 def compare(root, surplus, deficit, _type, _list, xlsx_dict):
     if surplus:
         # add extra to xml file
@@ -382,16 +389,16 @@ def get_manifest(root, ws):
     return root
 
 # gets threat categories from the metadata worksheet
-# TODO: rather with static columns; a better approach would be to find whcih column "Threat Categories" is in
+# TODO: rather with static columns; a better approach would be to find which column "Threat Categories" is in
 # then search in with iter_rows(min_col= found_col, max_col=found_col). Could help avoid breaking template changes
 def get_threat_categories(xml, ws):
     found = False
-    root_categories = SubElement(xml, 'ThreatCategories')
+    root_category = SubElement(xml, 'ThreatCategories')
     for row in ws.iter_rows(max_col=1):
         for cell in row:
             if found == True:
                 if cell.value is not None:
-                    category = SubElement(root_categories, 'ThreatCategory')
+                    category = SubElement(root_category, 'ThreatCategory')
                     SubElement(category, 'Name').text = cell.value
                     # get cell next to current cell
                     SubElement(category, 'Id').text = ws.cell(row=cell.row,column=(cell.column + 1)).value
@@ -404,22 +411,28 @@ def get_threat_categories(xml, ws):
                 continue
     print("Getting threat categories failed")
     return None
-
-# def get_Threat_Meta(root, ws):
-
-#     for row in ws.iter_rows():
-#         for cell in row:
-#             if cell.value == "Template name:":
-#                 # find Tag cell, then get the cell value that's next to the current cell
-#                 _name = ws.cell(row=cell.row,column=(cell.column + 1)).value
-#             elif cell.value == "Template id:":
-#                 _id = ws.cell(row=cell.row,column=(cell.column + 1)).value
-#             elif cell.value == "Template version:":
-#                 _ver = ws.cell(row=cell.row,column=(cell.column + 1)).value
-#             elif cell.value == "Template author:":
-#                 _author = ws.cell(row=cell.row,column=(cell.column + 1)).value
-#     SubElement(root, 'Manifest', name=_name, id=_id, version=_ver, author=_author)
-#     return root 
+ 
+def get_Threat_Meta(xml, ws):
+    found = False
+    find_list = ["Is Priority Used", "Is Status Used", "Threat Properties MetaData"]
+    root_category = SubElement(xml, 'ThreatMetaData')
+    props = SubElement(root_category, 'PropertiesMetaData')
+    for row in ws.iter_rows(max_col=1):
+        for cell in row:
+            if found:
+                datum = SubElement(props, 'ThreatMetaDatum')
+                SubElement(datum, 'Name').text = cell.value
+                SubElement(datum, 'Label').text = ws.cell(row=cell.row,column=(cell.column + 1)).value
+                SubElement(datum, 'Id').text = ws.cell(row=cell.row,column=(cell.column + 2)).value
+            elif str(cell.value) in find_list:
+                if cell.value == "Is Priority Used":
+                    SubElement(root_category, 'IsPriorityUsed').text = ws.cell(row=cell.row,column=(cell.column + 1)).value
+                elif cell.value == "Is Status Used":
+                    SubElement(root_category, 'IsStatusUsed').text = ws.cell(row=cell.row,column=(cell.column + 1)).value
+                else:
+                    found = True
+                    continue
+    return xml
 
 
 def main():
@@ -442,6 +455,7 @@ def main():
 
     # Get All Sheets
     a_sheet_names = wb.sheetnames
+    metadata_sheet = wb.get_sheet_by_name(name ="Metadata")
     # check for sheets
     if ('Metadata' and 'Threats' and 'Stencils') in a_sheet_names:
         print("All Sheets found!")
@@ -458,12 +472,12 @@ def main():
 
     # Add xml root's subelements
     # NOTE: Do not rename the worksheet default names or default title/tags for data (anything that's in bold font)
-    root = get_manifest(root, wb.get_sheet_by_name(name ="Metadata"))
+    root = get_manifest(root, metadata_sheet)
     ThreatMetaData = SubElement(root, 'ThreatMetaData')
-    #root = get_Threat_Meta(ThreatMetaData, wb.get_sheet_by_name(name ="Metadata"))
+    root = get_Threat_Meta(ThreatMetaData,metadata_sheet)
     GenericElements = SubElement(root, 'GenericElements')
     StandardElements = SubElement(root, 'StandardElements')
-    root = get_threat_categories(root, wb.get_sheet_by_name(name ="Metadata"))
+    root = get_threat_categories(root, metadata_sheet)
     ThreatTypes = SubElement(root, 'ThreatTypes')
 
     print('Finished!')

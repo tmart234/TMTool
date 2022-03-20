@@ -381,6 +381,46 @@ def get_manifest(root, ws):
     SubElement(root, 'Manifest', name=_name, id=_id, version=_ver, author=_author)
     return root
 
+# gets threat categories from the metadata worksheet
+# TODO: rather with static columns; a better approach would be to find whcih column "Threat Categories" is in
+# then search in with iter_rows(min_col= found_col, max_col=found_col). Could help avoid breaking template changes
+def get_threat_categories(xml, ws):
+    found = False
+    root_categories = SubElement(xml, 'ThreatCategories')
+    for row in ws.iter_rows(max_col=1):
+        for cell in row:
+            if found == True:
+                if cell.value is not None:
+                    category = SubElement(root_categories, 'ThreatCategory')
+                    SubElement(category, 'Name').text = cell.value
+                    # get cell next to current cell
+                    SubElement(category, 'Id').text = ws.cell(row=cell.row,column=(cell.column + 1)).value
+                    SubElement(category, 'ShortDescription')
+                    SubElement(category, 'LongDescription')
+                else:
+                    return xml
+            elif cell.value == "Threat Categories":
+                found = True
+                continue
+    print("Getting threat categories failed")
+    return None
+
+# def get_Threat_Meta(root, ws):
+
+#     for row in ws.iter_rows():
+#         for cell in row:
+#             if cell.value == "Template name:":
+#                 # find Tag cell, then get the cell value that's next to the current cell
+#                 _name = ws.cell(row=cell.row,column=(cell.column + 1)).value
+#             elif cell.value == "Template id:":
+#                 _id = ws.cell(row=cell.row,column=(cell.column + 1)).value
+#             elif cell.value == "Template version:":
+#                 _ver = ws.cell(row=cell.row,column=(cell.column + 1)).value
+#             elif cell.value == "Template author:":
+#                 _author = ws.cell(row=cell.row,column=(cell.column + 1)).value
+#     SubElement(root, 'Manifest', name=_name, id=_id, version=_ver, author=_author)
+#     return root 
+
 
 def main():
     root = tk.Tk()
@@ -420,9 +460,10 @@ def main():
     # NOTE: Do not rename the worksheet default names or default title/tags for data (anything that's in bold font)
     root = get_manifest(root, wb.get_sheet_by_name(name ="Metadata"))
     ThreatMetaData = SubElement(root, 'ThreatMetaData')
+    #root = get_Threat_Meta(ThreatMetaData, wb.get_sheet_by_name(name ="Metadata"))
     GenericElements = SubElement(root, 'GenericElements')
     StandardElements = SubElement(root, 'StandardElements')
-    ThreatCategories = SubElement(root, 'ThreatCategories')
+    root = get_threat_categories(root, wb.get_sheet_by_name(name ="Metadata"))
     ThreatTypes = SubElement(root, 'ThreatTypes')
 
     print('Finished!')

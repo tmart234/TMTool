@@ -1,6 +1,6 @@
 [project]
 name = "TMTool"
-version = "0.0.32"
+version = "0.0.33"
 description = "python tool for Microsoft Threat modeling tool"
 authors = [
     "Tyler M. <tmart234@gmail.com>"

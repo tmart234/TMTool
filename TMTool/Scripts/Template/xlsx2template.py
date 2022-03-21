@@ -419,12 +419,7 @@ def get_Threat_Meta(xml, ws):
     props = SubElement(root_category, 'PropertiesMetaData')
     for row in ws.iter_rows(max_col=1):
         for cell in row:
-            if found:
-                datum = SubElement(props, 'ThreatMetaDatum')
-                SubElement(datum, 'Name').text = cell.value
-                SubElement(datum, 'Label').text = ws.cell(row=cell.row,column=(cell.column + 1)).value
-                SubElement(datum, 'Id').text = ws.cell(row=cell.row,column=(cell.column + 2)).value
-            elif str(cell.value) in find_list:
+            if str(cell.value) in find_list:
                 if cell.value == "Is Priority Used":
                     SubElement(root_category, 'IsPriorityUsed').text = ws.cell(row=cell.row,column=(cell.column + 1)).value
                 elif cell.value == "Is Status Used":
@@ -432,6 +427,20 @@ def get_Threat_Meta(xml, ws):
                 else:
                     found = True
                     continue
+            elif found:
+                datum = SubElement(props, 'ThreatMetaDatum')
+                SubElement(datum, 'Name').text = cell.value
+                SubElement(datum, 'Label').text = ws.cell(row=cell.row,column=(cell.column + 1)).value
+                SubElement(datum, 'Id').text = ws.cell(row=cell.row,column=(cell.column + 2)).value
+                SubElement(datum, 'Description').text = ws.cell(row=cell.row,column=(cell.column + 3)).value
+                if ws.cell(row=cell.row,column=(cell.column + 4)).value is None:
+                    SubElement(datum, 'HideFromUI').text = 'false'
+                else:
+                    SubElement(datum, 'HideFromUI').text = 'true'
+                if ws.cell(row=cell.row,column=(cell.column + 5)).value is not None:
+                    SubElement(datum, 'AttributeType').text = ws.cell(row=cell.row,column=(cell.column + 4)).value
+                vals = SubElement(datum, 'Values')
+                val = SubElement(vals, 'Value')
     return xml
 
 
@@ -473,8 +482,7 @@ def main():
     # Add xml root's subelements
     # NOTE: Do not rename the worksheet default names or default title/tags for data (anything that's in bold font)
     root = get_manifest(root, metadata_sheet)
-    ThreatMetaData = SubElement(root, 'ThreatMetaData')
-    root = get_Threat_Meta(ThreatMetaData,metadata_sheet)
+    root = get_Threat_Meta(root,metadata_sheet)
     GenericElements = SubElement(root, 'GenericElements')
     StandardElements = SubElement(root, 'StandardElements')
     root = get_threat_categories(root, metadata_sheet)

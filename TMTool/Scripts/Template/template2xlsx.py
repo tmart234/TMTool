@@ -291,6 +291,14 @@ def writeMetadata(xml_root, meta_worksheet, cell_format):
                     meta_worksheet.write(new_row, 1, proplabel.text)
                 for id in threatmeta.findall('Id'):
                     meta_worksheet.write(new_row, 2, id.text)
+                for des in threatmeta.findall('Description'):
+                    meta_worksheet.write(new_row, 3, des.text)
+                for hide in threatmeta.findall('HideFromUI'):
+                    if str(hide.text) == 'true':
+                        meta_worksheet.write(new_row, 4, 'HIDDEN')
+                for _type in threatmeta.findall('AttributeType'):
+                    meta_worksheet.write(new_row, 5, _type.text)
+                
                 # TODO: get list of "Values"
     return
 

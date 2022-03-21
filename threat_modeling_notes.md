@@ -15,7 +15,7 @@
 
 ### Assets
 
-Because Microsoft's Threat Modeling tool uses STRIDE, it is "threat" and/or "attacker" centric it. TMTool believes a Model's Stencils or Threats can contain the Likelihood based metrics, but determining Impact takes additional insight into the assets at hand: What are we protecting? Therefore, we also aim to provide an "asset centric" method that describes assets in a repeatable way in order to derive these Impact metrics.
+Because Microsoft's Threat Modeling tool uses STRIDE, it is "attacker" centric. TMTool believes in a hybrid centric approach. A Model's Stencils or Threats can contain the Likelihood based metrics, but determining Impact takes additional insight into the assets at hand: What are we protecting? Therefore, we also aim to provide an "asset centric" method that describes assets in a repeatable way in order to derive these Impact metrics.
 
 An asset should be in a Threat (ex: keys in a side channel attack) or within a flow (TODO: CIA_form.py). This step is essential deriving CVSS impact metrics (C.I.A. + severity).
 

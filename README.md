@@ -15,8 +15,10 @@ $ pip install TMTool
 ```
 $ TMTool
 ```
+The Tinkter GUI containing all the available workflows and scripts:
+![](https://github.com/tmart234/TMT/blob/main/README.assets/TMTool_gui.png)
 
-## Build better Threat Knowelege Bases (templates)
+## Build better Threat Knowledge Bases (templates)
 - Search and quickly refine the threat knowledge base
 - View modifications between 2 knowledge bases
 

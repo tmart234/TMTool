@@ -7,17 +7,24 @@ from ttkthemes import ThemedStyle
 from TMTool.Scripts.Template import template2xlsx
 from TMTool.Scripts.Template import xlsx2template
 from TMTool.Scripts.Template import template_diff
+from TMTool.Scripts.Model import set_metadata_tags
+from TMTool.Scripts.Model import set_assets
+from TMTool.Scripts.Model import tmt2td
 from TMTool.Scripts import jira_issues
-from TMTool.Scripts import fix_report_hyperlinks
-from TMTool.Scripts import set_metadata_tags
-from TMTool.Scripts import set_assets
 from TMTool.Scripts import confluence
+from TMTool.Scripts import fix_report_hyperlinks
 
 root = Tk()
 
 def open_temp2xlsx():
     template2xlsx.main()
     print("executed template2xlsx")
+    root.destroy()
+    quit()
+
+def open_tmt2TD():
+    tmt2td.main()
+    print("executed tmt2td")
     root.destroy()
     quit()
 
@@ -93,7 +100,7 @@ def main():
     
     # report Scripts
     button4 = ttk.Button(window,
-                    text="Fix Report",
+                    text="Fix broken report hyperlinks",
                     command=open_report_fix)
 
     # model scripts 
@@ -113,6 +120,10 @@ def main():
                     text="Upload to Confluence",
                     command= upload_confluence)
 
+    button9 = ttk.Button(window,
+                    text="Convert to Threat Dragon",
+                    command= open_tmt2TD)
+
     # configure columns
     window.columnconfigure(0, weight=1)
     window.columnconfigure(1, weight=1)
@@ -128,6 +139,7 @@ def main():
     button5.grid(row=2, column=1, sticky=W+E)
     button3.grid(row=3, column=1, sticky=W+E)
     button7.grid(row=4, column=1, sticky=W+E)
+    button9.grid(row=5, column=1, sticky=W+E)
     root.mainloop()
     quit()
 

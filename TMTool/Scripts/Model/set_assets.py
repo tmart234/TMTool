@@ -9,7 +9,7 @@ import tkinter as tk
 from tkinter import filedialog
 import json
 from . import asset_form
-from .Scoring import cvss
+from ..Scoring import cvss
 
 
 # checks element props for anything containing <_name>

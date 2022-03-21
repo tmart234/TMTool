@@ -13,7 +13,7 @@ from tkinter import ttk
 # override the basic Tk widgets
 from tkinter import *
 from ttkthemes import ThemedStyle
-from . import tooltip
+from .. import tooltip
 
 class AssetsWindow(ttk.Frame):
     def __init__(self, master, flows, *args, **kwargs):

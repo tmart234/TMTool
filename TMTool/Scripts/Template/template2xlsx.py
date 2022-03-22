@@ -241,8 +241,7 @@ def writeElementsAndThreats(xml_root, threat_worksheet, stencil_worksheet, headd
         _row = _row + 1
 
     # Elements headders
-    #stencil_worksheet.write(['Stencil Name', 'Type', 'ID', 'Description','Parent', 'Hidden_bool', 'Representation', 'Attributes'])
-    stencil_headers = ['Stencil Name', 'Type', 'ID', 'Description', 'Parent', 'Hidden_bool', 'Representation']
+    stencil_headers = ['Name', 'Type', 'ID', 'Description', 'ParentElement', 'Hidden', 'Representation']
     for col_num, data in enumerate(stencil_headers):
         stencil_worksheet.write(0, col_num, data, headder_fmt)
 

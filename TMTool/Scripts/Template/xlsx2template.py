@@ -9,191 +9,7 @@ from lxml.etree import Element, SubElement, ElementTree
 from tkinter import filedialog
 import uuid
 import openpyxl
-
-# take a threat category GUID and look it up in the category dict
-#TODO: delete
-def cat2str(cat, cats):
-    for key, value in cats.items():
-         if cat == value:
-             return key
-    return None
-
-# take a threat category GUID and look it up in the category dict
-#TODO: delete
-def cat2guid(cat, cats):
-    for key, value in cats.items():
-         if cat == key:
-             return value
-    return None
-
-# deletes temp xml file
-#TODO: delete
-def cleanUp(_folder_path):
-    if os.path.exists(_folder_path):
-        os.remove(_folder_path)
-        return
-    else:
-        print("The temp file does not exist")
-
-# pull all available threat Categories and their GUIDs from the XML
-# some may be empty (contains 0 threats)
-#TODO: delete
-def find_cats(root):
-    cats= dict()
-    cat_ID=''
-    cat_name=''
-    for cat in root.iter('ThreatCategory'):
-        for subelem in cat.findall('Name'):
-            cat_name = subelem.text
-        for subelem in cat.findall('Id'):
-            cat_ID = subelem.text
-        cats[cat_name]=cat_ID
-    return cats
-
-# get threats from .tb7 file as dict
-def find_threats(root):
-    threats = dict()
-    _id = ''
-    title = ''
-    desc = ''
-    category = ''
-    for threat in root.iter('ThreatType'):
-        for subelem in threat.findall('ShortTitle'):
-            # remove curley braces for xlsx output
-            title = subelem.text.translate({ord('{'):None, ord('}'):None})
-        for subelem in threat.findall('Id'):
-            _id = subelem.text
-        if _id == 'SU':
-            continue
-        elif _id == 'TU':
-            continue
-        elif _id == 'RU':
-            continue
-        elif _id == 'IU':
-            continue
-        elif _id == 'DU':
-            continue
-        elif _id == 'EU':
-            continue
-        for subelem in threat.findall('Description'):
-            desc = subelem.text.translate({ord('{'):None, ord('}'):None})
-        for subelem in threat.findall('Category'):
-            category = cat2str(subelem.text, find_cats(root))
-        threats[_id]=[title,desc,category]
-    return threats
-
-# get all elements from .tb7 file as dict
-def find_elements(root):
-    name = ''
-    _id = ''
-    desc = ''
-    parent = ''
-    hidden = ''
-    rep = ''
-    elements = dict()
-    #element = dict().fromkeys({'Stencil Name', 'Type', 'ID', 'Description','Parent', 'Hidden_bool', 'Representation', 'Attributes'})
-    _type = 'GenericElements'
-    for ele in root.findall(_type):
-        for subelem in ele.findall('ElementType'):
-            for subelem2 in subelem.findall('ID'):
-                _id = str(subelem2.text)
-            for subelem2 in subelem.findall('Name'):
-                name = str(subelem2.text)
-            for subelem2 in subelem.findall('Description'):
-                desc = str(subelem2.text)
-            for subelem2 in subelem.findall('ParentElement'):
-                parent = str(subelem2.text)    
-            for subelem2 in subelem.findall('Hidden'):
-                hidden = str(subelem2.text)    
-            for subelem2 in subelem.findall('Representation'):
-                rep = str(subelem2.text)   
-            elements[_id]=[name,_type,_id, desc, parent, hidden, rep]
-    _type = 'StandardElements'
-    for ele in root.findall(_type):
-        for subelem in ele.findall('ElementType'):
-            for subelem2 in subelem.findall('ID'):
-                _id = str(subelem2.text)
-            for subelem2 in subelem.findall('Name'):
-                name = str(subelem2.text)
-            for subelem2 in subelem.findall('Description'):
-                desc = str(subelem2.text)
-            for subelem2 in subelem.findall('ParentElement'):
-                parent = str(subelem2.text)    
-            for subelem2 in subelem.findall('Hidden'):
-                hidden = str(subelem2.text)    
-            for subelem2 in subelem.findall('Representation'):
-                rep = str(subelem2.text)   
-            elements[_id]=[name,_type,_id, desc, parent, hidden, rep]
-    return elements
-
-# add cat to xml file
-def add_cat(root, cat, cats_dict=None):
-    _uuid = ''
-    new_cat = Element("ThreatCategory")
-    name = SubElement(new_cat, 'Name')
-    # set category name
-    name.text = str(cat)
-    
-    id_ele = SubElement(new_cat, 'Id')
-    if cats_dict.get(cat) is None:
-        # generate GUID for category
-        _uuid = str(uuid.uuid4())
-        id_ele.text = _uuid
-    else:
-        # set ID
-        id_ele.text = str(cats_dict.get(cat))
-        _uuid = str(id_ele.text)
-
-    SubElement(new_cat, 'ShortDescription')
-    SubElement(new_cat, 'LongDescription')
-    # insert new element
-    root[4].insert(0, new_cat)
-    print('added category: ' + cat)
-    return _uuid
-
-# find threat from id in xlsx_threat_dict and add to .tb7
-def add_threat(root, threat_id, threats):
-    threat = threats.get(threat_id)
-    new_threat = Element("ThreatType")
-
-    _uuid = ''
-    filter = SubElement(new_threat, 'GenerationFilters')
-    include_ele = SubElement(filter, 'Include')
-    include_ele.text = threat.get('Include Logic')
-    exclude_ele = SubElement(filter, 'Exclude')
-    exclude_ele.text = threat.get('Exclude Logic')
-    # check id
-    id_ele = SubElement(new_threat, 'Id')
-    if threat.get('Id') is None:
-        # generate GUID if not present
-        _uuid = str(uuid.uuid4())
-        id_ele.text = _uuid
-    else:
-        # sets to ID if present
-        id_ele.text = threat_id
-
-    name = SubElement(new_threat, 'ShortTitle')
-    # set threat name
-    name.text = threat.get('Threat Title')
-
-    cat = SubElement(new_threat, 'Category')
-    # set as cat guid
-    _cat = cat2guid(threat.get('Category'),find_cats(root))
-    if not _cat:
-        # add if it does not exist
-        print('warning no category found: '+ threat.get('Category'))
-        # 
-        _cat = add_cat(root, threat.get('Category'),find_cats(root))
-    cat.text = _cat
-    SubElement(new_threat, 'RelatedCategory')  
-
-    desc = SubElement(new_threat, 'Description')
-    desc.text = threat.get('Description')
-    SubElement(new_threat, 'PropertiesMetaData')
-    # insert new threat
-    root[5].insert(0, new_threat)
-    print('added threat: ' + str(name.text) + ' ' + str(id_ele.text))
-    return _uuid
+import functools
 
 # find threat from id in xlsx_threat_dict and add to .tb7
 def add_element(root, ele_id, elements, _type):
@@ -275,41 +91,6 @@ def delete_element(root, ele_id):
                 print('removed element: ' + ele_id)
     return
 
-#TODO: delete
-def compare(root, surplus, deficit, _type, _list, xlsx_dict):
-    if surplus:
-        # add extra to xml file
-        print('Adding all '+ _type +' found: ' + str(surplus))
-        for x in surplus:
-            if x not in _list:
-                if str(_type) == 'categories':
-                    add_cat(root, x, xlsx_dict)
-                elif str(_type) == 'threats':
-                    add_threat(root, x, xlsx_dict)
-                elif str(_type) == 'stencils':
-                    add_element(root, x, xlsx_dict, _type)
-                else:
-                    print('bad type. Chose type from categories, threats, or stencils')
-            else:
-                print('error adding. Chekck lists')
-                print(*_list)
-    if deficit:
-        print('Removing all '+ _type+' found: ' + str(deficit))
-        for x in deficit:
-        # remove missing from xml file
-            if x in _list:
-                if _type == 'categories':
-                    delete_cat(root, x)
-                elif _type == 'threats':
-                    delete_threat(root, x)
-                elif _type == 'threats':
-                    delete_element(root, x, xlsx_dict)
-                else:
-                    print('bad type. Chose type from categories, threats, or stencils')
-            else:
-                print('error removing. Chekck lists')
-                print(*_list)
-    
 # returns xlsx threats as dict of threats (dict of dicts)
 def find_xlsx_threats(wb):
     sheet = wb['Threats']
@@ -420,9 +201,9 @@ def get_Threat_Meta(xml, ws):
     for row in ws.iter_rows(max_col=1):
         for cell in row:
             if str(cell.value) in find_list:
-                if cell.value == "Is Priority Used":
+                if cell.value == find_list[0]:
                     SubElement(root_category, 'IsPriorityUsed').text = ws.cell(row=cell.row,column=(cell.column + 1)).value
-                elif cell.value == "Is Status Used":
+                elif cell.value == find_list[1]:
                     SubElement(root_category, 'IsStatusUsed').text = ws.cell(row=cell.row,column=(cell.column + 1)).value
                 else:
                     found = True
@@ -443,6 +224,50 @@ def get_Threat_Meta(xml, ws):
                 val = SubElement(vals, 'Value')
     return xml
 
+"""  <ElementType>
+      <Name>Generic Interaction</Name>
+      <ID>dd163aaf-713b-46df-bc66-4ace6c033067</ID>
+      <Description />
+      <ParentElement>ROOT</ParentElement>
+      <Image>
+      <Hidden>false</Hidden>
+      <Representation>Ellipse</Representation>
+      <StrokeThickness>0</StrokeThickness>
+      <ImageLocation>Centered on stencil</ImageLocation>
+      <Attributes />
+      <StencilConstraints>
+        <StencilConstraint>
+          <SelectedStencilType>Any</SelectedStencilType>
+          <SelectedStencilConnection>Any</SelectedStencilConnection>
+        </StencilConstraint>
+      </StencilConstraints>
+    </ElementType """
+
+# more advanced way of using openpyxl. Uses find and found lists to dynamically finds xlsx titles
+# in order to avoid breaking changes
+# TODO: find_list is also in template2xlsx. consolidate and refactor
+# TODO: 
+def get_generic(xml, ws):
+    find_list = ['Name', 'Type', 'ID', 'Description', 'ParentElement', 'Hidden', 'Representation']
+    found_list = []
+    llen = len(find_list)
+    root_category = SubElement(xml, 'GenericElements')
+    for row in ws.iter_rows(max_col=llen, max_row=1):
+        for cell in row:
+            found_list.insert((int(cell.column)-1),cell.value)
+    delete_list = [x for x in find_list + found_list if x not in found_list]
+    offset = 0
+    if delete_list is not None:
+        find_list = [functools.reduce(lambda item,loc: item.replace(loc,''), [item]+delete_list) for item in find_list]
+        offset = len(delete_list)
+    _col = llen - offset
+    for row in ws.iter_rows(max_col=_col, min_row=2):
+        ele = SubElement(root_category, 'ElementType')
+        for cell in row:
+            title = str(ws.cell(row=1,column=cell.column).value)
+            if title in find_list:
+                SubElement(ele,title).text = cell.value
+    return xml
 
 def main():
     root = tk.Tk()
@@ -465,6 +290,8 @@ def main():
     # Get All Sheets
     a_sheet_names = wb.sheetnames
     metadata_sheet = wb.get_sheet_by_name(name ="Metadata")
+    stencils_sheet = wb.get_sheet_by_name(name ="Stencils")
+    threats_sheet = wb.get_sheet_by_name(name ="Threats")
     # check for sheets
     if ('Metadata' and 'Threats' and 'Stencils') in a_sheet_names:
         print("All Sheets found!")
@@ -483,7 +310,7 @@ def main():
     # NOTE: Do not rename the worksheet default names or default title/tags for data (anything that's in bold font)
     root = get_manifest(root, metadata_sheet)
     root = get_Threat_Meta(root,metadata_sheet)
-    GenericElements = SubElement(root, 'GenericElements')
+    root = get_generic(root,stencils_sheet)
     StandardElements = SubElement(root, 'StandardElements')
     root = get_threat_categories(root, metadata_sheet)
     ThreatTypes = SubElement(root, 'ThreatTypes')

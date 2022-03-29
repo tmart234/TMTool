@@ -243,10 +243,10 @@ def get_Threat_Meta(xml, ws):
       </StencilConstraints>
     </ElementType """
 
-# more advanced way of using openpyxl. Uses find and found lists to dynamically finds xlsx titles
-# in order to avoid breaking changes
-# TODO: find_list is also in template2xlsx. consolidate and refactor
-# TODO: 
+# more advanced way of using openpyxl than get_metadata. This function uses find and found 
+# lists to dynamically finds xlsx titles in order to avoid breaking changes
+# TODO: find_list is also in template2xlsx.py as title. consolidate and refactor
+# TODO: include ele_props and use offset to find starting location
 def get_generic(xml, ws):
     find_list = ['Name', 'Type', 'ID', 'Description', 'ParentElement', 'Hidden', 'Representation']
     found_list = []
@@ -260,6 +260,8 @@ def get_generic(xml, ws):
     if delete_list is not None:
         find_list = [functools.reduce(lambda item,loc: item.replace(loc,''), [item]+delete_list) for item in find_list]
         offset = len(delete_list)
+        print("Error: skipping element titles that could not be found:")
+        print(delete_list)
     _col = llen - offset
     for row in ws.iter_rows(max_col=_col, min_row=2):
         ele = SubElement(root_category, 'ElementType')

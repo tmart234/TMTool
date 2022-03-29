@@ -4,7 +4,10 @@ threat properties, generic elements, standard elements, boundaries, and metadata
 from a MS TMT template files (.tb7) after, it creates a template.xlsx file
 '''
 
+import base64
+from matplotlib import style
 import xlsxwriter
+import openpyxl
 
 from lxml import etree
 import tkinter as tk
@@ -20,17 +23,16 @@ namespaces = {
         
 
 # blocking
-def close_wb(_wb):
+def close_wb(_wb, _wb_file):
     while True:
         try:
-            _wb.close()
-        except xlsxwriter.exceptions.FileCreateError as e:
+            _wb.save(_wb_file)
+        except openpyxl.exceptions as e:
             decision = input("Exception caught in workbook.close(): %s\n"
                                 "Please close the file if it is open in Excel.\n"
                                 "Try to write file again? [Y/n]: " % e)
             if decision != 'n':
                 continue
-
         break
 
 # pull all threat Categories and their GUIDs from the XML
@@ -139,7 +141,6 @@ def writeProp(label, val, _ws, row, headers, fmt):
 # writes elements (stencils, flows, and boundarys)
 def write_row(_root, ele_type, stencil_worksheet, headers, headder_fmt):
     _row = 1
-
     for _type in _root.findall(ele_type):
         for types in _type.iter('ElementType'):
             for subelem in types.findall('Name'):
@@ -154,12 +155,20 @@ def write_row(_root, ele_type, stencil_worksheet, headers, headder_fmt):
                     hidden = subelem.text
             for subelem in types.findall('Representation'):
                     rep = subelem.text
-            # will not get <Image>, <StrokeThickness>, <ImageLocation>, or sencil constraints
+            for subelem in types.findall('Image'):
+                img_64 = subelem.text
+            imgdata = base64.b64decode(img_64)
+            img = io.BytesIO(imgdata.read())
+            # will not get <StrokeThickness>, <ImageLocation>, or sencil constraints
                     # get all property data (all child elements)
 
-            my_list = [ele_name,ele_type,ele_id,ele_desc,ele_parent,hidden,rep]
+            my_list = [ele_name,ele_type,ele_id,ele_desc,ele_parent,hidden,rep,img]
             for col_num, data in enumerate(my_list):
-                stencil_worksheet.write(_row, col_num, data)
+                if type(data.read()) == 'bytes':
+                    img = openpyxl.drawing.image.Image(img)
+                    stencil_worksheet.add_image(img, str(_row + openpyxl.utils.get_column_letter(col_num)))
+                else:
+                    stencil_worksheet.write(_row, col_num, data)
 
             # write all element attribs
             for attribs in types.findall('Attributes'):
@@ -219,6 +228,7 @@ def writeElementsAndThreats(xml_root, threat_worksheet, stencil_worksheet, headd
             title = subelem.text
         for subelem in types.findall('Description'):
             desc = subelem.text
+
         # WRITE EACH ROW ITERATIVELY 
         my_list = [threat_id, title, category, desc, include, exclude]
 
@@ -255,48 +265,53 @@ def writeMetadata(xml_root, meta_worksheet, cell_format):
     atrib_list = ['name','id','version','author']
     for atrib in xml_root.findall('Manifest'):
         for index in range(len(atrib_list)):
-            meta_worksheet.write(index, 0, ("Template " + atrib_list[index] + ":" ), cell_format)
-            meta_worksheet.write(index, 1, atrib.get(atrib_list[index]))
-
+            meta_worksheet.cell(row=index+1, column=1).font = cell_format
+            meta_worksheet.cell(row=index+1, column=1).value = str("Template " + atrib_list[index] + ":" )
+            meta_worksheet.cell(row=index+1, column=2).value = atrib.get(atrib_list[index])
     # get threat categories as a key value pair dictionary
     # TODO: get descriptions too
-    new_row = len(atrib_list)+1
+    new_row = len(atrib_list)+2
     template_cats = find_cats(xml_root)
-    meta_worksheet.write(new_row, 0, "Threat Categories", cell_format)
+    meta_worksheet.cell(row=new_row, column=1).font = cell_format
+    meta_worksheet.cell(row=new_row, column=1).value = "Threat Categories"
+    #meta_worksheet.cell(new_row, 0, "Threat Categories", cell_format)
     for key,val in template_cats.items():
         new_row = 1 + new_row
-        meta_worksheet.write(new_row, 0, key)
-        meta_worksheet.write(new_row, 1, val)
+        meta_worksheet.cell(row=new_row, column=1).value = key
+        meta_worksheet.cell(row=new_row, column=2).value = val
 
     # Get all threat properties available
     new_row = new_row + 1
     for props in xml_root.findall('ThreatMetaData'):
         for priority in props.findall('IsPriorityUsed'):
             new_row = new_row + 1
-            meta_worksheet.write(new_row, 0, "Is Priority Used", cell_format)
-            meta_worksheet.write(new_row, 1, priority.text)
+            meta_worksheet.cell(row=new_row, column=1).font = cell_format
+            meta_worksheet.cell(row=new_row, column=1).value = "Is Priority Used"
+            meta_worksheet.cell(row=new_row, column=2).value = priority.text
         for status in props.findall('IsStatusUsed'):
             new_row = new_row + 1
-            meta_worksheet.write(new_row, 0, "Is Status Used", cell_format)
-            meta_worksheet.write(new_row, 1, status.text)
+            meta_worksheet.cell(row=new_row, column=1).font = cell_format
+            meta_worksheet.cell(row=new_row, column=1).value = "Is Status Used"
+            meta_worksheet.cell(row=new_row, column=2).value = status.text
         new_row = new_row + 1
-        meta_worksheet.write(new_row, 0, "Threat Properties MetaData", cell_format)
+        meta_worksheet.cell(row=new_row, column=1).font = cell_format
+        meta_worksheet.cell(row=new_row, column=1).value = "Threat Properties MetaData"
         for metaprops in props.findall('PropertiesMetaData'):
             for threatmeta in metaprops.findall('ThreatMetaDatum'):
                 new_row = new_row + 1
                 for propname in threatmeta.findall('Name'):
-                    meta_worksheet.write(new_row, 0, propname.text)
+                    meta_worksheet.cell(row=new_row, column=1).value = propname.text
                 for proplabel in threatmeta.findall('Label'):
-                    meta_worksheet.write(new_row, 1, proplabel.text)
+                    meta_worksheet.cell(row=new_row, column=2).value = proplabel.text
                 for id in threatmeta.findall('Id'):
-                    meta_worksheet.write(new_row, 2, id.text)
+                    meta_worksheet.cell(row=new_row, column=3).value = id.text
                 for des in threatmeta.findall('Description'):
-                    meta_worksheet.write(new_row, 3, des.text)
+                    meta_worksheet.cell(row=new_row, column=4).value = des.text
                 for hide in threatmeta.findall('HideFromUI'):
                     if str(hide.text) == 'true':
-                        meta_worksheet.write(new_row, 4, 'HIDDEN')
+                        meta_worksheet.cell(row=new_row, column=5).value = 'HIDDEN'
                 for _type in threatmeta.findall('AttributeType'):
-                    meta_worksheet.write(new_row, 5, _type.text)
+                    meta_worksheet.cell(row=new_row, column=6).value = _type.text
                 
                 # TODO: get list of "Values"
     return
@@ -321,19 +336,19 @@ def main():
     xml_root = tree.getroot()
 
     # copy file and rename  extension
-    wb_path = os.path.splitext(file_path)[0]
-    wb_path = wb_path + '.xlsx'
+    wb_file = os.path.splitext(file_path)[0]
+    wb_file = wb_file + '.xlsx'
     
     # Create a workbook and add worksheets
-    workbook = xlsxwriter.Workbook(wb_path)
-    cell_format = workbook.add_format({'bold': True})
-    meta_worksheet = workbook.add_worksheet('Metadata')
-    threat_worksheet = workbook.add_worksheet('Threats')
-    stencil_worksheet = workbook.add_worksheet('Stencils')
+    workbook = openpyxl.Workbook()
+    cell_format = openpyxl.styles.Font(bold=True)
+    meta_worksheet = workbook.create_sheet('Metadata', 0)
+    threat_worksheet = workbook.create_sheet('Threats', 1)
+    stencil_worksheet = workbook.create_sheet('Stencils', 2)
 
     writeMetadata(xml_root, meta_worksheet, cell_format)
-    writeElementsAndThreats(xml_root, threat_worksheet, stencil_worksheet, cell_format)
-    close_wb(workbook)
+    #writeElementsAndThreats(xml_root, threat_worksheet, stencil_worksheet, cell_format)
+    close_wb(workbook, wb_file)
     return
 
 if __name__ == '__main__':

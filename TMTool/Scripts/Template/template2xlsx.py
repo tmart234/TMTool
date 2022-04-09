@@ -4,7 +4,10 @@ threat properties, generic elements, standard elements, boundaries, and metadata
 from a MS TMT template files (.tb7) after, it creates a template.xlsx file
 '''
 
+import base64
 import xlsxwriter
+from io import BytesIO
+from PIL import Image
 
 from lxml import etree
 import tkinter as tk
@@ -125,6 +128,18 @@ def guid2name(_root, txt):
         txt = txt.replace(guid, prop_name)
     return txt
 
+# uses PIL to generate bytes for JPG or PNG from base64 string
+# given size reformat and image conversion, there will be some loss in image quality
+# TODO: reformate image size with PIL so everything fits nicely, xlsxwriter won't cut it
+def decode_img(msg):
+    msg = base64.b64decode(msg)
+    image = Image.open(BytesIO(msg))
+    img_buf = BytesIO()
+    image.save(img_buf, format='PNG')
+    image.seek(0)
+    img_bytes = img_buf.getvalue()
+    return img_bytes
+
 # checks if label is an existing header, adds it if not
 # then writes the value to that column and row
 def writeProp(label, val, _ws, row, headers, fmt):
@@ -139,27 +154,33 @@ def writeProp(label, val, _ws, row, headers, fmt):
 # writes elements (stencils, flows, and boundarys)
 def write_row(_root, ele_type, stencil_worksheet, headers, headder_fmt):
     _row = 1
-
     for _type in _root.findall(ele_type):
         for types in _type.iter('ElementType'):
             for subelem in types.findall('Name'):
-                    ele_name = subelem.text
+                ele_name = subelem.text
             for subelem in types.findall('ID'):
-                    ele_id = subelem.text
+                ele_id = subelem.text
             for subelem in types.findall('Description'):
-                    ele_desc = subelem.text
+                ele_desc = subelem.text
             for subelem in types.findall('ParentElement'):
-                    ele_parent = subelem.text
+                ele_parent = subelem.text
             for subelem in types.findall('Hidden'):
-                    hidden = subelem.text
+                hidden = subelem.text
             for subelem in types.findall('Representation'):
-                    rep = subelem.text
-            # will not get <Image>, <StrokeThickness>, <ImageLocation>, or sencil constraints
+                rep = subelem.text
+            for subelem in types.findall('Image'):
+                img = decode_img(subelem.text)
+            
+            # will not get <StrokeThickness>, <ImageLocation>, or sencil constraints
                     # get all property data (all child elements)
 
-            my_list = [ele_name,ele_type,ele_id,ele_desc,ele_parent,hidden,rep]
+            my_list = [ele_name,ele_type,ele_id,ele_desc,ele_parent,hidden,rep,img]
+            found = False
             for col_num, data in enumerate(my_list):
-                stencil_worksheet.write(_row, col_num, data)
+                if type(data) is bytes and not found:
+                    stencil_worksheet.insert_image(_row, col_num,'myimg.png', {'image_data':BytesIO(img), 'x_scale': 0.05, 'y_scale': 0.05})
+                else:
+                    stencil_worksheet.write(_row, col_num, data)
 
             # write all element attribs
             for attribs in types.findall('Attributes'):
@@ -187,7 +208,7 @@ def writeElementsAndThreats(xml_root, threat_worksheet, stencil_worksheet, headd
     exclude = ''
     
     # write threat headers in xlsx worksheet
-    threat_headers = ['ID', 'Threat Title', 'Category', 'Description', 'Include Logic', 'Exclude Logic']
+    threat_headers = ['ID', 'Threat Title', 'Category', 'Description', 'Include Logic', 'Exclude Logic','Image']
     for col_num, data in enumerate(threat_headers):
         threat_worksheet.write(0, col_num, data, headder_fmt)
 
@@ -334,6 +355,7 @@ def main():
     writeMetadata(xml_root, meta_worksheet, cell_format)
     writeElementsAndThreats(xml_root, threat_worksheet, stencil_worksheet, cell_format)
     close_wb(workbook)
+
     return
 
 if __name__ == '__main__':

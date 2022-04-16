@@ -1,8 +1,11 @@
 name: myActions
 on:
   push:
-      branches:
-        - main
+    branches:
+      - main
+  pull_request:
+    branches: 
+      - main
 
 jobs:
   Publish-Pipy:

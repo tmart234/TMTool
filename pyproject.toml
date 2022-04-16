@@ -5,7 +5,6 @@ description = "python tool for Microsoft Threat modeling tool"
 authors = [
     "Tyler M. <tmart234@gmail.com>"
 ]
-license = "MIT"
 readme = "README.md"
 python = "^3.7"
 homepage = "https://github.com/tmart234/TMT"

@@ -1,4 +1,6 @@
-*This project is currently in beta and is highly unstable!* 
+*This project is in beta and is highly unstable!* 
+TMTool was an idea to try and create a risk based threat model (RBTM) approach using the Microsoft threat modeling tool. Tmtool is a set of custom workflows for the inputs & outputs of the Microsoft tool 
+
 
 # TMTool
 

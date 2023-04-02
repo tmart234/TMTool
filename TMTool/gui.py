@@ -1,147 +1,68 @@
-from tkinter import ttk
-# override the basic Tk widgets
-from tkinter.ttk import *
-from tkinter import *
-from ttkthemes import ThemedStyle
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
+from PyQt5.QtCore import Qt
 
-from TMTool.Scripts.Template import template2xlsx
-from TMTool.Scripts.Template import xlsx2template
-from TMTool.Scripts.Template import template_diff
-from TMTool.Scripts.Model import set_metadata_tags
-from TMTool.Scripts.Model import set_assets
-from TMTool.Scripts.Model import tmt2td
-from TMTool.Scripts import jira_issues
-from TMTool.Scripts import confluence
-from TMTool.Scripts import fix_report_hyperlinks
+# Define the functions for the buttons' actions here
+# ...
 
-root = Tk()
+class TMToolGUI(QWidget):
+    def __init__(self):
+        super().__init__()
 
-def open_temp2xlsx():
-    template2xlsx.main()
-    print("executed template2xlsx")
-    root.destroy()
-    quit()
+        self.init_ui()
 
-def open_tmt2TD():
-    tmt2td.main()
-    print("executed tmt2td")
-    root.destroy()
-    quit()
+    def init_ui(self):
+        self.setWindowTitle("TMTool GUI")
+        self.setGeometry(100, 100, 800, 400)
 
-def open_xlsx2temp():
-    xlsx2template.main()
-    print("executed xlsx2template")
-    root.destroy()
-    return
+        layout = QVBoxLayout()
 
-def open_jira_upload():
-    jira_issues.main()
-    print("executed jira upload")
+        template_scripts_label = QLabel("Template Scripts:", self)
+        template_scripts_label.setStyleSheet("color: #CCFFCC")
+        model_scripts_label = QLabel("Model Scripts:", self)
+        model_scripts_label.setStyleSheet("color: #CCE5FF")
+        report_scripts_label = QLabel("Report Scripts:", self)
+        report_scripts_label.setStyleSheet("color: #CCAAFF")
 
-def open_report_fix():
-    fix_report_hyperlinks.main()
-    print("fix HTML report hyperlinks")
+        template_layout = QVBoxLayout()
+        template_layout.addWidget(template_scripts_label)
+        template_layout.addWidget(self.create_button("Template -> XLSX", self.open_temp2xlsx))
+        template_layout.addWidget(self.create_button("XLSX -> Template", self.open_xlsx2temp))
+        template_layout.addWidget(self.create_button("Diff XLSX vs Template", self.open_diff))
 
-def open_metadata():
-    set_metadata_tags.main()
-    print("set Model's Environmental metrics")
-    return
+        model_layout = QVBoxLayout()
+        model_layout.addWidget(model_scripts_label)
+        model_layout.addWidget(self.create_button("Set Model Metadata", self.open_metadata))
+        model_layout.addWidget(self.create_button("Set Model Assets", self.open_assets))
+        model_layout.addWidget(self.create_button("Convert to Threat Dragon", self.open_tmt2TD))
 
-def open_assets():
-    set_assets.main()
-    print("set Model's Assets")
-    return
+        report_layout = QVBoxLayout()
+        report_layout.addWidget(report_scripts_label)
+        report_layout.addWidget(self.create_button("Fix broken report hyperlinks", self.open_report_fix))
+        report_layout.addWidget(self.create_button("Upload as Jira Issues", self.open_jira_upload))
+        report_layout.addWidget(self.create_button("Upload to Confluence", self.upload_confluence))
 
-def upload_confluence():
-    confluence.main()
-    print("set Model's Assets")
-    return
+        main_layout = QHBoxLayout()
+        main_layout.addLayout(template_layout)
+        main_layout.addLayout(model_layout)
+        main_layout.addLayout(report_layout)
 
-def open_diff():
-    template_diff.main()
-    print("Diffing...")
-    return
-    
+        layout.addLayout(main_layout)
 
+        self.setLayout(layout)
 
-def main():
-    root.configure(background='#404040')
-    root.title("TMTool GUI")
-    root.geometry("400x200")
-    # Setting Theme
-    style = ThemedStyle(root)
-    style.set_theme("equilux")
+    def create_button(self, text, function):
+        button = QPushButton(text, self)
+        button.clicked.connect(function)
+        button.setStyleSheet("font-size: 14px; padding: 10px; background-color: #808080; color: #ffffff;")
+        return button
 
-    # for the main area of the window
-    window = ttk.Frame(root)
-    window.pack(fill=X, side=TOP)
-
-    # light green
-    text1 = ttk.Label(window,
-                    text="Template Scripts:", foreground='#CCFFCC')
-    # light blue
-    text2 = ttk.Label(window,
-                    text="Model Scripts:", foreground='#CCE5FF')
-    # light purple
-    text3 = ttk.Label(window,
-                    text="Report Scripts:", foreground='#CCAAFF')
-
-    # template scripts
-    button1 = ttk.Button(window, 
-                    text="Template -> XLSX", 
-                    command=open_temp2xlsx)
-
-    button2 = ttk.Button(window,
-                    text="XLSX -> Template",
-                    command=open_xlsx2temp)
-    button8 = ttk.Button(window,
-                text="Diff XLSX vs Template",
-                command=open_diff)
-    
-    # report Scripts
-    button4 = ttk.Button(window,
-                    text="Fix broken report hyperlinks",
-                    command=open_report_fix)
-
-    # model scripts 
-    button3 = ttk.Button(window,
-                    text="Upload as Jira Issues",
-                    command=open_jira_upload)
-
-    button5 = ttk.Button(window,
-                    text="Set Model Metadata",
-                    command= open_metadata)
-
-    button6 = ttk.Button(window,
-                    text="Set Model Assets",
-                    command= open_assets)
-
-    button7 = ttk.Button(window,
-                    text="Upload to Confluence",
-                    command= upload_confluence)
-
-    button9 = ttk.Button(window,
-                    text="Convert to Threat Dragon",
-                    command= open_tmt2TD)
-
-    # configure columns
-    window.columnconfigure(0, weight=1)
-    window.columnconfigure(1, weight=1)
-    # make buttons grow when window and cells grow  
-    text1.grid(row=0, column=0, sticky=W+E)
-    text2.grid(row=0, column=1, sticky=W+E)
-    button1.grid(row=1, column=0, sticky=W+E)
-    button2.grid(row=2, column=0, sticky=W+E)
-    button8.grid(row=3, column=0, sticky=W+E)
-    text3.grid(row=4, column=0, sticky=W+E)
-    button4.grid(row=5, column=0, sticky=W+E)
-    button6.grid(row=1, column=1, sticky=W+E)
-    button5.grid(row=2, column=1, sticky=W+E)
-    button3.grid(row=3, column=1, sticky=W+E)
-    button7.grid(row=4, column=1, sticky=W+E)
-    button9.grid(row=5, column=1, sticky=W+E)
-    root.mainloop()
-    quit()
+    # Define the functions for the buttons' actions here
+    # ...
 
 if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = TMToolGUI()
+    window.show()
+    sys.exit(app.exec_())n__':
     main()

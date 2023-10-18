@@ -2,9 +2,7 @@
 name = "TMTool"
 version = "0.0.38"
 description = "python tool for Microsoft Threat modeling tool"
-authors = [
-    "Tyler M. <tmart234@gmail.com>"
-]
+authors = [ {name = "Tyler Martin", email = "tmart234@gmail.com"} ]
 readme = "README.md"
 python = "^3.7"
 homepage = "https://github.com/tmart234/TMT"

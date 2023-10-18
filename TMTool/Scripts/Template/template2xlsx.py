@@ -36,6 +36,38 @@ def close_wb(_wb):
 
         break
 
+def extract_logic_part(input_string):
+    # Remove the phrases "source is", "target is", "flow is", "flow crosses" from the input
+    input_string = re.sub(r"(source is|target is|flow is|flow crosses)", "", input_string)
+
+    # Replace 'and' with '+' and 'or' with '/' to represent logical operators
+    input_string = input_string.replace(" and ", " + ")
+    input_string = input_string.replace(" or ", " / ")
+
+    # Split the input string based on parentheses
+    parts = re.split(r"(\([^)]+\))", input_string)
+    parts = [part.strip() for part in parts if part.strip()]
+
+    # Initialize the result string
+    result = ""
+
+    # Process the parts
+    for part in parts:
+        if part.startswith("("):
+            result += part[1:-1]
+        elif result and not result.endswith(" "):
+            result += " " + part
+        else:
+            result += part
+
+    # Remove single quotes from the result
+    result = re.sub(r"'(.*?)'", r"\1", result)
+
+    # Remove all "(" and ")" characters from the result
+    result = result.replace("(", "").replace(")", "")
+
+    return result
+
 # pull all threat Categories and their GUIDs from the XML
 def find_cats(root):
     cats={}

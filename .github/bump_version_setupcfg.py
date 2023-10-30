@@ -1,7 +1,7 @@
-# bump_version_setupcfg.py
-
 import re
+import toml
 
+# Bump version in setup.cfg
 with open("setup.cfg", "r") as f:
     content = f.read()
 
@@ -17,3 +17,17 @@ updated_content = content.replace(f'version = {version}', f'version = {new_versi
 
 with open("setup.cfg", "w") as f:
     f.write(updated_content)
+
+# Bump version in pyproject.toml
+def bump_version(version_str):
+    major, minor, patch = map(int, version_str.split('.'))
+    return f"{major}.{minor}.{patch + 1}"
+
+with open("pyproject.toml", 'r') as file:
+    content = toml.load(file)
+
+old_version = content['project']['version']
+content['project']['version'] = bump_version(old_version)
+
+with open("pyproject.toml", 'w') as file:
+    toml.dump(content, file)

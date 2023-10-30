@@ -4,6 +4,8 @@ version = "0.0.47"
 description = "python tool for Microsoft Threat modeling tool"
 readme = "README.md"
 requires-python = ">=3.7"
+dynamic = ["license", "dependencies", "scripts"]
+
 [[project.maintainers]]
 name = "Tyler Martin"
 email = "tmart234@gmail.com"

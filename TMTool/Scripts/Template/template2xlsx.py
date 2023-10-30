@@ -239,8 +239,8 @@ def writeElementsAndThreats(xml_root, threat_worksheet, stencil_worksheet, headd
     include = ''
     exclude = ''
     
-    # write threat headers in xlsx worksheet
-    threat_headers = ['ID', 'Threat Title', 'Category', 'Description', 'Include Logic', 'Exclude Logic','Image']
+    # Modify threat headers in xlsx worksheet
+    threat_headers = ['ID', 'Threat Title', 'Category', 'Description', 'Include', 'Include Logic', 'Exclude', 'Exclude Logic', 'Image']
     for col_num, data in enumerate(threat_headers):
         threat_worksheet.write(0, col_num, data, headder_fmt)
 
@@ -257,11 +257,19 @@ def writeElementsAndThreats(xml_root, threat_worksheet, stencil_worksheet, headd
                     include = replaceSingleQuote(xml_root, include)
                     # then replace GUIDs that are prop names ex: "flow.<guid>"
                     include = guid2name(xml_root, include)
+                    # Parse the logic
+                    parsed_include = extract_logic_part(include)
+
             for exclude_logic in gen_filters.findall('Exclude'):
                 exclude = exclude_logic.text
                 if exclude:
                     exclude = replaceSingleQuote(xml_root, exclude_logic.text)
                     exclude = guid2name(xml_root, exclude)
+                    # Parse the logic
+                    parsed_exclude = extract_logic_part(exclude)
+           # Write parsed logic to 'Include' and 'Exclude' columns
+            threat_worksheet.write(_row, 4, parsed_include)  # Include column
+            threat_worksheet.write(_row, 6, parsed_exclude)  # Exclude column
         # get elements
         for subelem in types.findall('Category'):
             category = str(cat2str(subelem.text, find_cats(xml_root)))
@@ -272,8 +280,8 @@ def writeElementsAndThreats(xml_root, threat_worksheet, stencil_worksheet, headd
             title = subelem.text
         for subelem in types.findall('Description'):
             desc = subelem.text
-        # WRITE EACH ROW ITERATIVELY 
-        my_list = [threat_id, title, category, desc, include, exclude]
+        # Update the data-writing loop to account for new columns
+        my_list = [threat_id, title, category, desc, parsed_include, include, parsed_exclude, exclude]
 
         for col_num, data in enumerate(my_list):
             threat_worksheet.write(_row, col_num, data)

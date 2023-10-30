@@ -1,6 +1,6 @@
 [project]
 name = "TMTool"
-version = "0.0.49"
+version = "0.0.50"
 description = "python tool for Microsoft Threat modeling tool"
 readme = "README.md"
 requires-python = ">=3.7"

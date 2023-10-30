@@ -18,26 +18,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: python -m pip install --upgrade pip build
+      - name: Install required packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install toml
 
-      - name: Run version bump script
-        run: python .github/bump_version_setupcfg.py
+      - name: Automated Version Bump
+        run: python .github/bump_version.py
 
       - name: Commit and push version bump
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add setup.cfg
-          git commit -m "Automated version bump" || echo "No changes to commit"
+          git add setup.cfg pyproject.toml
+          git commit -m "Automated Version Bump" -a
           git push
 
-      - name: Build distribution 📦
-        run: python -m build
+      - name: Install pypa/build
+        run: |
+          python -m pip install build --user
 
       - name: Publish distribution 📦 to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@master
         with:
-          user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
+
 

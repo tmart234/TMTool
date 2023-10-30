@@ -1,9 +1,8 @@
 [project]
 name = "TMTool"
-version = "0.0.45"
+version = "0.0.46"
 description = "python tool for Microsoft Threat modeling tool"
 readme = "README.md"
-project.requires-python = ">=3.7"
 [[project.maintainers]]
 name = "Tyler Martin"
 email = "tmart234@gmail.com"
@@ -15,6 +14,9 @@ email = "tmart234@gmail.com"
 [build-system]
 requires = [ "setuptools", "wheel",]
 build-backend = "setuptools.build_meta"
+
+[project.project]
+requires-python = ">=3.7"
 
 [project.urls]
 homepage = "https://github.com/tmart234/TMT"
